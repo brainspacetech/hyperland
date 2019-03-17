@@ -19,7 +19,15 @@ public class SelectorController {
 	@GetMapping(value = "/get/{type}")
 	public ResponseEntity<RestResponse> getSelector(@PathVariable("type") String type)
 	{
-		RestResponse response = selectorService.getSelector(type);
+		RestResponse response = selectorService.getSelector(type,null);
 		return  new ResponseEntity<RestResponse>(response, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/get/{type}/{value}")
+	public ResponseEntity<RestResponse> getSelector(@PathVariable("type") String type,String value)
+	{
+		RestResponse response = selectorService.getSelector(type,value);
+		return  new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+	}
+
 }

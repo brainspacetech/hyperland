@@ -17,12 +17,12 @@ public class SelectorService implements ISelectorService{
 	private ISelectorDAO selectorDao;
 	
 	@Override
-	public RestResponse getSelector(String type) {
+	public RestResponse getSelector(String type,String value) {
 		String statusCode = "";
 		String statusMessage = "";
 		List<SelectorBO> selectorList = null;
 		try {
-			selectorList = selectorDao.getSelectorValue(type);
+			selectorList = selectorDao.getSelectorValue(type,value);
 			statusCode = "1";
 			if(selectorList.size() == 0)
 				statusCode = "2";

@@ -6,5 +6,5 @@ import com.brainspace.hyperland.bo.SelectorBO;
 
 public interface ISelectorDAO {
 
-	List<SelectorBO> getSelectorValue(String type);
+	List<SelectorBO> getSelectorValue(String type,String value);
 }

@@ -8,8 +8,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.brainspace.hyperland.bo.Firm;
-import com.brainspace.hyperland.bo.FirmRowMapper;
 import com.brainspace.hyperland.bo.SelectorBO;
 import com.brainspace.hyperland.bo.SelectorRowMapper;
 
@@ -23,9 +21,9 @@ public class SelectorDAO implements ISelectorDAO {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 	@Override
-	public List<SelectorBO> getSelectorValue(String type) {
+	public List<SelectorBO> getSelectorValue(String type,String value) {
 		try {
-			String sql = getSQL(type);
+			String sql = getSQL(type,value);
 			RowMapper<SelectorBO> rowMapper = new SelectorRowMapper();
 			System.out.println("this.jdbcTemplate -- "+this.jdbcTemplate);
 			return this.jdbcTemplate.query(sql, rowMapper);
@@ -35,7 +33,7 @@ public class SelectorDAO implements ISelectorDAO {
 			throw e;
 		}
 	}
-	private String getSQL(String type)
+	private String getSQL(String type,String value)
 	{
 		String sql = "";
 		switch(type)
