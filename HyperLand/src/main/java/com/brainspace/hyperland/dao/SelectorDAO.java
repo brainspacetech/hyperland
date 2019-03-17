@@ -26,7 +26,10 @@ public class SelectorDAO implements ISelectorDAO {
 			String sql = getSQL(type,value);
 			RowMapper<SelectorBO> rowMapper = new SelectorRowMapper();
 			System.out.println("this.jdbcTemplate -- "+this.jdbcTemplate);
-			return this.jdbcTemplate.query(sql, rowMapper);
+			if(sql.contains("?"))
+				return this.jdbcTemplate.query(sql, rowMapper,value);
+			else
+				return this.jdbcTemplate.query(sql, rowMapper);
 		}
 		catch(Exception e)
 		{
@@ -38,8 +41,26 @@ public class SelectorDAO implements ISelectorDAO {
 		String sql = "";
 		switch(type)
 		{
-			case "Firm": 
+			case "firms":
 						sql = "SELECT Id as Code, FirmName as Value FROM FirmMaster";
+						break;
+			case "projects":
+						sql = "SELECT Id as Code, ProjectName as Value FROM ProjectMaster where FirmId = ?";
+						break;
+			case "cities":
+						sql = "SELECT Id as Code, City as Value FROM CityMaster";
+						break;
+			case "locations":
+						sql = "SELECT Id as Code, Location as Value FROM LocationMaster where CityId = ?";
+						break;
+			case "propertyTypes":
+						sql = "SELECT Id as Code, PropertyType as Value FROM PropertyTypeMaster";
+						break;
+			case "blocks":
+						sql = "SELECT Id as Code, Block as Value FROM BlockMaster where PropertyId = ?";
+						break;
+			case "plots":
+						sql = "SELECT Id as Code, Block as Value FROM BlockMaster where BlockId = ?";
 						break;
 			default: sql = "";
 					

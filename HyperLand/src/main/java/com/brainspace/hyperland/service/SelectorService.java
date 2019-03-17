@@ -30,6 +30,7 @@ public class SelectorService implements ISelectorService{
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			statusCode = "0";
 			statusMessage = "Failed";
 		}
