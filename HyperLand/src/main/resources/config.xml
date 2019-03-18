@@ -1,0 +1,37 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<Configuration>
+    <Service id = "firm">
+        <SelectQuery>select Id as id, FirmName as firmName from FirmMaster</SelectQuery>
+        <SelectQueryById>select Id as id, FirmName as firmName from FirmMaster where id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO FIRMMASSTER (FIRMNAME) VALUES (?)</InsertQuery>
+        <UpdateQuery></UpdateQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType = '4'/>
+            <Property name="firmName" columnName="FirmName" dataType = '12'/>
+        </PropertyMapping>
+    </Service>
+    <Service id = "city">
+        <SelectQuery>select Id as id, City as city from CityMaster</SelectQuery>
+        <SelectQueryById>select Id as id, City as city from CityMaster where id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO CityMaster (City) VALUES (?)</InsertQuery>
+        <UpdateQuery></UpdateQuery>
+        <DeleteQuery></DeleteQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType = '4'/>
+            <Property name="city" columnName="City" dataType = '12'/>
+        </PropertyMapping>
+    </Service>
+</Configuration>
+
+<!--
+dataTypes
+
+VARCHAR: 12
+TINYINT: -6
+INTEGER: 4
+DECIMAL: 3
+DATE: 91
+BLOB: 2004
+BOOLEAN: 16
+CLOB: 2005
+-->
