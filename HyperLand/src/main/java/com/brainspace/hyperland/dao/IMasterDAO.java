@@ -9,6 +9,6 @@ public interface IMasterDAO {
 	List getAllData(String query)  throws Exception ;
     Map<String,Object> getDataById(String query, int firmId);
     void addData(String query,Object params[],int argTypes[]);
-    //void updateFirm(Firm firm);
+    void updateData(String query,Object params[],int argTypes[]);
     //void deleteFirm(Firm firmId);
 }

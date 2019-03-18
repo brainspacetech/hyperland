@@ -43,5 +43,9 @@ public class MasterController {
         return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
     }
 
-
+    @PostMapping(value = "/update/{type}/{id}")
+    public ResponseEntity<RestResponse> update(@PathVariable(name = "type") String type,@PathVariable("id") int id,@RequestBody Object request) {
+        RestResponse response = masterService.updateData(type,id, request);
+        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+    }
 }

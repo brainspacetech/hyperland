@@ -4,7 +4,7 @@
         <SelectQuery>select Id as id, FirmName as firmName from FirmMaster</SelectQuery>
         <SelectQueryById>select Id as id, FirmName as firmName from FirmMaster where id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO FIRMMASSTER (FIRMNAME) VALUES (?)</InsertQuery>
-        <UpdateQuery></UpdateQuery>
+        <UpdateQuery>UPDATE FirmMaster set FirmName = ? WHERE Id = ?</UpdateQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType = '4'/>
             <Property name="firmName" columnName="FirmName" dataType = '12'/>
@@ -14,7 +14,7 @@
         <SelectQuery>select Id as id, City as city from CityMaster</SelectQuery>
         <SelectQueryById>select Id as id, City as city from CityMaster where id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO CityMaster (City) VALUES (?)</InsertQuery>
-        <UpdateQuery></UpdateQuery>
+        <UpdateQuery>UPDATE CityMaster SET City = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery></DeleteQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType = '4'/>
