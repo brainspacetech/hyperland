@@ -21,6 +21,51 @@
             <Property name="city" columnName="City" dataType = '12'/>
         </PropertyMapping>
     </Service>
+    <Service id = "project">
+        <SelectQuery>SELECT FirmId as firmId, FirmName as firmName,ProjectName as projectName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,CityId as cityId, CityName as cityName,LocationId as locationId,Location as location,Address as address,BusinessValue as businessValue FROM ProjectMaster</SelectQuery>
+        <SelectQueryById>SELECT FirmId as firmId, FirmName as firmName,ProjectName as projectName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,CityId as cityId, CityName as cityName,LocationId as locationId,Location as location,Address as address,BusinessValue as businessValue FROM ProjectMaster WHERE Id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO ProjectMaster (FirmId,FirmName,ProjectName,PropertyTypeId,PropertyType,CityId,CityName,LocationId,Location,Address,BusinessValue)  VALUES (?,?,?,?,?,?,?,?,?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE ProjectMaster SET FirmId = ? ,FirmName = ? ,ProjectName = ? ,PropertyTypeId = ? ,PropertyType = ? ,CityId = ? ,CityName = ? ,LocationId = ? ,Location= ? ,Address= ? ,BusinessValue= ? ) WHERE Id = ?</UpdateQuery>
+        <DeleteQuery></DeleteQuery>
+        <PropertyMapping>
+            <Property name="id"                 columnName="Id"                   dataType = '4'/>
+            <Property name = "FirmId"           columnName = "firmId"   		   dataType = "4"   />
+            <Property name = "FirmName"         columnName = "firmName"           dataType = "12"  />
+            <Property name = "ProjectName"      columnName = "projectName"        dataType = "12"  />
+            <Property name = "PropertyTypeId"   columnName = "propertyTypeId"     dataType = "4"   />
+            <Property name = "PropertyType"     columnName = "propertyType"       dataType = "12"  />
+            <Property name = "CityId"           columnName = "cityId"             dataType = "4"   />
+            <Property name = "CityName"         columnName = "cityName"           dataType = "12"  />
+            <Property name = "LocationId"       columnName = "locationId"         dataType = "4"   />
+            <Property name = "Location"         columnName = "location"           dataType = "12"  />
+            <Property name = "Address"          columnName = "address"            dataType = "12"  />
+            <Property name = "BusinessValue"    columnName = "businessValue"      dataType = "3"   />
+        </PropertyMapping>
+    </Service>
+    <Service id = "location">
+        <SelectQuery>select Id as id, CityId as cityId, CityName as cityName, Location as location from LocationMaster</SelectQuery>
+        <SelectQueryById>select Id as id, CityId as cityId, CityName as cityName, Location as location from LocationMaster where Id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO LocationMaster (CityId,CityName,Location) VALUES (?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE LocationMaster SET CityId = ?, CityName = ?, Location = ? WHERE Id = ?</UpdateQuery>
+        <DeleteQuery></DeleteQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType = '4'/>
+            <Property name="cityId" columnName="CityId" dataType = '4'/>
+            <Property name="cityName" columnName="CityName" dataType = '12'/>
+            <Property name="location" columnName="Location" dataType = '12'/>
+        </PropertyMapping>
+    </Service>
+    <Service id = "propertyType">
+        <SelectQuery>select Id as id, PropertyType as propertyType from PropertyTypeMaster</SelectQuery>
+        <SelectQueryById>select Id as id, PropertyType as propertyType from PropertyTypeMaster where id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO PropertyTypeMaster (propertyType) VALUES (?)</InsertQuery>
+        <UpdateQuery>UPDATE PropertyTypeMaster SET propertyType = ? WHERE Id = ?</UpdateQuery>
+        <DeleteQuery></DeleteQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType = '4'/>
+            <Property name="propertyType" columnName="PropertyType" dataType = '12'/>
+        </PropertyMapping>
+    </Service>
 </Configuration>
 
 <!--
