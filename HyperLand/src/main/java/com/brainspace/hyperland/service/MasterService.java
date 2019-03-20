@@ -23,7 +23,7 @@ public class MasterService implements IMasterService {
                 Service serviceObj = configBO.getServiceObj()[i];
                 String statusCode = "";
                 String statusMessage = "";
-                List<Firm> list = null;
+                List list = null;
                 try {
                     list = masterDAO.getAllData(serviceObj.getSelectQuery());
                     statusCode = "1";

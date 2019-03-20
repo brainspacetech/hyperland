@@ -28,18 +28,18 @@
         <UpdateQuery>UPDATE ProjectMaster SET FirmId = ? ,FirmName = ? ,ProjectName = ? ,PropertyTypeId = ? ,PropertyType = ? ,CityId = ? ,CityName = ? ,LocationId = ? ,Location= ? ,Address= ? ,BusinessValue= ? ) WHERE Id = ?</UpdateQuery>
         <DeleteQuery></DeleteQuery>
         <PropertyMapping>
-            <Property name="id"                 columnName="Id"                   dataType = '4'/>
-            <Property name = "FirmId"           columnName = "firmId"   		   dataType = "4"   />
-            <Property name = "FirmName"         columnName = "firmName"           dataType = "12"  />
-            <Property name = "ProjectName"      columnName = "projectName"        dataType = "12"  />
-            <Property name = "PropertyTypeId"   columnName = "propertyTypeId"     dataType = "4"   />
-            <Property name = "PropertyType"     columnName = "propertyType"       dataType = "12"  />
-            <Property name = "CityId"           columnName = "cityId"             dataType = "4"   />
-            <Property name = "CityName"         columnName = "cityName"           dataType = "12"  />
-            <Property name = "LocationId"       columnName = "locationId"         dataType = "4"   />
-            <Property name = "Location"         columnName = "location"           dataType = "12"  />
-            <Property name = "Address"          columnName = "address"            dataType = "12"  />
-            <Property name = "BusinessValue"    columnName = "businessValue"      dataType = "3"   />
+            <Property name = "id"             columnName ="Id"                   dataType = '4'/>
+            <Property name = "firmId"   	  columnName = "FirmId"              dataType = "4"   />
+            <Property name = "firmName"       columnName = "FirmName"            dataType = "12"  />
+            <Property name = "projectName"    columnName = "ProjectName"         dataType = "12"  />
+            <Property name = "propertyTypeId" columnName = "PropertyTypeId"      dataType = "4"   />
+            <Property name = "propertyType"   columnName = "PropertyType"        dataType = "12"  />
+            <Property name = "cityId"         columnName = "CityId"              dataType = "4"   />
+            <Property name = "cityName"       columnName = "CityName"            dataType = "12"  />
+            <Property name = "locationId"     columnName = "LocationId"          dataType = "4"   />
+            <Property name = "location"       columnName = "Location"            dataType = "12"  />
+            <Property name = "address"        columnName = "Address"             dataType = "12"  />
+            <Property name = "businessValue"  columnName = "BusinessValue"       dataType = "3"   />
         </PropertyMapping>
     </Service>
     <Service id = "location">
