@@ -23,7 +23,6 @@ public class ConfigReader {
                 JAXBContext jaxbcontext = JAXBContext.newInstance(ConfigBO.class);
                 Unmarshaller unmarshaller = jaxbcontext.createUnmarshaller();
                 configBO = (ConfigBO) unmarshaller.unmarshal(xmlFile);
-
                 System.out.println("configBO " + configBO.getServiceObj());
 
             } catch (Exception e) {

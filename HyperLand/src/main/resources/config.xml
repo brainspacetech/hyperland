@@ -3,7 +3,7 @@
     <Service id = "firm">
         <SelectQuery>select Id as id, FirmName as firmName from FirmMaster</SelectQuery>
         <SelectQueryById>select Id as id, FirmName as firmName from FirmMaster where id = ?</SelectQueryById>
-        <InsertQuery>INSERT INTO FIRMMASSTER (FIRMNAME) VALUES (?)</InsertQuery>
+        <InsertQuery>INSERT INTO FirmMaster (FirmName) VALUES (?)</InsertQuery>
         <UpdateQuery>UPDATE FirmMaster set FirmName = ? WHERE Id = ?</UpdateQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType = '4'/>
@@ -34,6 +34,7 @@
             <Property name = "projectName"    columnName = "ProjectName"         dataType = "12"  />
             <Property name = "propertyTypeId" columnName = "PropertyTypeId"      dataType = "4"   />
             <Property name = "propertyType"   columnName = "PropertyType"        dataType = "12"  />
+            <Property name = "cityId"         columnName = "CityId"              dataType = "4"   />
             <Property name = "cityId"         columnName = "CityId"              dataType = "4"   />
             <Property name = "cityName"       columnName = "CityName"            dataType = "12"  />
             <Property name = "locationId"     columnName = "LocationId"          dataType = "4"   />
