@@ -60,8 +60,8 @@
     <Service id = "propertyType">
         <SelectQuery>select Id as id, PropertyType as propertyType from PropertyTypeMaster</SelectQuery>
         <SelectQueryById>select Id as id, PropertyType as propertyType from PropertyTypeMaster where id = ?</SelectQueryById>
-        <InsertQuery>INSERT INTO PropertyTypeMaster (propertyType) VALUES (?)</InsertQuery>
-        <UpdateQuery>UPDATE PropertyTypeMaster SET propertyType = ? WHERE Id = ?</UpdateQuery>
+        <InsertQuery>INSERT INTO PropertyTypeMaster (PropertyType) VALUES (?)</InsertQuery>
+        <UpdateQuery>UPDATE PropertyTypeMaster SET PropertyType = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM PropertyTypeMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType = '4'/>
