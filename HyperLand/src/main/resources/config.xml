@@ -4,7 +4,7 @@
         <SelectQuery>select Id as id, FirmName as firmName from FirmMaster</SelectQuery>
         <SelectQueryById>select Id as id, FirmName as firmName from FirmMaster where id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO FirmMaster (FirmName) VALUES (?)</InsertQuery>
-        <UpdateQuery>UPDATE FirmMaster set FirmName = ? WHERE Id = ?</UpdateQuery>
+        <UpdateQuery>UPDATE FirmMaster SET FirmName = ? WHERE Id = ?</UpdateQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType = '4'/>
             <Property name="firmName" columnName="FirmName" dataType = '12'/>
