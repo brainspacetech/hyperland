@@ -10,6 +10,7 @@ public interface IMasterService {
 	RestResponse getDataById(String type , int id);
 	RestResponse addData(String type, Object requestObject);
 	RestResponse updateData(String type,int id, Object data);
+	RestResponse deleteData(String type,int id);
 	/*RestResponse updateFirm(Firm firm);
 	RestResponse deleteFirm(int firmId);*/
 }

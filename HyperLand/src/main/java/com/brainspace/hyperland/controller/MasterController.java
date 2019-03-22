@@ -48,4 +48,9 @@ public class MasterController {
         RestResponse response = masterService.updateData(type,id, request);
         return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
     }
+    @PostMapping(value = "/delete/{type}/{id}")
+    public ResponseEntity<RestResponse> delete(@PathVariable(name = "type") String type,@PathVariable("id") int id) {
+        RestResponse response = masterService.deleteData(type,id);
+        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+    }
 }

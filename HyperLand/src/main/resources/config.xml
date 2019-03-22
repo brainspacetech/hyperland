@@ -5,6 +5,7 @@
         <SelectQueryById>select Id as id, FirmName as firmName from FirmMaster where id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO FirmMaster (FirmName) VALUES (?)</InsertQuery>
         <UpdateQuery>UPDATE FirmMaster SET FirmName = ? WHERE Id = ?</UpdateQuery>
+        <DeleteQuery>DELETE FROM FirmMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType = '4'/>
             <Property name="firmName" columnName="FirmName" dataType = '12'/>
@@ -15,7 +16,7 @@
         <SelectQueryById>select Id as id, City as city from CityMaster where id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO CityMaster (City) VALUES (?)</InsertQuery>
         <UpdateQuery>UPDATE CityMaster SET City = ? WHERE Id = ?</UpdateQuery>
-        <DeleteQuery></DeleteQuery>
+        <DeleteQuery>DELETE FROM CityMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType = '4'/>
             <Property name="city" columnName="City" dataType = '12'/>
@@ -26,7 +27,7 @@
         <SelectQueryById>SELECT FirmId as firmId, FirmName as firmName,ProjectName as projectName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,CityId as cityId, CityName as cityName,LocationId as locationId,Location as location,Address as address,BusinessValue as businessValue FROM ProjectMaster WHERE Id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO ProjectMaster (FirmId,FirmName,ProjectName,PropertyTypeId,PropertyType,CityId,CityName,LocationId,Location,Address,BusinessValue)  VALUES (?,?,?,?,?,?,?,?,?,?,?)</InsertQuery>
         <UpdateQuery>UPDATE ProjectMaster SET FirmId = ? ,FirmName = ? ,ProjectName = ? ,PropertyTypeId = ? ,PropertyType = ? ,CityId = ? ,CityName = ? ,LocationId = ? ,Location= ? ,Address= ? ,BusinessValue= ? ) WHERE Id = ?</UpdateQuery>
-        <DeleteQuery></DeleteQuery>
+        <DeleteQuery>DELETE FROM ProjectMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name = "id"             columnName ="Id"                   dataType = '4'/>
             <Property name = "firmId"   	  columnName = "FirmId"              dataType = "4"   />
@@ -48,7 +49,7 @@
         <SelectQueryById>select Id as id, CityId as cityId, CityName as cityName, Location as location from LocationMaster where Id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO LocationMaster (CityId,CityName,Location) VALUES (?,?,?)</InsertQuery>
         <UpdateQuery>UPDATE LocationMaster SET CityId = ?, CityName = ?, Location = ? WHERE Id = ?</UpdateQuery>
-        <DeleteQuery></DeleteQuery>
+        <DeleteQuery>DELETE FROM LocationMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType = '4'/>
             <Property name="cityId" columnName="CityId" dataType = '4'/>
@@ -61,7 +62,7 @@
         <SelectQueryById>select Id as id, PropertyType as propertyType from PropertyTypeMaster where id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO PropertyTypeMaster (propertyType) VALUES (?)</InsertQuery>
         <UpdateQuery>UPDATE PropertyTypeMaster SET propertyType = ? WHERE Id = ?</UpdateQuery>
-        <DeleteQuery></DeleteQuery>
+        <DeleteQuery>DELETE FROM PropertyTypeMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType = '4'/>
             <Property name="propertyType" columnName="PropertyType" dataType = '12'/>

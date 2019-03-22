@@ -10,5 +10,5 @@ public interface IMasterDAO {
     Map<String,Object> getDataById(String query, int firmId);
     void addData(String query,Object params[],int argTypes[]);
     void updateData(String query,Object params[],int argTypes[]);
-    //void deleteFirm(Firm firmId);
+    void deleteData(String sql,int id);
 }

@@ -152,4 +152,28 @@ public class MasterService implements IMasterService {
         }
         return response;
     }
+
+    public RestResponse deleteData(String type,int id )
+    {
+        String statusCode = "";
+        String statusMessage = "";
+        RestResponse response = null;
+        for (int i = 0; i < configBO.getServiceObj().length; i++) {
+            if (configBO.getServiceObj()[i].getId().equalsIgnoreCase(type)) {
+                try {
+                    String sql = configBO.getServiceObj()[i].getDeleteQuery();
+                    masterDAO.deleteData(sql, id);
+                    statusCode = "1";
+                    statusMessage = "Success";
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    statusCode = "0";
+                    statusMessage = "Failed";
+                }
+                response = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
+                break;
+            }
+        }
+        return response;
+    }
 }

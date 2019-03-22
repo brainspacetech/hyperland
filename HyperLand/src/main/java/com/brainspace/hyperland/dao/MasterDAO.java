@@ -53,10 +53,9 @@ public class MasterDAO implements IMasterDAO {
 	public void updateData(String query,Object params[],int argTypes[]) {
 		jdbcTemplate.update(query, params, argTypes);
 	}
-/*
-	@Override
-	public void deleteData(Firm firmId) {
-		// TODO Auto-generated method stub
 
-	}*/
+	@Override
+	public void deleteData(String query , int id) {
+        jdbcTemplate.update(query, id);
+	}
 }
