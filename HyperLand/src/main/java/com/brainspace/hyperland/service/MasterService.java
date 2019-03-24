@@ -31,6 +31,7 @@ public class MasterService implements IMasterService {
                         statusCode = "2";
                     statusMessage = "Success";
                 } catch (Exception e) {
+                    e.printStackTrace();
                     statusCode = "0";
                     statusMessage = "Failed";
                 }
@@ -88,7 +89,7 @@ public class MasterService implements IMasterService {
                     Object arguments[] = new Object[paramsArr.length];
                     int argumentTypes[] = new int[paramsArr.length];
                     for (int j = 0; j < paramsArr.length; j++) {
-                        List jsonColTypeList = jsonColumnMap.get(paramsArr[j]);
+                        List jsonColTypeList = jsonColumnMap.get(paramsArr[j].trim());
                         Object colValue = propertyMap.get(jsonColTypeList.get(0));
                         arguments[j] = colValue;
                         argumentTypes[j] = Integer.parseInt((String) jsonColTypeList.get(1));

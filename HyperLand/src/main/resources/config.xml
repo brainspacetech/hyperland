@@ -68,6 +68,21 @@
             <Property name="propertyType" columnName="PropertyType" dataType = '12'/>
         </PropertyMapping>
     </Service>
+
+    <Service id = "bank">
+        <SelectQuery>select Id as id, BankName as bankName, Branch as branch,AccountNumber as accountNumber,IFSCCode as ifscCode from BankMaster</SelectQuery>
+        <SelectQueryById>select Id as id, BankName as bankName, Branch as branch ,AccountNumber as accountNumber,IFSCCode as ifscCode from BankMaster where id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO BankMaster (BankName, Branch,AccountNumber,IFSCCode) VALUES (?,?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE BankMaster SET BankName = ?,Branch = ?, AccountNumber = ?, IFSCCode = ? WHERE Id = ?</UpdateQuery>
+        <DeleteQuery>DELETE FROM BankMaster WHERE Id = ?</DeleteQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType = '4'/>
+            <Property name="bankName" columnName="BankName" dataType = '12'/>
+            <Property name="branch" columnName="Branch" dataType = '12'/>
+            <Property name="accountNumber" columnName="AccountNumber" dataType = '12'/>
+            <Property name="ifscCode" columnName="IFSCCode" dataType = '12'/>
+        </PropertyMapping>
+    </Service>
 </Configuration>
 
 <!--
