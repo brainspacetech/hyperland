@@ -19,4 +19,15 @@ public class ConfigBO {
         this.serviceObj = serviceObj;
     }
 
+    private Transactions transactions;
+
+    @XmlElement(name = "Transactions")
+    public Transactions getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(Transactions transactions) {
+        this.transactions = transactions;
+    }
+
 }
