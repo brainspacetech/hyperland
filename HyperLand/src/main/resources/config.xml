@@ -107,16 +107,19 @@
         </PropertyMapping>
     </Service>
     <Service id = "farmer">
-        <SelectQuery>select Id as id, FarmerName as farmerName,AdhaarNo as adhaarNo, PanNumber as panNumber from FarmerMaster</SelectQuery>
-        <SelectQueryById>select Id as id, FarmerName as farmerName,AdhaarNo as adhaarNo, PanNumber as panNumber  from FarmerMaster where id = ?</SelectQueryById>
-        <InsertQuery>INSERT INTO FarmerMaster (FarmerName,AdhaarNo,PanNumber) VALUES (?,?,?)</InsertQuery>
-        <UpdateQuery>UPDATE FarmerMaster SET FarmerName = ?, AdhaarNo = ?,PanNumber = ?  WHERE Id = ?</UpdateQuery>
+        <SelectQuery>select Id as id, FarmerName as farmerName,AdhaarNo as adhaarNo, PanNumber as panNumber,Bank as bank, Branch as branch, IFSCCode as ifscCode from FarmerMaster</SelectQuery>
+        <SelectQueryById>select Id as id, FarmerName as farmerName,AdhaarNo as adhaarNo, PanNumber as panNumber,Bank as bank, Branch as branch, IFSCCode as ifscCode  from FarmerMaster where id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO FarmerMaster (FarmerName,AdhaarNo,PanNumber,Bank, Branch, IFSCCode) VALUES (?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE FarmerMaster SET FarmerName = ?, AdhaarNo = ?,PanNumber = ?,Bank = ?, Branch = ?, IFSCCode =?  WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM FarmerMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType = '4'/>
             <Property name="farmerName" columnName="FarmerName" dataType = '12'/>
             <Property name="adhaarNo" columnName="AdhaarNo" dataType = '12'/>
             <Property name="panNumber" columnName="PanNumber" dataType = '12'/>
+            <Property name="bank" columnName="Bank" dataType = '12'/>
+            <Property name="branch" columnName="Branch" dataType = '12'/>
+            <Property name="ifscCode" columnName="IFSCCode" dataType = '12'/>
             <Property name="landId" columnName="LandId" dataType = '4'/>
         </PropertyMapping>
     </Service>
