@@ -45,14 +45,22 @@ public class MasterDAO implements IMasterDAO {
     }
 
     @Override
-    public void addData(String query, Object params[], int argTypes[]) {
+    public Object addData(String query, Object params[], int argTypes[]) {
         jdbcTemplate.update(query, params, argTypes);
+        String selectQuery = "SELECT LAST_INSERT_ID() as Id";
+        Map<String,Object> idMap = jdbcTemplate.queryForMap(selectQuery);
+        return idMap.get("Id");
     }
 
 	@Override
 	public void updateData(String query,Object params[],int argTypes[]) {
 		jdbcTemplate.update(query, params, argTypes);
 	}
+
+    @Override
+    public void updateData(String query) {
+        jdbcTemplate.update(query);
+    }
 
 	@Override
 	public void deleteData(String query , int id) {

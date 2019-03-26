@@ -12,6 +12,7 @@ public class Service {
     private String ClassName;
     private PropertyMapping PropertyMapping;
     private String id;
+    private String dependentMaster;
 
     @XmlElement(name="SelectQuery")
     public String getSelectQuery() {
@@ -80,5 +81,14 @@ public class Service {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @XmlElement(name="DependentMaster")
+    public String getDependentMaster() {
+        return dependentMaster;
+    }
+
+    public void setDependentMaster(String dependentMaster) {
+        this.dependentMaster = dependentMaster;
     }
 }

@@ -41,25 +41,25 @@ public class SelectorDAO implements ISelectorDAO {
 		String sql = "";
 		switch(type)
 		{
-			case "firms":
+			case "firm":
 						sql = "SELECT Id as Code, FirmName as Value FROM FirmMaster";
 						break;
-			case "projects":
+			case "project":
 						sql = "SELECT Id as Code, ProjectName as Value FROM ProjectMaster where FirmId = ?";
 						break;
-			case "cities":
+			case "citie":
 						sql = "SELECT Id as Code, City as Value FROM CityMaster";
 						break;
-			case "locations":
+			case "location":
 						sql = "SELECT Id as Code, Location as Value FROM LocationMaster where CityId = ?";
 						break;
-			case "propertyTypes":
+			case "propertyType":
 						sql = "SELECT Id as Code, PropertyType as Value FROM PropertyTypeMaster";
 						break;
-			case "blocks":
+			case "block":
 						sql = "SELECT Id as Code, Block as Value FROM BlockMaster where PropertyId = ?";
 						break;
-			case "plots":
+			case "plot":
 						sql = "SELECT Id as Code, Block as Value FROM BlockMaster where BlockId = ?";
 						break;
 			default: sql = "";

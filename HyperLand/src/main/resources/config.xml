@@ -94,6 +94,64 @@
             <Property name="ifscCode" columnName="IFSCCode" dataType = '12'/>
         </PropertyMapping>
     </Service>
+    <Service id = "land">
+        <SelectQuery>select Id as id, KhasraNumber as khasraNumber,LandAmount as landValue, PaidAmount as paidAmount from LandMaster</SelectQuery>
+        <SelectQueryById>select Id as id, KhasraNumber as khasraNumber,LandAmount as landValue, PaidAmount as paidAmount  from LandMaster where id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO LandMaster (KhasraNumber,LandAmount) VALUES (?,?)</InsertQuery>
+        <UpdateQuery>UPDATE LandMaster SET KhasraNumber = ?, LandAmount = ? WHERE Id = ?</UpdateQuery>
+        <DeleteQuery>DELETE FROM LandMaster WHERE Id = ?</DeleteQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType = '4'/>
+            <Property name="khasraNumber" columnName="KhasraNumber" dataType = '12'/>
+            <Property name="landAmount" columnName="LandAmount" dataType = '3'/>
+        </PropertyMapping>
+    </Service>
+    <Service id = "farmer">
+        <SelectQuery>select Id as id, FarmerName as farmerName,AdhaarNo as adhaarNo, PanNumber as panNumber from FarmerMaster</SelectQuery>
+        <SelectQueryById>select Id as id, FarmerName as farmerName,AdhaarNo as adhaarNo, PanNumber as panNumber  from FarmerMaster where id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO FarmerMaster (FarmerName,AdhaarNo,PanNumber) VALUES (?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE FarmerMaster SET FarmerName = ?, AdhaarNo = ?,PanNumber = ?  WHERE Id = ?</UpdateQuery>
+        <DeleteQuery>DELETE FROM FarmerMaster WHERE Id = ?</DeleteQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType = '4'/>
+            <Property name="farmerName" columnName="FarmerName" dataType = '12'/>
+            <Property name="adhaarNo" columnName="AdhaarNo" dataType = '12'/>
+            <Property name="panNumber" columnName="PanNumber" dataType = '12'/>
+            <Property name="landId" columnName="LandId" dataType = '4'/>
+        </PropertyMapping>
+    </Service>
+    <Service id = "agent">
+        <SelectQuery>select AgentId		as	agentId,AgentName 		as	agentName ,PanNumber  		as	panNumber  ,AdhaarNo  		as	adhaarNo  ,Address  		as	address  ,City  		as	city  ,State  		as	state  ,PinCode 		as	pinCode ,emailId 		as	emailId ,PhoneNo 		as	phoneNo ,DateOfJoining		as	dateOfJoining,DateOfBirth		as	dateOfBirth,Occupation 		as	occupation ,sponsorId 		as	sponsorId ,sponsorName  		as	sponsorName  ,Bank 		as	bank ,Branch 		as	branch ,AccountNumber 		as	accountNumber ,IFSCCode 		as	ifscCode ,Status  		as	status  ,LoginId 		as	loginId ,Designation		as	designation, from AgentMaster</SelectQuery>
+        <SelectQueryById>select AgentId		as	agentId,AgentName 		as	agentName ,PanNumber  		as	panNumber  ,AdhaarNo  		as	adhaarNo  ,Address  		as	address  ,City  		as	city  ,State  		as	state  ,PinCode 		as	pinCode ,emailId 		as	emailId ,PhoneNo 		as	phoneNo ,DateOfJoining		as	dateOfJoining,DateOfBirth		as	dateOfBirth,Occupation 		as	occupation ,sponsorId 		as	sponsorId ,sponsorName  		as	sponsorName  ,Bank 		as	bank ,Branch 		as	branch ,AccountNumber 		as	accountNumber ,IFSCCode 		as	ifscCode ,Status  		as	status  ,LoginId 		as	loginId ,Designation		as	designation, from AgentMaster where AgentId = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO AgentMaster (AgentName ,PanNumber  ,AdhaarNo  ,Address  ,City  ,State  ,PinCode ,emailId ,PhoneNo ,DateOfJoining Date,DateOfBirth Date,Occupation ,sponsorId ,sponsorName  ,Bank ,Branch ,AccountNumber ,IFSCCode ,Status  ,LoginId ,Designation) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE AgentMaster SET AgentName  = ?,PanNumber   = ?,AdhaarNo   = ?,Address   = ?,City   = ?,State   = ?,PinCode  = ?,emailId  = ?,PhoneNo  = ?,DateOfJoining Date = ?,DateOfBirth Date = ?,Occupation  = ?,sponsorId  = ?,sponsorName   = ?,Bank  = ?,Branch  = ?,AccountNumber  = ?,IFSCCode  = ?,Status   = ?,LoginId  = ?,Designation = ? WHERE AgentId = ?</UpdateQuery>
+        <DeleteQuery>DELETE FROM AgentMaster WHERE Id = ?</DeleteQuery>
+        <PropertyMapping>
+            <Property name = "agentId"			columnName = "AgentId" dataType = "4" />
+            <Property name = "agentName"		columnName = "AgentName" dataType = "12" />
+            <Property name = "panNumber "		columnName = "PanNumber" dataType = "12" />
+            <Property name = "adhaarNo "		columnName = "AdhaarNo " dataType = "12" />
+            <Property name = "address "		columnName = "Address" dataType = "12" />
+            <Property name = "city"			columnName = "City" dataType = "12" />
+            <Property name = "state"		columnName = "State" dataType = "12" />
+            <Property name = "pinCode"		columnName = "PinCode" dataType = "12" />
+            <Property name = "emailId"		columnName = "emailId" dataType = "12" />
+            <Property name = "phoneNo"		columnName = "PhoneNo" dataType = "12" />
+            <Property name = "dateOfJoining"		columnName = "DateOfJoining" dataType = "91" />
+            <Property name = "dateOfBirth "		columnName = "DateOfBirth" dataType = "91" />
+            <Property name = "occupation"		columnName = "Occupation" dataType = "12" />
+            <Property name = "sponsorId"		columnName = "sponsorId" dataType = "12" />
+            <Property name = "sponsorName"		columnName = "sponsorName" dataType = "12" />
+            <Property name = "bank"		columnName = "Bank" dataType = "12" />
+            <Property name = "branch"		columnName = "Branch" dataType = "12" />
+            <Property name = "accountNumber"		columnName = "AccountNumber" dataType = "12" />
+            <Property name = "ifscCode"		columnName = "IFSCCode" dataType = "12" />
+            <Property name = "status "		columnName = "Status" dataType = "12" />
+            <Property name = "loginId"		columnName = "LoginId" dataType = "12" />
+            <Property name = "designation"		columnName = "Designation" dataType = "12" />
+
+        </PropertyMapping>
+    </Service>
     <Transactions>
         <Transaction id = "booking">
             <UpdateQuery>UPDATE BookingDetails SET CustomerId =? , FirmId = ?,FirmName = ?,ProjectId = ?,ProjectName = ?,PropertyType = ?,PropertyTypeId = ?,BlockId = ?,Block = ?,PlotNumber = ?,PaymentType = ?,TokenAmount = ?,BookingAmount = ?,DownPayment = ?,ReceiptNumber = ?,BookingDate = ?,BaseSellingPrice = ?,BaseSellingPriceTax = ?,PLCCharges = ?,PLCChargesTax = ?,TotalAmount = ?,BookedBy = ?,BookingType = ?,InstallmentStartDate = ?,AgentId = ?,AdditionalCharges = ?,AdditionalChargesTax = ?,CreatedBy = ? WHERE BookingId = ?</UpdateQuery>

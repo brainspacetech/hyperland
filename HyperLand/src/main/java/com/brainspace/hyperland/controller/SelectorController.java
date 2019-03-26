@@ -24,7 +24,7 @@ public class SelectorController {
 	}
 	
 	@GetMapping(value = "/get/{type}/{value}")
-	public ResponseEntity<RestResponse> getDependentSelector(@PathVariable("type") String type,String value)
+	public ResponseEntity<RestResponse> getDependentSelector(@PathVariable("type") String type,@PathVariable("value") String value)
 	{
 		RestResponse response = selectorService.getSelector(type,value);
 		return  new ResponseEntity<RestResponse>(response, HttpStatus.OK);

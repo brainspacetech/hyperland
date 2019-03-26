@@ -6,6 +6,8 @@ import com.brainspace.hyperland.utils.ConfigReader;
 import com.brainspace.hyperland.utils.ServiceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigInteger;
+import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
@@ -94,7 +96,18 @@ public class MasterService implements IMasterService {
                         arguments[j] = colValue;
                         argumentTypes[j] = Integer.parseInt((String) jsonColTypeList.get(1));
                     }
-                    masterDAO.addData(sql, arguments, argumentTypes);
+                    Object landId = masterDAO.addData(sql, arguments, argumentTypes);
+
+                    //specially for Land and Farmer
+                    if (type.equalsIgnoreCase("land")) {
+                        // update farmer details
+                        List farmerIdList = (List) propertyMap.get("farmerIds");
+
+                        for (int k = 0; k < farmerIdList.size(); k++) {
+                            String updateFarmer = "UPDATE FarmerMaster SET LandId = "+landId+" WHERE Id = "+farmerIdList.get(k)+"";
+                            masterDAO.updateData(updateFarmer);
+                        }
+                    }
                     statusCode = "1";
                     statusMessage = "Success";
                 } catch (Exception e) {
@@ -155,8 +168,7 @@ public class MasterService implements IMasterService {
         return response;
     }
 
-    public RestResponse deleteData(String type,int id )
-    {
+    public RestResponse deleteData(String type, int id) {
         String statusCode = "";
         String statusMessage = "";
         RestResponse response = null;

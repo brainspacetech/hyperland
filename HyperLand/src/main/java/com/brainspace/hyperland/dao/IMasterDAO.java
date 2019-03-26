@@ -8,7 +8,8 @@ import com.brainspace.hyperland.bo.Firm;
 public interface IMasterDAO {
 	List getAllData(String query)  throws Exception ;
     Map<String,Object> getDataById(String query, int firmId);
-    void addData(String query,Object params[],int argTypes[]);
+    Object addData(String query,Object params[],int argTypes[]);
     void updateData(String query,Object params[],int argTypes[]);
+    void updateData(String query);
     void deleteData(String sql,int id);
 }
