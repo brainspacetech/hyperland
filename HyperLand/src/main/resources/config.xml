@@ -126,15 +126,15 @@
     <Service id = "agent">
         <SelectQuery>select AgentId		as	agentId,AgentName 		as	agentName ,PanNumber  		as	panNumber  ,AdhaarNo  		as	adhaarNo  ,Address  		as	address  ,City  		as	city  ,State  		as	state  ,PinCode 		as	pinCode ,emailId 		as	emailId ,PhoneNo 		as	phoneNo ,DateOfJoining		as	dateOfJoining,DateOfBirth		as	dateOfBirth,Occupation 		as	occupation ,sponsorId 		as	sponsorId ,sponsorName  		as	sponsorName  ,Bank 		as	bank ,Branch 		as	branch ,AccountNumber 		as	accountNumber ,IFSCCode 		as	ifscCode ,Status  		as	status  ,LoginId 		as	loginId ,Designation		as	designation, from AgentMaster</SelectQuery>
         <SelectQueryById>select AgentId		as	agentId,AgentName 		as	agentName ,PanNumber  		as	panNumber  ,AdhaarNo  		as	adhaarNo  ,Address  		as	address  ,City  		as	city  ,State  		as	state  ,PinCode 		as	pinCode ,emailId 		as	emailId ,PhoneNo 		as	phoneNo ,DateOfJoining		as	dateOfJoining,DateOfBirth		as	dateOfBirth,Occupation 		as	occupation ,sponsorId 		as	sponsorId ,sponsorName  		as	sponsorName  ,Bank 		as	bank ,Branch 		as	branch ,AccountNumber 		as	accountNumber ,IFSCCode 		as	ifscCode ,Status  		as	status  ,LoginId 		as	loginId ,Designation		as	designation, from AgentMaster where AgentId = ?</SelectQueryById>
-        <InsertQuery>INSERT INTO AgentMaster (AgentName ,PanNumber  ,AdhaarNo  ,Address  ,City  ,State  ,PinCode ,emailId ,PhoneNo ,DateOfJoining Date,DateOfBirth Date,Occupation ,sponsorId ,sponsorName  ,Bank ,Branch ,AccountNumber ,IFSCCode ,Status  ,LoginId ,Designation) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</InsertQuery>
-        <UpdateQuery>UPDATE AgentMaster SET AgentName  = ?,PanNumber   = ?,AdhaarNo   = ?,Address   = ?,City   = ?,State   = ?,PinCode  = ?,emailId  = ?,PhoneNo  = ?,DateOfJoining Date = ?,DateOfBirth Date = ?,Occupation  = ?,sponsorId  = ?,sponsorName   = ?,Bank  = ?,Branch  = ?,AccountNumber  = ?,IFSCCode  = ?,Status   = ?,LoginId  = ?,Designation = ? WHERE AgentId = ?</UpdateQuery>
+        <InsertQuery>INSERT INTO AgentMaster (AgentName ,PanNumber  ,AdhaarNo  ,Address  ,City  ,State  ,PinCode ,emailId ,PhoneNo ,DateOfJoining ,DateOfBirth ,Occupation ,sponsorId ,sponsorName  ,Bank ,Branch ,AccountNumber ,IFSCCode ,Status  ,LoginId ,Designation) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE AgentMaster SET AgentName  = ?,PanNumber   = ?,AdhaarNo   = ?,Address   = ?,City   = ?,State   = ?,PinCode  = ?,emailId  = ?,PhoneNo  = ?,DateOfJoining  = ?,DateOfBirth  = ?,Occupation  = ?,sponsorId  = ?,sponsorName   = ?,Bank  = ?,Branch  = ?,AccountNumber  = ?,IFSCCode  = ?,Status   = ?,LoginId  = ?,Designation = ? WHERE AgentId = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM AgentMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name = "agentId"			columnName = "AgentId" dataType = "4" />
             <Property name = "agentName"		columnName = "AgentName" dataType = "12" />
-            <Property name = "panNumber "		columnName = "PanNumber" dataType = "12" />
-            <Property name = "adhaarNo "		columnName = "AdhaarNo " dataType = "12" />
-            <Property name = "address "		columnName = "Address" dataType = "12" />
+            <Property name = "panNumber"		columnName = "PanNumber" dataType = "12" />
+            <Property name = "adhaarNo"		columnName = "AdhaarNo" dataType = "12" />
+            <Property name = "address"		columnName = "Address" dataType = "12" />
             <Property name = "city"			columnName = "City" dataType = "12" />
             <Property name = "state"		columnName = "State" dataType = "12" />
             <Property name = "pinCode"		columnName = "PinCode" dataType = "12" />
@@ -149,7 +149,7 @@
             <Property name = "branch"		columnName = "Branch" dataType = "12" />
             <Property name = "accountNumber"		columnName = "AccountNumber" dataType = "12" />
             <Property name = "ifscCode"		columnName = "IFSCCode" dataType = "12" />
-            <Property name = "status "		columnName = "Status" dataType = "12" />
+            <Property name = "status"		columnName = "Status" dataType = "12" />
             <Property name = "loginId"		columnName = "LoginId" dataType = "12" />
             <Property name = "designation"		columnName = "Designation" dataType = "12" />
 
