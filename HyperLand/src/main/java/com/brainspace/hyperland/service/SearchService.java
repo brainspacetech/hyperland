@@ -2,6 +2,7 @@ package com.brainspace.hyperland.service;
 
 import com.brainspace.hyperland.bo.ConfigBO;
 import com.brainspace.hyperland.bo.Property;
+import com.brainspace.hyperland.bo.RestResponse;
 import com.brainspace.hyperland.bo.Search;
 import com.brainspace.hyperland.dao.IMasterDAO;
 import com.brainspace.hyperland.utils.ConfigReader;
@@ -17,7 +18,8 @@ public class SearchService implements ISearchService {
     @Autowired
     private IMasterDAO masterDAO;
 
-    public Map searchDailyExpense(Map searchCriteria, String type) {
+    public RestResponse searchObject(Map searchCriteria, String type) {
+        RestResponse  restResponse = null;
         ConfigBO configBO = ConfigReader.getConfig();
         ServiceUtils serviceUtils = new ServiceUtils();
         for (int i = 0; i < configBO.getSearches().getSearch().length; i++) {
@@ -42,15 +44,27 @@ public class SearchService implements ISearchService {
                 }
                 whereClause = whereClause.substring(0, whereClause.lastIndexOf(" AND"));
                 String sql = search.getSearchQuery().replace("{MACRO}", whereClause);
+                String statusCode = "";
+                String statusMessage = "";
+                List result =null;
                 try {
-                    List result = masterDAO.getAllData(sql);
+
+                     result = masterDAO.getAllData(sql);
+                    statusCode = "1";
+                    if (result.size() == 0)
+                        statusCode = "2";
+                    statusMessage = "Success";
+
                     System.out.println(result);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    statusCode = "0";
+                    statusMessage = "Failed";
                 }
+                restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, result);
 
             }
         }
-        return null;
+        return restResponse;
     }
 }
