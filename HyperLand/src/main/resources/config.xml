@@ -1,255 +1,562 @@
 <?xml version = "1.0" encoding = "utf-8"?>
 <Configuration>
-    <Service id = "firm">
+    <Service id="firm">
         <SelectQuery>select Id as id, FirmName as firmName from FirmMaster</SelectQuery>
         <SelectQueryById>select Id as id, FirmName as firmName from FirmMaster where id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO FirmMaster (FirmName) VALUES (?)</InsertQuery>
         <UpdateQuery>UPDATE FirmMaster SET FirmName = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM FirmMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
-            <Property name="id" columnName="Id" dataType = '4'/>
-            <Property name="firmName" columnName="FirmName" dataType = '12'/>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="firmName" columnName="FirmName" dataType='12'/>
         </PropertyMapping>
     </Service>
-    <Service id = "expenseCategory">
+    <Service id="expenseCategory">
         <SelectQuery>select Id as id, ExpenseCategory as expenseCategory from ExpenseCategoryMaster</SelectQuery>
-        <SelectQueryById>select Id as id, ExpenseCategory as expenseCategory from ExpenseCategoryMaster where id = ?</SelectQueryById>
+        <SelectQueryById>select Id as id, ExpenseCategory as expenseCategory from ExpenseCategoryMaster where id = ?
+        </SelectQueryById>
         <InsertQuery>INSERT INTO ExpenseCategoryMaster (ExpenseCategory) VALUES (?)</InsertQuery>
         <UpdateQuery>UPDATE ExpenseCategoryMaster SET ExpenseCategory = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM ExpenseCategoryMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
-            <Property name="id" columnName="Id" dataType = '4'/>
-            <Property name="expenseCategory" columnName="ExpenseCategory" dataType = '12'/>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="expenseCategory" columnName="ExpenseCategory" dataType='12'/>
         </PropertyMapping>
     </Service>
-    <Service id = "city">
+    <Service id="city">
         <SelectQuery>select Id as id, City as city from CityMaster</SelectQuery>
         <SelectQueryById>select Id as id, City as city from CityMaster where id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO CityMaster (City) VALUES (?)</InsertQuery>
         <UpdateQuery>UPDATE CityMaster SET City = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM CityMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
-            <Property name="id" columnName="Id" dataType = '4'/>
-            <Property name="city" columnName="City" dataType = '12'/>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="city" columnName="City" dataType='12'/>
         </PropertyMapping>
     </Service>
-    <Service id = "project">
-        <SelectQuery>SELECT FirmId as firmId, FirmName as firmName,ProjectName as projectName,PropertyTypeId as PropertyTypeId,PropertyType as PropertyType,CityId as cityId, CityName as cityName,LocationId as locationId,Location as location,Address as address,BusinessValue as businessValue FROM ProjectMaster</SelectQuery>
-        <SelectQueryById>SELECT FirmId as firmId, FirmName as firmName,ProjectName as projectName,PropertyTypeId as PropertyTypeId,PropertyType as PropertyType,CityId as cityId, CityName as cityName,LocationId as locationId,Location as location,Address as address,BusinessValue as businessValue FROM ProjectMaster WHERE Id = ?</SelectQueryById>
-        <InsertQuery>INSERT INTO ProjectMaster (FirmId,FirmName,ProjectName,PropertyTypeId,PropertyType,CityId,CityName,LocationId,Location,Address,BusinessValue)  VALUES (?,?,?,?,?,?,?,?,?,?,?)</InsertQuery>
-        <UpdateQuery>UPDATE ProjectMaster SET FirmId = ? ,FirmName = ? ,ProjectName = ? ,PropertyTypeId = ? ,PropertyType = ? ,CityId = ? ,CityName = ? ,LocationId = ? ,Location= ? ,Address= ? ,BusinessValue= ? ) WHERE Id = ?</UpdateQuery>
+    <Service id="project">
+        <SelectQuery>SELECT FirmId as firmId, FirmName as firmName,ProjectName as projectName,PropertyTypeId as
+            PropertyTypeId,PropertyType as PropertyType,CityId as cityId, CityName as cityName,LocationId as
+            locationId,Location as location,Address as address,BusinessValue as businessValue FROM ProjectMaster
+        </SelectQuery>
+        <SelectQueryById>SELECT FirmId as firmId, FirmName as firmName,ProjectName as projectName,PropertyTypeId as
+            PropertyTypeId,PropertyType as PropertyType,CityId as cityId, CityName as cityName,LocationId as
+            locationId,Location as location,Address as address,BusinessValue as businessValue FROM ProjectMaster WHERE
+            Id = ?
+        </SelectQueryById>
+        <InsertQuery>INSERT INTO ProjectMaster
+            (FirmId,FirmName,ProjectName,PropertyTypeId,PropertyType,CityId,CityName,LocationId,Location,Address,BusinessValue)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?)
+        </InsertQuery>
+        <UpdateQuery>UPDATE ProjectMaster SET FirmId = ? ,FirmName = ? ,ProjectName = ? ,PropertyTypeId = ?
+            ,PropertyType = ? ,CityId = ? ,CityName = ? ,LocationId = ? ,Location= ? ,Address= ? ,BusinessValue= ? )
+            WHERE Id = ?
+        </UpdateQuery>
         <DeleteQuery>DELETE FROM ProjectMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
-            <Property name = "id"             columnName ="Id"                   dataType = '4'/>
-            <Property name = "firmId"   	  columnName = "FirmId"              dataType = "4"   />
-            <Property name = "firmName"       columnName = "FirmName"            dataType = "12"  />
-            <Property name = "projectName"    columnName = "ProjectName"         dataType = "12"  />
-            <Property name = "PropertyTypeId" columnName = "PropertyTypeId"      dataType = "4"   />
-            <Property name = "PropertyType"   columnName = "PropertyType"        dataType = "12"  />
-            <Property name = "cityId"         columnName = "CityId"              dataType = "4"   />
-            <Property name = "cityId"         columnName = "CityId"              dataType = "4"   />
-            <Property name = "cityName"       columnName = "CityName"            dataType = "12"  />
-            <Property name = "locationId"     columnName = "LocationId"          dataType = "4"   />
-            <Property name = "location"       columnName = "Location"            dataType = "12"  />
-            <Property name = "address"        columnName = "Address"             dataType = "12"  />
-            <Property name = "businessValue"  columnName = "BusinessValue"       dataType = "3"   />
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="firmId" columnName="FirmId" dataType="4"/>
+            <Property name="firmName" columnName="FirmName" dataType="12"/>
+            <Property name="projectName" columnName="ProjectName" dataType="12"/>
+            <Property name="PropertyTypeId" columnName="PropertyTypeId" dataType="4"/>
+            <Property name="PropertyType" columnName="PropertyType" dataType="12"/>
+            <Property name="cityId" columnName="CityId" dataType="4"/>
+            <Property name="cityId" columnName="CityId" dataType="4"/>
+            <Property name="cityName" columnName="CityName" dataType="12"/>
+            <Property name="locationId" columnName="LocationId" dataType="4"/>
+            <Property name="location" columnName="Location" dataType="12"/>
+            <Property name="address" columnName="Address" dataType="12"/>
+            <Property name="businessValue" columnName="BusinessValue" dataType="3"/>
         </PropertyMapping>
     </Service>
-    <Service id = "location">
-        <SelectQuery>select Id as id, CityId as cityId, CityName as cityName, Location as location from LocationMaster</SelectQuery>
-        <SelectQueryById>select Id as id, CityId as cityId, CityName as cityName, Location as location from LocationMaster where Id = ?</SelectQueryById>
+    <Service id="location">
+        <SelectQuery>select Id as id, CityId as cityId, CityName as cityName, Location as location from LocationMaster
+        </SelectQuery>
+        <SelectQueryById>select Id as id, CityId as cityId, CityName as cityName, Location as location from
+            LocationMaster where Id = ?
+        </SelectQueryById>
         <InsertQuery>INSERT INTO LocationMaster (CityId,CityName,Location) VALUES (?,?,?)</InsertQuery>
         <UpdateQuery>UPDATE LocationMaster SET CityId = ?, CityName = ?, Location = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM LocationMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
-            <Property name="id" columnName="Id" dataType = '4'/>
-            <Property name="cityId" columnName="CityId" dataType = '4'/>
-            <Property name="cityName" columnName="CityName" dataType = '12'/>
-            <Property name="location" columnName="Location" dataType = '12'/>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="cityId" columnName="CityId" dataType='4'/>
+            <Property name="cityName" columnName="CityName" dataType='12'/>
+            <Property name="location" columnName="Location" dataType='12'/>
         </PropertyMapping>
     </Service>
-    <Service id = "PropertyType">
+    <Service id="PropertyType">
         <SelectQuery>select Id as id, PropertyType as PropertyType from PropertyTypeMaster</SelectQuery>
-        <SelectQueryById>select Id as id, PropertyType as PropertyType from PropertyTypeMaster where id = ?</SelectQueryById>
+        <SelectQueryById>select Id as id, PropertyType as PropertyType from PropertyTypeMaster where id = ?
+        </SelectQueryById>
         <InsertQuery>INSERT INTO PropertyTypeMaster (PropertyType) VALUES (?)</InsertQuery>
         <UpdateQuery>UPDATE PropertyTypeMaster SET PropertyType = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM PropertyTypeMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
-            <Property name="id" columnName="Id" dataType = '4'/>
-            <Property name="PropertyType" columnName="PropertyType" dataType = '12'/>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="PropertyType" columnName="PropertyType" dataType='12'/>
         </PropertyMapping>
     </Service>
 
-    <Service id = "bank">
-        <SelectQuery>select Id as id, BankName as bankName, Branch as branch,AccountNumber as accountNumber,IFSCCode as ifscCode from BankMaster</SelectQuery>
-        <SelectQueryById>select Id as id, BankName as bankName, Branch as branch ,AccountNumber as accountNumber,IFSCCode as ifscCode from BankMaster where id = ?</SelectQueryById>
+    <Service id="bank">
+        <SelectQuery>select Id as id, BankName as bankName, Branch as branch,AccountNumber as accountNumber,IFSCCode as
+            ifscCode from BankMaster
+        </SelectQuery>
+        <SelectQueryById>select Id as id, BankName as bankName, Branch as branch ,AccountNumber as
+            accountNumber,IFSCCode as ifscCode from BankMaster where id = ?
+        </SelectQueryById>
         <InsertQuery>INSERT INTO BankMaster (BankName, Branch,AccountNumber,IFSCCode) VALUES (?,?,?,?)</InsertQuery>
-        <UpdateQuery>UPDATE BankMaster SET BankName = ?,Branch = ?, AccountNumber = ?, IFSCCode = ? WHERE Id = ?</UpdateQuery>
+        <UpdateQuery>UPDATE BankMaster SET BankName = ?,Branch = ?, AccountNumber = ?, IFSCCode = ? WHERE Id = ?
+        </UpdateQuery>
         <DeleteQuery>DELETE FROM BankMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
-            <Property name="id" columnName="Id" dataType = '4'/>
-            <Property name="bankName" columnName="BankName" dataType = '12'/>
-            <Property name="branch" columnName="Branch" dataType = '12'/>
-            <Property name="accountNumber" columnName="AccountNumber" dataType = '12'/>
-            <Property name="ifscCode" columnName="IFSCCode" dataType = '12'/>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="bankName" columnName="BankName" dataType='12'/>
+            <Property name="branch" columnName="Branch" dataType='12'/>
+            <Property name="accountNumber" columnName="AccountNumber" dataType='12'/>
+            <Property name="ifscCode" columnName="IFSCCode" dataType='12'/>
         </PropertyMapping>
     </Service>
-    <Service id = "land">
-        <SelectQuery>select Id as id, KhasraNumber as khasraNumber,LandAmount as landValue, PaidAmount as paidAmount from LandMaster</SelectQuery>
-        <SelectQueryById>select Id as id, KhasraNumber as khasraNumber,LandAmount as landValue, PaidAmount as paidAmount  from LandMaster where id = ?</SelectQueryById>
+    <Service id="land">
+        <SelectQuery>select Id as id, KhasraNumber as khasraNumber,LandAmount as landValue, PaidAmount as paidAmount
+            from LandMaster
+        </SelectQuery>
+        <SelectQueryById>select Id as id, KhasraNumber as khasraNumber,LandAmount as landValue, PaidAmount as paidAmount
+            from LandMaster where id = ?
+        </SelectQueryById>
         <InsertQuery>INSERT INTO LandMaster (KhasraNumber,LandAmount) VALUES (?,?)</InsertQuery>
         <UpdateQuery>UPDATE LandMaster SET KhasraNumber = ?, LandAmount = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM LandMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
-            <Property name="id" columnName="Id" dataType = '4'/>
-            <Property name="khasraNumber" columnName="KhasraNumber" dataType = '12'/>
-            <Property name="landAmount" columnName="LandAmount" dataType = '3'/>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="khasraNumber" columnName="KhasraNumber" dataType='12'/>
+            <Property name="landAmount" columnName="LandAmount" dataType='3'/>
         </PropertyMapping>
     </Service>
-    <Service id = "farmer">
-        <SelectQuery>select Id as id, FarmerName as farmerName,AdhaarNo as adhaarNo, PanNumber as panNumber,Bank as bank, Branch as branch, IFSCCode as ifscCode from FarmerMaster</SelectQuery>
-        <SelectQueryById>select Id as id, FarmerName as farmerName,AdhaarNo as adhaarNo, PanNumber as panNumber,Bank as bank, Branch as branch, IFSCCode as ifscCode  from FarmerMaster where id = ?</SelectQueryById>
-        <InsertQuery>INSERT INTO FarmerMaster (FarmerName,AdhaarNo,PanNumber,Bank, Branch, IFSCCode) VALUES (?,?,?)</InsertQuery>
-        <UpdateQuery>UPDATE FarmerMaster SET FarmerName = ?, AdhaarNo = ?,PanNumber = ?,Bank = ?, Branch = ?, IFSCCode =?  WHERE Id = ?</UpdateQuery>
+    <Service id="farmer">
+        <SelectQuery>select Id as id, FarmerName as farmerName,AdhaarNo as adhaarNo, PanNumber as panNumber,Bank as
+            bank, Branch as branch, IFSCCode as ifscCode from FarmerMaster
+        </SelectQuery>
+        <SelectQueryById>select Id as id, FarmerName as farmerName,AdhaarNo as adhaarNo, PanNumber as panNumber,Bank as
+            bank, Branch as branch, IFSCCode as ifscCode from FarmerMaster where id = ?
+        </SelectQueryById>
+        <InsertQuery>INSERT INTO FarmerMaster (FarmerName,AdhaarNo,PanNumber,Bank, Branch, IFSCCode) VALUES (?,?,?)
+        </InsertQuery>
+        <UpdateQuery>UPDATE FarmerMaster SET FarmerName = ?, AdhaarNo = ?,PanNumber = ?,Bank = ?, Branch = ?, IFSCCode
+            =? WHERE Id = ?
+        </UpdateQuery>
         <DeleteQuery>DELETE FROM FarmerMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
-            <Property name="id" columnName="Id" dataType = '4'/>
-            <Property name="farmerName" columnName="FarmerName" dataType = '12'/>
-            <Property name="adhaarNo" columnName="AdhaarNo" dataType = '12'/>
-            <Property name="panNumber" columnName="PanNumber" dataType = '12'/>
-            <Property name="bank" columnName="Bank" dataType = '12'/>
-            <Property name="branch" columnName="Branch" dataType = '12'/>
-            <Property name="ifscCode" columnName="IFSCCode" dataType = '12'/>
-            <Property name="landId" columnName="LandId" dataType = '4'/>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="farmerName" columnName="FarmerName" dataType='12'/>
+            <Property name="adhaarNo" columnName="AdhaarNo" dataType='12'/>
+            <Property name="panNumber" columnName="PanNumber" dataType='12'/>
+            <Property name="bank" columnName="Bank" dataType='12'/>
+            <Property name="branch" columnName="Branch" dataType='12'/>
+            <Property name="ifscCode" columnName="IFSCCode" dataType='12'/>
+            <Property name="landId" columnName="LandId" dataType='4'/>
         </PropertyMapping>
     </Service>
-    <Service id = "agent">
-        <SelectQuery>select AgentId		as	agentId,AgentName 		as	agentName ,PanNumber  		as	panNumber  ,AdhaarNo  		as	adhaarNo  ,Address  		as	address  ,City  		as	city  ,State  		as	state  ,PinCode 		as	pinCode ,emailId 		as	emailId ,PhoneNo 		as	phoneNo ,DateOfJoining		as	dateOfJoining,DateOfBirth		as	dateOfBirth,Occupation 		as	occupation ,sponsorId 		as	sponsorId ,sponsorName  		as	sponsorName  ,Bank 		as	bank ,Branch 		as	branch ,AccountNumber 		as	accountNumber ,IFSCCode 		as	ifscCode ,Status  		as	status  ,LoginId 		as	loginId ,Designation		as	designation, from AgentMaster</SelectQuery>
-        <SelectQueryById>select AgentId		as	agentId,AgentName 		as	agentName ,PanNumber  		as	panNumber  ,AdhaarNo  		as	adhaarNo  ,Address  		as	address  ,City  		as	city  ,State  		as	state  ,PinCode 		as	pinCode ,emailId 		as	emailId ,PhoneNo 		as	phoneNo ,DateOfJoining		as	dateOfJoining,DateOfBirth		as	dateOfBirth,Occupation 		as	occupation ,sponsorId 		as	sponsorId ,sponsorName  		as	sponsorName  ,Bank 		as	bank ,Branch 		as	branch ,AccountNumber 		as	accountNumber ,IFSCCode 		as	ifscCode ,Status  		as	status  ,LoginId 		as	loginId ,Designation		as	designation, from AgentMaster where AgentId = ?</SelectQueryById>
-        <InsertQuery>INSERT INTO AgentMaster (AgentName ,PanNumber  ,AdhaarNo  ,Address  ,City  ,State  ,PinCode ,emailId ,PhoneNo ,DateOfJoining ,DateOfBirth ,Occupation ,sponsorId ,sponsorName  ,Bank ,Branch ,AccountNumber ,IFSCCode ,Status  ,LoginId ,Designation) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</InsertQuery>
-        <UpdateQuery>UPDATE AgentMaster SET AgentName  = ?,PanNumber   = ?,AdhaarNo   = ?,Address   = ?,City   = ?,State   = ?,PinCode  = ?,emailId  = ?,PhoneNo  = ?,DateOfJoining  = ?,DateOfBirth  = ?,Occupation  = ?,sponsorId  = ?,sponsorName   = ?,Bank  = ?,Branch  = ?,AccountNumber  = ?,IFSCCode  = ?,Status   = ?,LoginId  = ?,Designation = ? WHERE AgentId = ?</UpdateQuery>
+    <Service id="agent">
+        <SelectQuery>select AgentId as agentId,AgentName as agentName ,PanNumber as panNumber ,AdhaarNo as adhaarNo
+            ,Address as address ,City as city ,State as state ,PinCode as pinCode ,emailId as emailId ,PhoneNo as
+            phoneNo ,DateOfJoining as dateOfJoining,DateOfBirth as dateOfBirth,Occupation as occupation ,sponsorId as
+            sponsorId ,sponsorName as sponsorName ,Bank as bank ,Branch as branch ,AccountNumber as accountNumber
+            ,IFSCCode as ifscCode ,Status as status ,LoginId as loginId ,Designation as designation, from AgentMaster
+        </SelectQuery>
+        <SelectQueryById>select AgentId as agentId,AgentName as agentName ,PanNumber as panNumber ,AdhaarNo as adhaarNo
+            ,Address as address ,City as city ,State as state ,PinCode as pinCode ,emailId as emailId ,PhoneNo as
+            phoneNo ,DateOfJoining as dateOfJoining,DateOfBirth as dateOfBirth,Occupation as occupation ,sponsorId as
+            sponsorId ,sponsorName as sponsorName ,Bank as bank ,Branch as branch ,AccountNumber as accountNumber
+            ,IFSCCode as ifscCode ,Status as status ,LoginId as loginId ,Designation as designation, from AgentMaster
+            where AgentId = ?
+        </SelectQueryById>
+        <InsertQuery>INSERT INTO AgentMaster (AgentName ,PanNumber ,AdhaarNo ,Address ,City ,State ,PinCode ,emailId
+            ,PhoneNo ,DateOfJoining ,DateOfBirth ,Occupation ,sponsorId ,sponsorName ,Bank ,Branch ,AccountNumber
+            ,IFSCCode ,Status ,LoginId ,Designation) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        </InsertQuery>
+        <UpdateQuery>UPDATE AgentMaster SET AgentName = ?,PanNumber = ?,AdhaarNo = ?,Address = ?,City = ?,State =
+            ?,PinCode = ?,emailId = ?,PhoneNo = ?,DateOfJoining = ?,DateOfBirth = ?,Occupation = ?,sponsorId =
+            ?,sponsorName = ?,Bank = ?,Branch = ?,AccountNumber = ?,IFSCCode = ?,Status = ?,LoginId = ?,Designation = ?
+            WHERE AgentId = ?
+        </UpdateQuery>
         <DeleteQuery>DELETE FROM AgentMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
-            <Property name = "agentId"			columnName = "AgentId" dataType = "4" />
-            <Property name = "agentName"		columnName = "AgentName" dataType = "12" />
-            <Property name = "panNumber"		columnName = "PanNumber" dataType = "12" />
-            <Property name = "adhaarNo"		columnName = "AdhaarNo" dataType = "12" />
-            <Property name = "address"		columnName = "Address" dataType = "12" />
-            <Property name = "city"			columnName = "City" dataType = "12" />
-            <Property name = "state"		columnName = "State" dataType = "12" />
-            <Property name = "pinCode"		columnName = "PinCode" dataType = "12" />
-            <Property name = "emailId"		columnName = "emailId" dataType = "12" />
-            <Property name = "phoneNo"		columnName = "PhoneNo" dataType = "12" />
-            <Property name = "dateOfJoining"		columnName = "DateOfJoining" dataType = "91" />
-            <Property name = "dateOfBirth "		columnName = "DateOfBirth" dataType = "91" />
-            <Property name = "occupation"		columnName = "Occupation" dataType = "12" />
-            <Property name = "sponsorId"		columnName = "sponsorId" dataType = "12" />
-            <Property name = "sponsorName"		columnName = "sponsorName" dataType = "12" />
-            <Property name = "bank"		columnName = "Bank" dataType = "12" />
-            <Property name = "branch"		columnName = "Branch" dataType = "12" />
-            <Property name = "accountNumber"		columnName = "AccountNumber" dataType = "12" />
-            <Property name = "ifscCode"		columnName = "IFSCCode" dataType = "12" />
-            <Property name = "status"		columnName = "Status" dataType = "12" />
-            <Property name = "loginId"		columnName = "LoginId" dataType = "12" />
-            <Property name = "designation"		columnName = "Designation" dataType = "12" />
+            <Property name="agentId" columnName="AgentId" dataType="4"/>
+            <Property name="agentName" columnName="AgentName" dataType="12"/>
+            <Property name="panNumber" columnName="PanNumber" dataType="12"/>
+            <Property name="adhaarNo" columnName="AdhaarNo" dataType="12"/>
+            <Property name="address" columnName="Address" dataType="12"/>
+            <Property name="city" columnName="City" dataType="12"/>
+            <Property name="state" columnName="State" dataType="12"/>
+            <Property name="pinCode" columnName="PinCode" dataType="12"/>
+            <Property name="emailId" columnName="emailId" dataType="12"/>
+            <Property name="phoneNo" columnName="PhoneNo" dataType="12"/>
+            <Property name="dateOfJoining" columnName="DateOfJoining" dataType="91"/>
+            <Property name="dateOfBirth " columnName="DateOfBirth" dataType="91"/>
+            <Property name="occupation" columnName="Occupation" dataType="12"/>
+            <Property name="sponsorId" columnName="sponsorId" dataType="12"/>
+            <Property name="sponsorName" columnName="sponsorName" dataType="12"/>
+            <Property name="bank" columnName="Bank" dataType="12"/>
+            <Property name="branch" columnName="Branch" dataType="12"/>
+            <Property name="accountNumber" columnName="AccountNumber" dataType="12"/>
+            <Property name="ifscCode" columnName="IFSCCode" dataType="12"/>
+            <Property name="status" columnName="Status" dataType="12"/>
+            <Property name="loginId" columnName="LoginId" dataType="12"/>
+            <Property name="designation" columnName="Designation" dataType="12"/>
 
         </PropertyMapping>
     </Service>
     <Transactions>
-        <Transaction id = "booking">
-            <UpdateQuery>UPDATE BookingDetails SET CustomerId =? , FirmId = ?,FirmName = ?,ProjectId = ?,ProjectName = ?,PropertyType = ?,PropertyTypeId = ?,BlockId = ?,Block = ?,PlotNumber = ?,PaymentType = ?,TokenAmount = ?,BookingAmount = ?,DownPayment = ?,ReceiptNumber = ?,BookingDate = ?,BaseSellingPrice = ?,BaseSellingPriceTax = ?,PLCCharges = ?,PLCChargesTax = ?,TotalAmount = ?,BookedBy = ?,BookingType = ?,InstallmentStartDate = ?,AgentId = ?,AdditionalCharges = ?,AdditionalChargesTax = ?,CreatedBy = ? WHERE BookingId = ?</UpdateQuery>
+        <Transaction id="booking">
+            <UpdateQuery>UPDATE BookingDetails SET CustomerId =? , FirmId = ?,FirmName = ?,ProjectId = ?,ProjectName =
+                ?,PropertyType = ?,PropertyTypeId = ?,BlockId = ?,Block = ?,PlotNumber = ?,PaymentType = ?,TokenAmount =
+                ?,BookingAmount = ?,DownPayment = ?,ReceiptNumber = ?,BookingDate = ?,BaseSellingPrice =
+                ?,BaseSellingPriceTax = ?,PLCCharges = ?,PLCChargesTax = ?,TotalAmount = ?,BookedBy = ?,BookingType =
+                ?,InstallmentStartDate = ?,AgentId = ?,AdditionalCharges = ?,AdditionalChargesTax = ?,CreatedBy = ?
+                WHERE BookingId = ?
+            </UpdateQuery>
             <PropertyMapping>
-                <Property columnName ="BookingId"     name = "bookingId"                        dataType = "4"/>
-                <Property columnName ="CustomerId"     name = "customerId"           dataType = "12"/>
-                <Property columnName ="FirmId"     name = "firmId"                           dataType = "4"/>
-                <Property columnName ="FirmName"     name = "firmName"                         dataType = "12"/>
-                <Property columnName ="ProjectId"     name = "projectId"                        dataType = "12"/>
-                <Property columnName ="ProjectName"     name = "projectName"                    dataType = "12"/>
-                <Property columnName ="PropertyTypeId"     name = "propertyTypeId"              dataType = "4"/>
-                <Property columnName ="PropertyType"     name = "propertyType"                  dataType = "12"/>
-                <Property columnName ="BlockId"     name = "blockId"                            dataType = "4"/>
-                <Property columnName ="Block"     name = "block"                                dataType = "12"/>
-                <Property columnName ="PlotNumber"     name = "plotNumber"                      dataType = "12"/>
-                <Property columnName ="PaymentType"     name = "paymentType"                    dataType = "12"/>
-                <Property columnName ="TokenAmount"     name = "tokenAmount"                    dataType = "3"/>
-                <Property columnName ="BookingAmount"     name = "bookingAmount"                dataType = "3"/>
-                <Property columnName ="DownPayment"     name = "downPayment"                    dataType = "3"/>
-                <Property columnName ="ReceiptNumber"     name = "receiptNumber"                dataType = "12"/>
-                <Property columnName ="BookingDate"     name = "bookingDate"                    dataType = "91"/>
-                <Property columnName ="BaseSellingPrice"     name = "baseSellingPrice"          dataType = "3"/>
-                <Property columnName ="BaseSellingPriceTax"     name = "baseSellingPriceTax"    dataType = "3"/>
-                <Property columnName ="PLCCharges"     name = "plcCharges"                      dataType = "3"/>
-                <Property columnName ="PLCChargesType"     name = "plcChargesType"              dataType = "12"/>
-                <Property columnName ="PLCChargesTax"     name = "plcChargesTax"                dataType = "3"/>
-                <Property columnName ="TotalAmount"     name = "totalAmount"                    dataType = "3"/>
-                <Property columnName ="BookedBy"     name = "bookedBy"                          dataType = "12"/>
-                <Property columnName ="BookingType"     name = "bookingType"                    dataType = "12"/>
-                <Property columnName ="InstallmentStartDate"     name = "installmentStartDate"  dataType = "91"/>
-                <Property columnName ="AgentId"     name = "agentId" dataType = "12"/>
-                <Property columnName ="AdditionalCharges"     name = "additionalCharges"                      dataType = "3"/>
-                <Property columnName ="AdditionalChargesTax"     name = "additionalChargesTax"                dataType = "3"/>
-                <Property columnName ="NumberOfInstallment"     name = "numberOfInstallment"                dataType = "4"/>
-                <Property columnName ="CreatedOn"     name = "createdOn"                dataType = "91"/>
-                <Property columnName ="CreatedBy"     name = "createdBy"                dataType = "12"/>
+                <Property columnName="BookingId" name="bookingId" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="FirmName" name="firmName" dataType="12"/>
+                <Property columnName="ProjectId" name="projectId" dataType="12"/>
+                <Property columnName="ProjectName" name="projectName" dataType="12"/>
+                <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
+                <Property columnName="PropertyType" name="propertyType" dataType="12"/>
+                <Property columnName="BlockId" name="blockId" dataType="4"/>
+                <Property columnName="Block" name="block" dataType="12"/>
+                <Property columnName="PlotNumber" name="plotNumber" dataType="12"/>
+                <Property columnName="PaymentType" name="paymentType" dataType="12"/>
+                <Property columnName="TokenAmount" name="tokenAmount" dataType="3"/>
+                <Property columnName="BookingAmount" name="bookingAmount" dataType="3"/>
+                <Property columnName="DownPayment" name="downPayment" dataType="3"/>
+                <Property columnName="ReceiptNumber" name="receiptNumber" dataType="12"/>
+                <Property columnName="BookingDate" name="bookingDate" dataType="91"/>
+                <Property columnName="BaseSellingPrice" name="baseSellingPrice" dataType="3"/>
+                <Property columnName="BaseSellingPriceTax" name="baseSellingPriceTax" dataType="3"/>
+                <Property columnName="PLCCharges" name="plcCharges" dataType="3"/>
+                <Property columnName="PLCChargesType" name="plcChargesType" dataType="12"/>
+                <Property columnName="PLCChargesTax" name="plcChargesTax" dataType="3"/>
+                <Property columnName="TotalAmount" name="totalAmount" dataType="3"/>
+                <Property columnName="BookedBy" name="bookedBy" dataType="12"/>
+                <Property columnName="BookingType" name="bookingType" dataType="12"/>
+                <Property columnName="InstallmentStartDate" name="installmentStartDate" dataType="91"/>
+                <Property columnName="AgentId" name="agentId" dataType="12"/>
+                <Property columnName="AdditionalCharges" name="additionalCharges" dataType="3"/>
+                <Property columnName="AdditionalChargesTax" name="additionalChargesTax" dataType="3"/>
+                <Property columnName="NumberOfInstallment" name="numberOfInstallment" dataType="4"/>
+                <Property columnName="CreatedOn" name="createdOn" dataType="91"/>
+                <Property columnName="CreatedBy" name="createdBy" dataType="12"/>
             </PropertyMapping>
         </Transaction>
-          <Transaction id = "customer">
-              <InsertQuery>INSERT INTO CustomerDetails (CustomerId,CustomerName,PanNumber,AdhaarNo,Address,City,State,Nationality,PinCode,EmailId,PhoneNo,RelationType,RelativeName,DateOfBirth,Occupation,CustomerType) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</InsertQuery>
-              <PropertyMapping>
-                  <Property columnName = "Id"     name = "id"                      dataType="4"  />
-                  <Property columnName = "CustomerId"     name = "customerId"      dataType="12" />
-                  <Property columnName = "CustomerName"     name = "customerName"  dataType="12" />
-                  <Property columnName = "PanNumber"     name = "panNumber"            dataType="12" />
-                  <Property columnName = "AdhaarNo"     name = "adhaarNo"            dataType="12" />
-                  <Property columnName = "Address"     name = "address"            dataType="12" />
-                  <Property columnName = "City"     name = "city"                  dataType="12" />
-                  <Property columnName = "State"     name = "state"                dataType="12" />
-                  <Property columnName = "Nationality"     name = "nationality"    dataType="12" />
-                  <Property columnName = "RelationType"     name = "relationType"  dataType="12" />
-                  <Property columnName = "RelativeName"     name = "relativeName"  dataType="12" />
-                  <Property columnName = "PinCode"     name = "pinCode"            dataType="12" />
-                  <Property columnName = "EmailId"     name = "emailId"            dataType="12" />
-                  <Property columnName = "PhoneNo"     name = "phoneNo"            dataType="12" />
-                  <Property columnName = "DateOfBirth"     name = "dateOfBirth"    dataType="91" />
-                  <Property columnName = "Occupation"     name = "occupation"      dataType="12" />
-                  <Property columnName = "CustomerType"     name = "customerType"  dataType="12" />
-              </PropertyMapping>
-          </Transaction>
-        <Transaction id = "payment">
-            <InsertQuery>INSERT INTO PaymentDetails (CustomerId,BookingId,CollectedBy,PaymentType,PaymentMode, ChequeNo, TransactionId, PaymentDate, ReceiptNo,BankName,ChequeDate,InstallmentAmount,DueDate,Status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)</InsertQuery>
+        <Transaction id="customer">
+            <InsertQuery>INSERT INTO CustomerDetails
+                (CustomerId,CustomerName,PanNumber,AdhaarNo,Address,City,State,Nationality,PinCode,EmailId,PhoneNo,RelationType,RelativeName,DateOfBirth,Occupation,CustomerType)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            </InsertQuery>
             <PropertyMapping>
-                <Property columnName = "Id"     name = "id"                      dataType="4"  />
-                <Property columnName = "CustomerId"     name = "customerId"      dataType="12" />
-                <Property columnName = "BookingId"     name = "bookingId"  dataType="4" />
-                <Property columnName = "InstallmentAmount"     name = "installmentAmount"            dataType="3" />
-                <Property columnName = "DueDate"     name = "dueDate"            dataType="91" />
-                <Property columnName = "Status"     name = "status"            dataType="12" />
-                <Property columnName = "PaymentType"     name = "paymentType"                  dataType="12" />
-                <Property columnName = "CollectedBy"     name = "collectedBy"                  dataType="12" />
-                <Property columnName = "PaymentMode"     name = "paymentMode"                  dataType="12" />
-                <Property columnName = "ChequeNo"     name = "chequeNo"                  dataType="12" />
-                <Property columnName = "TransactionId"     name = "transactionId"                  dataType="12" />
-                <Property columnName = "PaymentDate"     name = "paymentDate"                  dataType="91" />
-                <Property columnName = "ReceiptNo"     name = "receiptNo"                  dataType="4" />
-                <Property columnName = "BankName"     name = "bankName"                  dataType="12" />
-                <Property columnName = "ChequeDate"     name = "ChequeDate"                  dataType="91" />
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="CustomerName" name="customerName" dataType="12"/>
+                <Property columnName="PanNumber" name="panNumber" dataType="12"/>
+                <Property columnName="AdhaarNo" name="adhaarNo" dataType="12"/>
+                <Property columnName="Address" name="address" dataType="12"/>
+                <Property columnName="City" name="city" dataType="12"/>
+                <Property columnName="State" name="state" dataType="12"/>
+                <Property columnName="Nationality" name="nationality" dataType="12"/>
+                <Property columnName="RelationType" name="relationType" dataType="12"/>
+                <Property columnName="RelativeName" name="relativeName" dataType="12"/>
+                <Property columnName="PinCode" name="pinCode" dataType="12"/>
+                <Property columnName="EmailId" name="emailId" dataType="12"/>
+                <Property columnName="PhoneNo" name="phoneNo" dataType="12"/>
+                <Property columnName="DateOfBirth" name="dateOfBirth" dataType="91"/>
+                <Property columnName="Occupation" name="occupation" dataType="12"/>
+                <Property columnName="CustomerType" name="customerType" dataType="12"/>
+            </PropertyMapping>
+        </Transaction>
+        <Transaction id="payment">
+            <InsertQuery>INSERT INTO PaymentDetails (CustomerId,BookingId,CollectedBy,PaymentType,PaymentMode, ChequeNo,
+                TransactionId, PaymentDate, ReceiptNo,BankName,ChequeDate,InstallmentAmount,DueDate,Status) VALUES
+                (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            </InsertQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="BookingId" name="bookingId" dataType="4"/>
+                <Property columnName="InstallmentAmount" name="installmentAmount" dataType="3"/>
+                <Property columnName="DueDate" name="dueDate" dataType="91"/>
+                <Property columnName="Status" name="status" dataType="12"/>
+                <Property columnName="PaymentType" name="paymentType" dataType="12"/>
+                <Property columnName="CollectedBy" name="collectedBy" dataType="12"/>
+                <Property columnName="PaymentMode" name="paymentMode" dataType="12"/>
+                <Property columnName="ChequeNo" name="chequeNo" dataType="12"/>
+                <Property columnName="TransactionId" name="transactionId" dataType="12"/>
+                <Property columnName="PaymentDate" name="paymentDate" dataType="91"/>
+                <Property columnName="ReceiptNo" name="receiptNo" dataType="4"/>
+                <Property columnName="BankName" name="bankName" dataType="12"/>
+                <Property columnName="ChequeDate" name="ChequeDate" dataType="91"/>
 
             </PropertyMapping>
         </Transaction>
-
+        <Transaction id="farmer">
+            <InsertQuery>INSERT INTO FarmerPayment (FarmerId,LandId,FarmerName,PaymentDate, PaymentMode,BankName,
+                PaymentAmount, ChequeNo, TransactionId, TransactionDate, ChequeDate,
+                CreatedBy,CreatedOn,ApprovedOn,ApprovedBy) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            </InsertQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="FarmerId" name="farmerId" dataType="4"/>
+                <Property columnName="LandId" name="landId" dataType="4"/>
+                <Property columnName="FarmerName" name="farmerName" dataType="12"/>
+                <Property columnName="PaymentDate" name="paymentDate" dataType="91"/>
+                <Property columnName="PaymentMode" name="paymentMode" dataType="12"/>
+                <Property columnName="BankName" name="bankName" dataType="12"/>
+                <Property columnName="PaymentAmount" name="paymentAmount" dataType="12"/>
+                <Property columnName="ChequeNo" name="chequeNo" dataType="12"/>
+                <Property columnName="TransactionId" name="transactionId" dataType="12"/>
+                <Property columnName="ChequeDate" name="chequeDate" dataType="91"/>
+                <Property columnName="TransactionDate" name="transactionDate" dataType="91"/>
+                <Property columnName="CreatedBy" name="createdBy " dataType="12"/>
+                <Property columnName="CreatedOn" name="createdOn " dataType="93"/>
+                <Property columnName="ApprovedOn" name="approvedOn" dataType="93"/>
+                <Property columnName="ApprovedBy" name="approvedBy" dataType="12"/>
+                <Property columnName="IsApproved" name="isApproved" dataType="1"/>
+            </PropertyMapping>
+        </Transaction>
+        <Transaction id="agent">
+            <InsertQuery>INSERT INTO AgentPayment (AgentId,AgentName,PaymentDate, PaymentMode,BankName, PaymentAmount,
+                ChequeNo, TransactionId, TransactionDate, ChequeDate, CreatedBy,CreatedOn,ApprovedOn,ApprovedBy) VALUES
+                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            </InsertQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="AgentId" name="agentId" dataType="4"/>
+                <Property columnName="AgentName" name="agentName" dataType="12"/>
+                <Property columnName="PaymentDate" name="paymentDate" dataType="91"/>
+                <Property columnName="PaymentMode" name="paymentMode" dataType="12"/>
+                <Property columnName="BankName" name="bankName" dataType="12"/>
+                <Property columnName="PaymentAmount" name="paymentAmount" dataType="12"/>
+                <Property columnName="ChequeNo" name="chequeNo" dataType="12"/>
+                <Property columnName="TransactionId" name="transactionId" dataType="12"/>
+                <Property columnName="ChequeDate" name="chequeDate" dataType="91"/>
+                <Property columnName="TransactionDate" name="transactionDate" dataType="91"/>
+                <Property columnName="CreatedBy" name="createdBy " dataType="12"/>
+                <Property columnName="CreatedOn" name="createdOn " dataType="93"/>
+                <Property columnName="ApprovedOn" name="approvedOn" dataType="93"/>
+                <Property columnName="ApprovedBy" name="approvedBy" dataType="12"/>
+                <Property columnName="IsApproved" name="isApproved" dataType="1"/>
+            </PropertyMapping>
+        </Transaction>
+        <Transaction id="expense">
+            <InsertQuery>INSERT INTO ExpenseDetails (AgentId,AgentName,PaymentDate, PaymentMode,BankName, PaymentAmount,
+                ChequeNo, TransactionId, TransactionDate, ChequeDate, CreatedBy,CreatedOn,ApprovedOn,ApprovedBy) VALUES
+                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            </InsertQuery>
+            <UpdateQuery>UPDATE ExpenseDetails SET ApprovedBy = ? , ApprovedOn = SYSDATE() WHERE Id = ? AND ApprovedOn is null</UpdateQuery>
+            <PropertyMapping>
+                <Property name="id" columnName="Id" dataType="4"/>
+                <Property name="expenseCategory" columnName="ExpenseCategory" dataType="12"/>,
+                <Property name="amount" columnName="Amount" dataType="3"/>
+                <Property name="createdBy" columnName="CreatedBy" dataType="12"/>
+                <Property name="createdOn" columnName="CreatedOn" dataType="91"/>
+                <Property name="transactionDetail" columnName="TransactionDetail" dataType="12"/>
+                <Property name="transactionId" columnName="TransactionId" dataType="12"/>
+                <Property name="firmId" columnName="FirmId" dataType="4"/>
+                <Property name="firmName" columnName="FirmName" dataType="12"/>
+                <Property name="propertyId" columnName="PropertyId" dataType="4"/>
+                <Property name="propertyName" columnName="PropertyName" dataType="12"/>
+                <Property name="approvedOn" columnName="ApprovedOn" dataType="91"/>
+                <Property name="approvedBy" columnName="ApprovedBy" dataType="12"/>
+                <Property name="invoiceNo" columnName="InvoiceNo" dataType="12"/>
+                <Property name="expenseDate" columnName="ExpenseDate" dataType="91"/>
+                <Property name="paidTo" columnName="PaidTo" dataType="12"/>
+                <Property name="paymentMode" columnName="PaymentMode" dataType="12"/>
+                <Property name="chequeNo" columnName="ChequeNo" dataType="12"/>
+                <Property name="bankName" columnName="BankName" dataType="12"/>
+                <Property name="chequeDate" columnName="ChequeDate" dataType="91"/>
+                <Property name="expenseFrom" columnName="ExpenseDate" dataType="-101"/> <!--(-101) for from date -->
+                <Property name="expenseTo" columnName="ExpenseDate" dataType="-102"/> <!--(-101) for to date -->
+                <Property name="isApproved" columnName="IsApproved" dataType="1"/>
+            </PropertyMapping>
+        </Transaction>
     </Transactions>
+    <Searches>
+        <Search id="expense">
+            <SearchQuery>SELECT Id as id, FirmName as firmName,ExpenseCategory as category,ExpenseDate as expenseDate,
+                PaidTo as paidTo, Amount as amount, PaymentMode as paymentMode,IsApproved as isApproved FROM
+                ExpenseDetails WHERE {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property name="id" columnName="Id" dataType="4"/>
+                <Property name="expenseCategory" columnName="ExpenseCategory" dataType="12"/>,
+                <Property name="amount" columnName="Amount" dataType="3"/>
+                <Property name="createdBy" columnName="CreatedBy" dataType="12"/>
+                <Property name="createdOn" columnName="CreatedOn" dataType="91"/>
+                <Property name="transactionDetail" columnName="TransactionDetail" dataType="12"/>
+                <Property name="transactionId" columnName="TransactionId" dataType="12"/>
+                <Property name="firmId" columnName="FirmId" dataType="4"/>
+                <Property name="firmName" columnName="FirmName" dataType="12"/>
+                <Property name="propertyId" columnName="PropertyId" dataType="4"/>
+                <Property name="propertyName" columnName="PropertyName" dataType="12"/>
+                <Property name="approvedOn" columnName="ApprovedOn" dataType="91"/>
+                <Property name="approvedBy" columnName="ApprovedBy" dataType="12"/>
+                <Property name="invoiceNo" columnName="InvoiceNo" dataType="12"/>
+                <Property name="expenseDate" columnName="ExpenseDate" dataType="91"/>
+                <Property name="paidTo" columnName="PaidTo" dataType="12"/>
+                <Property name="paymentMode" columnName="PaymentMode" dataType="12"/>
+                <Property name="chequeNo" columnName="ChequeNo" dataType="12"/>
+                <Property name="bankName" columnName="BankName" dataType="12"/>
+                <Property name="chequeDate" columnName="ChequeDate" dataType="91"/>
+                <Property name="expenseFrom" columnName="ExpenseDate" dataType="-101"/> <!--(-101) for from date -->
+                <Property name="expenseTo" columnName="ExpenseDate" dataType="-102"/> <!--(-101) for to date -->
+                <Property name="isApproved" columnName="IsApproved" dataType="1"/>
+            </PropertyMapping>
+        </Search>
+        <Search id="customer"> <!-- customer details-->
+            <SearchQuery>SELECT a.Id as id, a.CustomerId as customerId, a.CustomerName as customerName,a.Address as
+                address,a.State as state, a.PinCode as pinCode, a.EmailId as emailId, a.PanNumber as
+                panNumber,a.RelationType as relationType,a.RelativeName as relativeName ,
+                a.City as city, a.Nationality as nationality,a.PhoneNo as phoneNo,a.DateOfBirth as
+                dateOfBirth,a.Occupation as occupation FROM CustomerDetails a INNER JOIN BookingDetails b on b.BookingId
+                = a.BookingId WHERE {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="CustomerName" name="customerName" dataType="12"/>
+                <Property columnName="PanNumber" name="panNumber" dataType="12"/>
+                <Property columnName="AdhaarNo" name="adhaarNo" dataType="12"/>
+                <Property columnName="Address" name="address" dataType="12"/>
+                <Property columnName="City" name="city" dataType="12"/>
+                <Property columnName="State" name="state" dataType="12"/>
+                <Property columnName="Nationality" name="nationality" dataType="12"/>
+                <Property columnName="RelationType" name="relationType" dataType="12"/>
+                <Property columnName="RelativeName" name="relativeName" dataType="12"/>
+                <Property columnName="PinCode" name="pinCode" dataType="12"/>
+                <Property columnName="EmailId" name="emailId" dataType="12"/>
+                <Property columnName="PhoneNo" name="phoneNo" dataType="12"/>
+                <Property columnName="DateOfBirth" name="dateOfBirth" dataType="91"/>
+                <Property columnName="Occupation" name="occupation" dataType="12"/>
+                <Property columnName="CustomerType" name="customerType" dataType="12"/>
+                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="BlockId" name="blockId" dataType="4"/>
+                <Property columnName="PlotNumber" name="plotNumber" dataType="12"/>
+            </PropertyMapping>
+        </Search>
+        <Search id="booking"> <!-- Booking report-->
+            <SearchQuery>SELECT a.Id as id, a.CustomerId as customerId, a.CustomerName as customerName,c.AgentName as
+                agentName,b.BookingDate as bookingDate,b.ProjectName as projectName,b.FirmName as firmName,b.Block as
+                block,b.PlotNumber as plotNumber,b.TotalAmount as totalAmount,
+                b.BookingType as bookingType,b.LastPaymentDate as paymentDate,e.PlotSize as plotSize,e.SqFtRate as
+                sqftRate FROM CustomerDetails a INNER JOIN BookingDetails b on b.BookingId = a.BookingId INNER JOIN
+                AgentMaster c on b.AgentId = c.AgentId INNER JOIN PlotTransaction d
+                ON d.BookingId = b.BookingId INNER JOIN PlotDetails e ON e.Id = d.PlotId WHERE a.CustomerType =
+                'Primary' AND {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="CustomerName" name="customerName" dataType="12"/>
+                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="BlockId" name="blockId" dataType="4"/>
+                <Property columnName="PlotNumber" name="plotNumber" dataType="12"/>
+                <Property columnName="BookingDate" name="bookingDateFrom" dataType="-101"/>
+                <Property columnName="BookingDate" name="bookingDateTo" dataType="-102"/>
+            </PropertyMapping>
+        </Search>
+        <Search id="transaction"><!-- Transaction Report-->
+            <SearchQuery>
+                SELECT a.CustomerName as customerName, b.FirmName as firmName,b.ProjectName as projectName,b.block as
+                block,b.PlotNumber as plotNumber,c.AgentName as agentName,d.PaymentDate as paymentDate,d.PaymentMode as
+                paymentMode,CASE WHEN d.PaymentMode = 'Cheque' THEN d.ChequeDate ELSE d.TransactionDate END as
+                transactionDate, CASE WHEN d.PaymentMode = 'Cheque' THEN d.ChequeNo ELSE d.TransactionId END as
+                transactionId,d.BankName as bankName,d.InstallmentAmount as installmentAmount, d.PaidInstallment as
+                paidInstallment FROM CustomerDetails a INNER JOIN
+                BookingDetails b ON a.CustomerId = b.CustomerId INNER JOIN AgentMaster c ON c.AgentId = b.AgentId INNER
+                JOIN PaymentDetails d ON d.BookingId = b.BookingId where d.PaymentDate is not null AND {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="CustomerName" name="customerName" dataType="12"/>
+                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="BlockId" name="blockId" dataType="4"/>
+                <Property columnName="PlotNumber" name="plotNumber" dataType="12"/>
+                <Property columnName="PaymentDate" name="paymentDateFrom" dataType="-101"/>
+                <Property columnName="PaymentDate" name="paymentDateTo" dataType="-102"/>
+            </PropertyMapping>
+        </Search>
+        <Search id="paymentDue"><!-- Payment Due Report-->
+            <SearchQuery>SELECT a.CustomerName as customerName,a.PhoneNo as phoneNo, c.AgentName as agentName,
+                sum(d.InstallmentAmount) as pendingInstallment,b.BookingDate as bookingDate, b.FirmName as
+                firmName,b.ProjectName as projectName,b.block as block,b.PlotNumber as plotNumber FROM CustomerDetails a
+                INNER JOIN
+                BookingDetails b ON a.CustomerId = b.CustomerId INNER JOIN AgentMaster c ON c.AgentId = b.AgentId INNER
+                JOIN PaymentDetails d ON d.BookingId = b.BookingId where d.Status ='Pending' and d.DueDate &lt;
+                SYSDATE() and d.BookingId = '15' AND {MACRO} group by a.CustomerName,a.PhoneNo
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="CustomerName" name="customerName" dataType="12"/>
+                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="BlockId" name="blockId" dataType="4"/>
+                <Property columnName="PlotNumber" name="plotNumber" dataType="12"/>
+            </PropertyMapping>
+        </Search>
+        <Search id="propertyStatus"><!-- Property Availability Report-->
+            <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
+                propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize FROM PlotDetails
+                WHERE {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="CustomerName" name="customerName" dataType="12"/>
+                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="BlockId" name="blockId" dataType="4"/>
+                <Property columnName="PlotNumber" name="plotNumber" dataType="12"/>
+                <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
+                <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
+                <Property columnName="Status" name="status" dataType="12"/>
+
+            </PropertyMapping>
+        </Search>
+
+        <Search id="dayBook"><!-- Day Book Report--> <!-- add all transaction details in this table -->
+            <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
+                propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize FROM PlotDetails
+                WHERE {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="TransactionDate" name="transactionDateFrom" dataType="-101"/>
+                <Property columnName="TransactionDate" name="transactionDateTo" dataType="-102"/>
+                <Property columnName="PaymentMode" name="paymentMode" dataType="12"/>
+            </PropertyMapping>
+        </Search>
+    </Searches>
 
 </Configuration>
 
-<!--
-dataTypes
+        <!--
+        dataTypes
 
-VARCHAR: 12
-TINYINT: -6
-INTEGER: 4
-DECIMAL: 3
-DATE: 91
-BLOB: 2004
-BOOLEAN: 16
-CLOB: 2005
--->
+        VARCHAR: 12
+        TINYINT: -6
+        INTEGER: 4
+        DECIMAL: 3
+        DATE: 91
+        BLOB: 2004
+        BOOLEAN: 16
+        CLOB: 2005
+        -->

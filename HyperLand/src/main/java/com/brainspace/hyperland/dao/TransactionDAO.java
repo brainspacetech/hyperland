@@ -41,11 +41,9 @@ public class TransactionDAO implements ITransactionDAO {
                         preparedStatement.setInt((i + 1), (Integer) dataList.get(j).get(paramsArr[i].trim()));
                     } else if (dataList.get(j).get(paramsArr[i].trim()) instanceof Date) {
                         preparedStatement.setDate((i + 1), (Date) dataList.get(j).get(paramsArr[i].trim()));
-                    }
-                    else if (dataList.get(j).get(paramsArr[i].trim()) instanceof Double) {
+                    } else if (dataList.get(j).get(paramsArr[i].trim()) instanceof Double) {
                         preparedStatement.setDouble((i + 1), (Double) dataList.get(j).get(paramsArr[i].trim()));
-                    }
-                    else{
+                    } else {
                         preparedStatement.setDate((i + 1), null);
                     }
 
@@ -63,12 +61,20 @@ public class TransactionDAO implements ITransactionDAO {
     public Object getBookingId(String query, Object params[], int argTypes[]) {
         jdbcTemplate.update(query, params, argTypes);
         String selectQuery = "SELECT LAST_INSERT_ID() as bookingId";
-        Map<String,Object> idMap = jdbcTemplate.queryForMap(selectQuery);
+        Map<String, Object> idMap = jdbcTemplate.queryForMap(selectQuery);
         return idMap.get("bookingId");
     }
 
-    public void updateData(final String sql, Map dataMap,String idColName)
-    {
+    @Override
+    public void addData(String query, Object params[], int argTypes[]) {
+        jdbcTemplate.update(query, params, argTypes);
+    }
+
+    @Override
+    public void updateData(String query) {
+        jdbcTemplate.update(query);
+    }
+    public void updateData(final String sql, Map dataMap, String idColName) {
         jdbcTemplate.update(sql, new PreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement preparedStatement) throws SQLException {
@@ -76,8 +82,8 @@ public class TransactionDAO implements ITransactionDAO {
                 String paramsArr[] = params.split(",");
                 int count = 0;
                 for (int i = 0; i < paramsArr.length; i++) {
-                    String paramName = paramsArr[i].substring(0,paramsArr[i].indexOf("=")).trim();
-                    System.out.println(paramName + " --- "+paramName);
+                    String paramName = paramsArr[i].substring(0, paramsArr[i].indexOf("=")).trim();
+                    System.out.println(paramName + " --- " + paramName);
                     System.out.println(paramName + "-- " + dataMap.get(paramName));
                     if (dataMap.get(paramName) instanceof String) {
                         preparedStatement.setString((i + 1), (String) dataMap.get(paramName));
@@ -85,17 +91,15 @@ public class TransactionDAO implements ITransactionDAO {
                         preparedStatement.setInt((i + 1), (Integer) dataMap.get(paramName));
                     } else if (dataMap.get(paramName) instanceof Date) {
                         preparedStatement.setDate((i + 1), (Date) dataMap.get(paramName));
-                    }
-                    else if (dataMap.get(paramName) instanceof Double) {
+                    } else if (dataMap.get(paramName) instanceof Double) {
                         preparedStatement.setDouble((i + 1), (Double) dataMap.get(paramName));
-                    }
-                    else{
+                    } else {
                         preparedStatement.setDate((i + 1), null);
                     }
                     count++;
                 }
 
-                preparedStatement.setInt(count+1,((Integer)dataMap.get(idColName)).intValue());
+                preparedStatement.setInt(count + 1, ((Integer) dataMap.get(idColName)).intValue());
                 System.out.println("preparedStatement  -- " + preparedStatement);
             }
         });

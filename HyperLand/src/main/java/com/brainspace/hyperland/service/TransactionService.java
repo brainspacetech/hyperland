@@ -4,6 +4,7 @@ import com.brainspace.hyperland.bo.*;
 import com.brainspace.hyperland.dao.ITransactionDAO;
 import com.brainspace.hyperland.utils.ConfigReader;
 import com.brainspace.hyperland.utils.ServiceUtils;
+import com.brainspace.hyperland.utils.TransactionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,7 @@ public class TransactionService implements ITransactionService {
     private ITransactionDAO transactionDAO;
 
     @Override
-    public RestResponse createBooking(Object requestObject) {
+    public RestResponse createBooking(Object requestObject, String createdBy) {
         List<Map> installmentList = null;
         ConfigBO configBO = ConfigReader.getConfig();
         Transactions transactions = configBO.getTransactions();
@@ -73,7 +74,7 @@ public class TransactionService implements ITransactionService {
                     bookingDetails.put("additionalChargesTax", additionalChargesTax);
                     totalAmount += additionalChargesTax;
                 }
-                bookingDetails.put("createdBy", "System");
+                bookingDetails.put("createdBy", createdBy);
                 bookingDetails.put("totalAmount", totalAmount);
                 Map bookingMap = serviceUtils.customerMap(bookingDetails, jsonColumnMap);
                 transactionDAO.updateData(updateQuery, bookingMap, "BookingId");
@@ -97,10 +98,8 @@ public class TransactionService implements ITransactionService {
                     }
                 }
                 transactionDAO.insertDataBatch(insertQuery, customerList);
-            }
-
-            else if (transactions.getTransaction()[i].getId().equalsIgnoreCase("payment")) {
-                Map paymentDetails = (Map)mainObject.get("paymentDetails");
+            } else if (transactions.getTransaction()[i].getId().equalsIgnoreCase("payment")) {
+                Map paymentDetails = (Map) mainObject.get("paymentDetails");
                 installmentList = new ArrayList<>();
                 insertQuery = transactions.getTransaction()[i].getInsertQuery();
                 Map installmentMap = new HashMap();
@@ -108,19 +107,19 @@ public class TransactionService implements ITransactionService {
                 installmentMap.put("bookingId", bookingId);
                 installmentMap.put("status", "Paid");
                 installmentMap.put("paymentType", "Booking");
-                installmentMap.put("collectedBy"        , "66565"  );
-                installmentMap.put("paymentMode"        , paymentDetails.get("paymentMode") );
-                installmentMap.put("chequeNo"           , paymentDetails.get("chequeNo"));
-                installmentMap.put("transactionId"      , paymentDetails.get("transactionId"));
-                installmentMap.put("paymentDate"        , paymentDetails.get("paymentDate") );
-                installmentMap.put("receiptNo"          , paymentDetails.get("receiptNo")   );
-                installmentMap.put("bankName"           , paymentDetails.get("bankName") );
-                installmentMap.put("installmentAmount"   , bookingDetails.get("bookingAmount") );
-                installmentList.add(   serviceUtils.customerMap(installmentMap,jsonColumnMap));
+                installmentMap.put("collectedBy", "66565");
+                installmentMap.put("paymentMode", paymentDetails.get("paymentMode"));
+                installmentMap.put("chequeNo", paymentDetails.get("chequeNo"));
+                installmentMap.put("transactionId", paymentDetails.get("transactionId"));
+                installmentMap.put("paymentDate", paymentDetails.get("paymentDate"));
+                installmentMap.put("receiptNo", paymentDetails.get("receiptNo"));
+                installmentMap.put("bankName", paymentDetails.get("bankName"));
+                installmentMap.put("installmentAmount", bookingDetails.get("bookingAmount"));
+                installmentList.add(serviceUtils.customerMap(installmentMap, jsonColumnMap));
                 Double pendingAmount = 0.0;
                 Double totalAmount = 0.00;
 
-                if(bookingDetails.get("totalAmount") != null){
+                if (bookingDetails.get("totalAmount") != null) {
                     totalAmount = Double.valueOf(bookingDetails.get("totalAmount").toString());
                 }
                 if (bookingDetails.get("bookingAmount") != null) {
@@ -132,17 +131,15 @@ public class TransactionService implements ITransactionService {
                 if (((String) bookingDetails.get("paymentType")).equalsIgnoreCase("Installment")) {
                     int numberOfInstallment = Integer.valueOf((String) bookingDetails.get("numberOfInstallment"));
 
-                    Double installmentAmount = pendingAmount/numberOfInstallment;
-                    String installlmentDueDate = (String)bookingDetails.get("installmentStartDate");
+                    Double installmentAmount = pendingAmount / numberOfInstallment;
+                    String installlmentDueDate = (String) bookingDetails.get("installmentStartDate");
                     DateFormat sourceDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     Calendar cal = null;
                     try {
                         Date dt = sourceDateFormat.parse(installlmentDueDate);
                         cal = Calendar.getInstance();
                         cal.setTime(dt);
-                    }
-                    catch(Exception e)
-                    {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 /*
@@ -160,14 +157,74 @@ public class TransactionService implements ITransactionService {
                         installmentList.add(   serviceUtils.customerMap(installmentMap,jsonColumnMap));
                     }*/
                 }
+                //insert data in balance entry table
+                //String paymentMode, Double depositAmount, String particulars, Double withdrawlAmount,String transactionDoneBy
+                TransactionUtils transactionUtils = new TransactionUtils();
+                Double bookingAmount = Double.valueOf(bookingDetails.get("bookingAmount").toString());
+                String particulars = bookingDetails.get("customerName") + " - " + bookingDetails.get("bookingAmount") + " - ";
+                transactionUtils.addBalanceEntry(transactionDAO, (String) bookingDetails.get("paymentMode"), bookingAmount, particulars, null, createdBy);
                 transactionDAO.insertDataBatch(insertQuery, installmentList);
             }
-
         }
 
         //add booking details
         //property details
 
         return null;
+    }
+
+    //used for Farmer and Agent Payment Entry
+    public void makePayment(Map paymentMap, String type,String createdBy) {
+        ConfigBO configBO = ConfigReader.getConfig();
+        Transactions transactions = configBO.getTransactions();
+
+        ServiceUtils serviceUtils = new ServiceUtils();
+
+        for (int i = 0; i < transactions.getTransaction().length; i++) {
+            Transaction transaction = transactions.getTransaction()[i];
+            if (transaction.getId().equalsIgnoreCase(type)) {
+                String sql = transaction.getInsertQuery();
+                String params = sql.substring(sql.indexOf('(') + 1, sql.indexOf(')'));
+                String paramsArr[] = params.split(",");
+                PropertyMapping propertyMapping = transaction.getPropertyMapping();
+                Property property[] = propertyMapping.getProperty();
+                Map<String, List> jsonColumnMap = serviceUtils.propertyMapper(property);
+                String value = "";
+                Object arguments[] = new Object[paramsArr.length];
+                int argumentTypes[] = new int[paramsArr.length];
+                for (int j = 0; j < paramsArr.length; j++) {
+                    System.out.println("paramsArr[j].trim() -- " + paramsArr[j].trim());
+                    List jsonColTypeList = jsonColumnMap.get(paramsArr[j].trim());
+                    Object colValue = paymentMap.get(jsonColTypeList.get(0));
+                    arguments[j] = colValue;
+                    argumentTypes[j] = Integer.parseInt((String) jsonColTypeList.get(1));
+                }
+                transactionDAO.addData(sql, arguments, argumentTypes); // add entry in table
+                //In case of farmer payment update paid amount in LandMaster
+                if (type.equalsIgnoreCase("farmer")) {
+                    Double paidAmount = Double.valueOf(paymentMap.get("paymentAmount").toString());
+                    String updateQuery = "UPDATE LandMaster SET PaidAmount = CASE WHEN PaidAmount IS NULL  THEN "+paidAmount+"  ELSE PaidAmount + " + paidAmount + " END WHERE Id = " + paymentMap.get("landId");
+                    transactionDAO.updateData(updateQuery);
+                }
+                if (type.equalsIgnoreCase("agent")) {
+                    Double paidAmount = Double.valueOf(paymentMap.get("paymentAmount").toString());
+                    String updateQuery = " UPDATE AgentMaster SET PaidAmount = CASE WHEN PaidAmount IS NULL THEN "+paidAmount+"  ELSE PaidAmount " + paidAmount + " END WHERE Id = " + paymentMap.get("agentId");
+                    transactionDAO.updateData(updateQuery);
+                }
+
+
+            }
+
+        }
+
+    }
+
+
+    //used for Expense / Farmer Payment / Agent Payment Approval / Property Cancellation Payment - > make and entry in DaybookEntry table
+     public void approvePayment(String id,String type,String approvedBy) {
+        if(type.equalsIgnoreCase("expense"))
+        {
+
+        }
     }
 }

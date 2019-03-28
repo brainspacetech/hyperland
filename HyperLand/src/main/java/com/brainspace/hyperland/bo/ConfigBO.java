@@ -21,6 +21,8 @@ public class ConfigBO {
 
     private Transactions transactions;
 
+    private Searches searches;
+
     @XmlElement(name = "Transactions")
     public Transactions getTransactions() {
         return transactions;
@@ -30,4 +32,12 @@ public class ConfigBO {
         this.transactions = transactions;
     }
 
+    @XmlElement(name = "Searches")
+    public Searches getSearches() {
+        return searches;
+    }
+
+    public void setSearches(Searches searches) {
+        this.searches = searches;
+    }
 }

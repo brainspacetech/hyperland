@@ -91,6 +91,7 @@ public class MasterService implements IMasterService {
                     Object arguments[] = new Object[paramsArr.length];
                     int argumentTypes[] = new int[paramsArr.length];
                     for (int j = 0; j < paramsArr.length; j++) {
+                        System.out.println("paramsArr[j].trim() -- "+paramsArr[j].trim());
                         List jsonColTypeList = jsonColumnMap.get(paramsArr[j].trim());
                         Object colValue = propertyMap.get(jsonColTypeList.get(0));
                         arguments[j] = colValue;
