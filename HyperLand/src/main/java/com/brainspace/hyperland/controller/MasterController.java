@@ -32,7 +32,7 @@ public class MasterController {
 
     @PostMapping(value = "/add/{type}")
     public ResponseEntity<RestResponse> add(@PathVariable(name = "type") String type,@RequestBody Object request) {
-        RestResponse response = masterService.addData(type,request);
+        RestResponse response = masterService.addData(type,request,"");
         return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
     }
 

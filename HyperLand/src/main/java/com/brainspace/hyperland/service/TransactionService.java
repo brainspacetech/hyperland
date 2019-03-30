@@ -174,7 +174,7 @@ public class TransactionService implements ITransactionService {
     }
 
     //used for Farmer and Agent Payment Entry
-    public void makePayment(Map paymentMap, String type,String createdBy) {
+    public void createPayment(Map paymentMap, String type,String createdBy) {
         ConfigBO configBO = ConfigReader.getConfig();
         Transactions transactions = configBO.getTransactions();
 
@@ -220,11 +220,27 @@ public class TransactionService implements ITransactionService {
     }
 
 
-    //used for Expense / Farmer Payment / Agent Payment Approval / Property Cancellation Payment - > make and entry in DaybookEntry table
+    //used for Daily Expense / Farmer Payment / Agent Payment Approval / Property Cancellation Payment - > make and entry in Day book Entry table
      public void approvePayment(String id,String type,String approvedBy) {
-        if(type.equalsIgnoreCase("expense"))
-        {
+         ConfigBO configBO = ConfigReader.getConfig();
+         Transactions transactions = configBO.getTransactions();
+         String updateQuery;
+         for (Transaction transaction: transactions.getTransaction()) {
+             if(transaction.getId().equalsIgnoreCase(type)){
+                 updateQuery = transaction.getUpdateQuery();
+                 updateQuery = updateQuery.replace("{1}","'"+approvedBy+"'");
+                 updateQuery = updateQuery.replace("{2}",id);
+                 transactionDAO.updateData(updateQuery);
+                 // after payment make an entry in DaybookEntry table
 
-        }
+             }
+         }
     }
+
+    // cancel property, update IScancelled = 'Y' in BookingDetails table
+    public void cancelProperty(String bookingId)
+    {
+
+    }
+
 }

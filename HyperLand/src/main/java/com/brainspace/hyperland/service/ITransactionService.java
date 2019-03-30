@@ -7,5 +7,6 @@ import java.util.Map;
 
 public interface ITransactionService {
     RestResponse createBooking(Object requestObject,String createdBy);
-    public void makePayment(Map paymentMap, String type,String createdBy);
+    public void createPayment(Map paymentMap, String type,String createdBy);
+    public void approvePayment(String id,String type,String approvedBy);
 }

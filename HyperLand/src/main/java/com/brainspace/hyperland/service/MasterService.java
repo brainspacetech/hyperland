@@ -73,7 +73,7 @@ public class MasterService implements IMasterService {
     }
 
     @Override
-    public RestResponse addData(String type, Object object) {
+    public RestResponse addData(String type, Object object,String createdBy) {
         RestResponse response = null;
         for (int i = 0; i < configBO.getServiceObj().length; i++) {
             if (configBO.getServiceObj()[i].getId().equalsIgnoreCase(type)) {

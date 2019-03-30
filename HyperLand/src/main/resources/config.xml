@@ -350,11 +350,10 @@
             </PropertyMapping>
         </Transaction>
         <Transaction id="expense">
-            <InsertQuery>INSERT INTO ExpenseDetails (AgentId,AgentName,PaymentDate, PaymentMode,BankName, PaymentAmount,
-                ChequeNo, TransactionId, TransactionDate, ChequeDate, CreatedBy,CreatedOn,ApprovedOn,ApprovedBy) VALUES
-                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            <InsertQuery>INSERT INTO ExpenseDetails (ExpenseCategory,Amount,CreatedBy,CreatedOn,TransactionDetail,TransactionId,FirmId,FirmName,PropertyId,PropertyName,InvoiceNo,PaidTo,PaymentMode,ChequeNo,BankName,ChequeDate,ExpenseDate) VALUES
+                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
-            <UpdateQuery>UPDATE ExpenseDetails SET ApprovedBy = ? , ApprovedOn = SYSDATE() WHERE Id = ? AND ApprovedOn is null</UpdateQuery>
+            <UpdateQuery>UPDATE ExpenseDetails SET ApprovedBy = {1} , ApprovedOn = SYSDATE(),IsApproved = 'Y' WHERE Id = {2} AND ApprovedOn is null</UpdateQuery>
             <PropertyMapping>
                 <Property name="id" columnName="Id" dataType="4"/>
                 <Property name="expenseCategory" columnName="ExpenseCategory" dataType="12"/>,
@@ -376,8 +375,7 @@
                 <Property name="chequeNo" columnName="ChequeNo" dataType="12"/>
                 <Property name="bankName" columnName="BankName" dataType="12"/>
                 <Property name="chequeDate" columnName="ChequeDate" dataType="91"/>
-                <Property name="expenseFrom" columnName="ExpenseDate" dataType="-101"/> <!--(-101) for from date -->
-                <Property name="expenseTo" columnName="ExpenseDate" dataType="-102"/> <!--(-101) for to date -->
+                <Property name="expenseDate" columnName="ExpenseDate" dataType="91"/>
                 <Property name="isApproved" columnName="IsApproved" dataType="1"/>
             </PropertyMapping>
         </Transaction>
@@ -454,7 +452,7 @@
                 sqftRate FROM CustomerDetails a INNER JOIN BookingDetails b on b.BookingId = a.BookingId INNER JOIN
                 AgentMaster c on b.AgentId = c.AgentId INNER JOIN PlotTransaction d
                 ON d.BookingId = b.BookingId INNER JOIN PlotDetails e ON e.Id = d.PlotId WHERE a.CustomerType =
-                'Primary' AND {MACRO}
+                'Primary' AND  IsCancelled is null  AND {MACRO}
             </SearchQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
@@ -477,7 +475,7 @@
                 transactionId,d.BankName as bankName,d.InstallmentAmount as installmentAmount, d.PaidInstallment as
                 paidInstallment FROM CustomerDetails a INNER JOIN
                 BookingDetails b ON a.CustomerId = b.CustomerId INNER JOIN AgentMaster c ON c.AgentId = b.AgentId INNER
-                JOIN PaymentDetails d ON d.BookingId = b.BookingId where d.PaymentDate is not null AND {MACRO}
+                JOIN PaymentDetails d ON d.BookingId = b.BookingId where d.PaymentDate is not null AND d.IsCancelled is null AND {MACRO}
             </SearchQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
@@ -498,7 +496,7 @@
                 INNER JOIN
                 BookingDetails b ON a.CustomerId = b.CustomerId INNER JOIN AgentMaster c ON c.AgentId = b.AgentId INNER
                 JOIN PaymentDetails d ON d.BookingId = b.BookingId where d.Status ='Pending' and d.DueDate &lt;
-                SYSDATE() and d.BookingId = '15' AND {MACRO} group by a.CustomerName,a.PhoneNo
+                SYSDATE() and d.BookingId = '15' AND d.IsCancelled is null AND {MACRO} group by a.CustomerName,a.PhoneNo
             </SearchQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>

@@ -6,6 +6,7 @@ import com.brainspace.hyperland.bo.ConfigBO;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.InputStream;
 
 public class ConfigReader {
     private static ConfigBO configBO = null;
@@ -18,11 +19,10 @@ public class ConfigReader {
             try {
 
                 ClassLoader classLoader = ConfigReader.class.getClassLoader();
-                File xmlFile = new File("C:\\Users\\Lenovo\\IdeaProjects\\hyperland3\\HyperLand\\src\\main\\resources\\config.xml");
-                System.out.println(xmlFile);
+                InputStream inputStream = classLoader.getResourceAsStream("./config.xml");
                 JAXBContext jaxbcontext = JAXBContext.newInstance(ConfigBO.class);
                 Unmarshaller unmarshaller = jaxbcontext.createUnmarshaller();
-                configBO = (ConfigBO) unmarshaller.unmarshal(xmlFile);
+                configBO = (ConfigBO) unmarshaller.unmarshal(inputStream);
                 System.out.println("configBO " + configBO.getServiceObj());
 
             } catch (Exception e) {
