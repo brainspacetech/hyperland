@@ -47,7 +47,7 @@ public class SelectorDAO implements ISelectorDAO {
 			case "property":
 						sql = "SELECT Id as Code, ProjectName as Value FROM ProjectMaster where FirmId = ?";
 						break;
-			case "citie":
+			case "city":
 						sql = "SELECT Id as Code, City as Value FROM CityMaster";
 						break;
 			case "location":
@@ -60,7 +60,7 @@ public class SelectorDAO implements ISelectorDAO {
 						sql = "SELECT Id as Code, Block as Value FROM BlockMaster where PropertyId = ?";
 						break;
 			case "plot":
-						sql = "SELECT Id as Code, Block as Value FROM BlockMaster where BlockId = ?";
+						sql = "SELECT Id as Code, Block as Value FROM PlotDetails where BlockId = ?";
 						break;
 			default: sql = "";
 					

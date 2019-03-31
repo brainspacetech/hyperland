@@ -36,9 +36,7 @@ public class ConfigReader {
     public static void main(String s[])
     {
         try {
-            Class dao = Class.forName("com.brainspace.hyperland.dao.MasterDAO");
-            Object obj = dao.newInstance();
-            System.out.println(obj.getClass());
+            getConfig();
         }
         catch(Exception e)
         {
