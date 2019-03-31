@@ -208,10 +208,10 @@
         </PropertyMapping>
     </Service>
     <Service id="plc">
-        <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName,PropertyId as propertyId,PropertyName as propertyName,PLCName as plcName ,PLCCharges as plcCharges,Id as id , ChargesType as chargesType from PLCMaster</SelectQuery>
-        <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName,PropertyId as propertyId,PropertyName as propertyName,PLCName as plcName ,PLCCharges as plcCharges,Id as id , ChargesType as chargesType from PLCMaster where Id = ?</SelectQueryById>
-        <InsertQuery>INSERT INTO PLCMaster (FirmId,FirmName,PropertyId,PropertyName,PLCName,PLCCharges, ChargesType ) VALUES (?,?,?,?,?,?,?)</InsertQuery>
-        <UpdateQuery>UPDATE PLCMaster SET FirmId=?,  FirmName = ?,PropertyId = ?, PropertyName = ?,PLCName =?,PLCCharges =?, ChargesType = ? WHERE Id = ?</UpdateQuery>
+        <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName,PropertyId as propertyId,PropertyName as propertyName,PLCName as plcName ,PLCCharge as plcCharge,Id as id , ChargeType as chargeType from PLCMaster</SelectQuery>
+        <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName,PropertyId as propertyId,PropertyName as propertyName,PLCName as plcName ,PLCCharge as plcCharge,Id as id , ChargeType as chargeType from PLCMaster where Id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO PLCMaster (FirmId,FirmName,PropertyId,PropertyName,PLCName,PLCCharge, ChargeType ) VALUES (?,?,?,?,?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE PLCMaster SET FirmId=?,  FirmName = ?,PropertyId = ?, PropertyName = ?,PLCName =?,PLCCharge =?, ChargeType = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM PLCMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType='4'/>
@@ -220,8 +220,8 @@
             <Property name="propertyId" columnName="PropertyId" dataType='4'/>
             <Property name="propertyName" columnName="PropertyName" dataType='12'/>
             <Property name="plcName" columnName="PLCName" dataType='12'/>
-            <Property name="plcCharges" columnName="PLCCharges" dataType='3'/>
-            <Property name="chargesType" columnName="ChargesType" dataType='12'/>
+            <Property name="plcCharge" columnName="PLCCharge" dataType='3'/>
+            <Property name="chargeType" columnName="ChargesType" dataType='12'/>
         </PropertyMapping>
     </Service>
     <Service id="block">
