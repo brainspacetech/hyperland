@@ -208,8 +208,8 @@
         </PropertyMapping>
     </Service>
     <Service id="plc">
-        <SelectQuery>select FirmId as firmId,FirmName as firmName,PropertyId as propertyId,PropertyName as propertyName,PLCName as plcName ,PLCCharges as plcCharges,Id as id , ChargesType as chargesType from PLCMaster</SelectQuery>
-        <SelectQueryById>select FirmId as firmId,FirmName as firmName,PropertyId as propertyId,PropertyName as propertyName,PLCName as plcName ,PLCCharges as plcCharges,Id as id , ChargesType as chargesType from PLCMaster where Id = ?</SelectQueryById>
+        <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName,PropertyId as propertyId,PropertyName as propertyName,PLCName as plcName ,PLCCharges as plcCharges,Id as id , ChargesType as chargesType from PLCMaster</SelectQuery>
+        <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName,PropertyId as propertyId,PropertyName as propertyName,PLCName as plcName ,PLCCharges as plcCharges,Id as id , ChargesType as chargesType from PLCMaster where Id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO PLCMaster (FirmId,FirmName,PropertyId,PropertyName,PLCName,PLCCharges, ChargesType ) VALUES (?,?,?,?,?,?,?)</InsertQuery>
         <UpdateQuery>UPDATE PLCMaster SET FirmId=?,  FirmName = ?,PropertyId = ?, PropertyName = ?,PLCName =?,PLCCharges =?, ChargesType = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM PLCMaster WHERE Id = ?</DeleteQuery>
@@ -222,6 +222,24 @@
             <Property name="plcName" columnName="PLCName" dataType='12'/>
             <Property name="plcCharges" columnName="PLCCharges" dataType='3'/>
             <Property name="chargesType" columnName="ChargesType" dataType='12'/>
+        </PropertyMapping>
+    </Service>
+    <Service id="block">
+        <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,Block as block,BlockId as blockId from BlockMaster</SelectQuery>
+        <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,Block as block,BlockId as block Idfrom BlockMaster where Id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO BlockMaster (FirmId,FirmName,PropertyId,PropertyName,PropertyTypeId,PropertyType, BlockId,Block ) VALUES (?,?,?,?,?,?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE BlockMaster SET FirmId=?,  FirmName = ?,PropertyId = ?, PropertyName = ?,PropertyTypeId =?,PropertyType =?, BlockId = ?, Block = ? WHERE Id = ?</UpdateQuery>
+        <DeleteQuery>DELETE FROM BlockMaster WHERE Id = ?</DeleteQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="firmId" columnName="FirmId" dataType='4'/>
+            <Property name="firmName" columnName="FirmName" dataType='12'/>
+            <Property name="propertyId" columnName="PropertyId" dataType='4'/>
+            <Property name="propertyName" columnName="PropertyName" dataType='12'/>
+            <Property name="propertyTypeId" columnName="PropertyTypeId" dataType='4'/>
+            <Property name="propertyType" columnName="PropertyType" dataType='12'/>
+            <Property name="blockId" columnName="BlockId" dataType='4'/>
+            <Property name="block" columnName="Block" dataType='12'/>
         </PropertyMapping>
     </Service>
     <Transactions>
