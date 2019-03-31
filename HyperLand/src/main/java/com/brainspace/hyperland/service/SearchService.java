@@ -19,7 +19,7 @@ public class SearchService implements ISearchService {
     private IMasterDAO masterDAO;
 
     public RestResponse searchObject(Map searchCriteria, String type) {
-        RestResponse  restResponse = null;
+        RestResponse restResponse = null;
         ConfigBO configBO = ConfigReader.getConfig();
         ServiceUtils serviceUtils = new ServiceUtils();
         for (int i = 0; i < configBO.getSearches().getSearch().length; i++) {
@@ -30,26 +30,27 @@ public class SearchService implements ISearchService {
                 Set<String> keys = searchCriteria.keySet();
                 String whereClause = "";
                 for (String key : keys) {
-                    List<String> colDataType = (List<String>) jsonColumnMap.get(key);
-                    if (colDataType.get(1).equalsIgnoreCase("-101")) {
-                        whereClause += colDataType.get(0) + " >= CAST('" + searchCriteria.get(key) + "' AS DATE) AND ";
-                    } else if (colDataType.get(1).equalsIgnoreCase("-102")) {
-                        whereClause += colDataType.get(0) + " <= CAST('" + searchCriteria.get(key) + "' AS DATE) AND ";
-                    } else if (colDataType.get(1).equalsIgnoreCase("-12")) {
-                        whereClause += colDataType.get(0) + " = '" + searchCriteria.get(key) + "' AND ";
-                    } else {
-                        whereClause += colDataType.get(0) + " = " + searchCriteria.get(key) + " AND ";
+                    if (searchCriteria.get(key) != null) {
+                        List<String> colDataType = (List<String>) jsonColumnMap.get(key);
+                        if (colDataType.get(1).equalsIgnoreCase("-101")) {
+                            whereClause += colDataType.get(0) + " >= CAST('" + searchCriteria.get(key) + "' AS DATE) AND ";
+                        } else if (colDataType.get(1).equalsIgnoreCase("-102")) {
+                            whereClause += colDataType.get(0) + " <= CAST('" + searchCriteria.get(key) + "' AS DATE) AND ";
+                        } else if (colDataType.get(1).equalsIgnoreCase("-12")) {
+                            whereClause += colDataType.get(0) + " = '" + searchCriteria.get(key) + "' AND ";
+                        } else {
+                            whereClause += colDataType.get(0) + " = " + searchCriteria.get(key) + " AND ";
+                        }
                     }
-
                 }
                 whereClause = whereClause.substring(0, whereClause.lastIndexOf(" AND"));
                 String sql = search.getSearchQuery().replace("{MACRO}", whereClause);
                 String statusCode = "";
                 String statusMessage = "";
-                List result =null;
+                List result = null;
                 try {
 
-                     result = masterDAO.getAllData(sql);
+                    result = masterDAO.getAllData(sql);
                     statusCode = "1";
                     if (result.size() == 0)
                         statusCode = "2";

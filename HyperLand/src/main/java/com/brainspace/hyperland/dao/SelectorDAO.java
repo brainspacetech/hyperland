@@ -60,7 +60,7 @@ public class SelectorDAO implements ISelectorDAO {
 						sql = "SELECT Id as Code, Block as Value FROM BlockMaster where PropertyId = ?";
 						break;
 			case "plot":
-						sql = "SELECT Id as Code, Block as Value FROM PlotDetails where BlockId = ?";
+						sql = "SELECT Id as Code, PlotNo as Value FROM PlotDetails where BlockId = ?";
 						break;
 			default: sql = "";
 					
