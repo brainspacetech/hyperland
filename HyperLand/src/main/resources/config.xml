@@ -158,17 +158,17 @@
         </PropertyMapping>
     </Service>
     <Service id="agent">
-        <SelectQuery>select AgentId as agentId,AgentName as agentName ,PanNumber as panNumber ,AdhaarNo as adhaarNo
+        <SelectQuery>select AgentId as id,AgentName as agentName ,PanNumber as panNumber ,AdhaarNo as adhaarNo
             ,Address as address ,City as city ,State as state ,PinCode as pinCode ,emailId as emailId ,PhoneNo as
             phoneNo ,DateOfJoining as dateOfJoining,DateOfBirth as dateOfBirth,Occupation as occupation ,sponsorId as
             sponsorId ,sponsorName as sponsorName ,Bank as bank ,Branch as branch ,AccountNumber as accountNumber
-            ,IFSCCode as ifscCode ,Status as status ,LoginId as loginId ,Designation as designation, from AgentMaster
+            ,IFSCCode as ifscCode ,Status as status ,LoginId as loginId ,Designation as designation from AgentMaster
         </SelectQuery>
-        <SelectQueryById>select AgentId as agentId,AgentName as agentName ,PanNumber as panNumber ,AdhaarNo as adhaarNo
+        <SelectQueryById>select AgentId as id,AgentName as agentName ,PanNumber as panNumber ,AdhaarNo as adhaarNo
             ,Address as address ,City as city ,State as state ,PinCode as pinCode ,emailId as emailId ,PhoneNo as
             phoneNo ,DateOfJoining as dateOfJoining,DateOfBirth as dateOfBirth,Occupation as occupation ,sponsorId as
             sponsorId ,sponsorName as sponsorName ,Bank as bank ,Branch as branch ,AccountNumber as accountNumber
-            ,IFSCCode as ifscCode ,Status as status ,LoginId as loginId ,Designation as designation, from AgentMaster
+            ,IFSCCode as ifscCode ,Status as status ,LoginId as loginId ,Designation as designation from AgentMaster
             where AgentId = ?
         </SelectQueryById>
         <InsertQuery>INSERT INTO AgentMaster (AgentName ,PanNumber ,AdhaarNo ,Address ,City ,State ,PinCode ,emailId
@@ -226,7 +226,7 @@
     </Service>
     <Service id="block">
         <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,Block as block,BlockId as blockId from BlockMaster</SelectQuery>
-        <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,Block as block,BlockId as block Idfrom BlockMaster where Id = ?</SelectQueryById>
+        <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,Block as block,BlockId as blockId from BlockMaster where Id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO BlockMaster (FirmId,FirmName,PropertyId,PropertyName,PropertyTypeId,PropertyType, BlockId,Block ) VALUES (?,?,?,?,?,?,?,?)</InsertQuery>
         <UpdateQuery>UPDATE BlockMaster SET FirmId=?,  FirmName = ?,PropertyId = ?, PropertyName = ?,PropertyTypeId =?,PropertyType =?, BlockId = ?, Block = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM BlockMaster WHERE Id = ?</DeleteQuery>
@@ -240,6 +240,23 @@
             <Property name="propertyType" columnName="PropertyType" dataType='12'/>
             <Property name="blockId" columnName="BlockId" dataType='4'/>
             <Property name="block" columnName="Block" dataType='12'/>
+        </PropertyMapping>
+    </Service>
+    <Service id="additionalCharges">
+        <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,AdditionalCharges as additionalCharges,Rate as rate,ChargesType as chargesType from AdditionalChargesMaster</SelectQuery>
+        <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,AdditionalCharges as additionalCharges,Rate as rate,ChargesType as chargesType from AdditionalChargesMaster where Id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO AdditionalChargesMaster (FirmId,FirmName,PropertyId,PropertyName,AdditionalCharges,Rate, ChargesType ) VALUES (?,?,?,?,?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE AdditionalChargesMaster SET FirmId = ?,  FirmName = ?,PropertyId = ?, PropertyName = ?,AdditionalCharges =?,Rate =?, ChargesType = ? WHERE Id = ?</UpdateQuery>
+        <DeleteQuery>DELETE FROM AdditionalChargesMaster WHERE Id = ?</DeleteQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="firmId" columnName="FirmId" dataType='4'/>
+            <Property name="firmName" columnName="FirmName" dataType='12'/>
+            <Property name="propertyId" columnName="PropertyId" dataType='4'/>
+            <Property name="propertyName" columnName="PropertyName" dataType='12'/>
+            <Property name="additionalCharges" columnName="AdditionalCharges" dataType='12'/>
+            <Property name="rate" columnName="Rate" dataType='3'/>
+            <Property name="chargesType" columnName="ChargesType" dataType='12'/>
         </PropertyMapping>
     </Service>
     <Transactions>
@@ -496,7 +513,7 @@
                 <Property columnName="FirmId" name="firmId" dataType="4"/>
                 <Property columnName="ProjectId" name="projectId" dataType="4"/>
                 <Property columnName="BlockId" name="blockId" dataType="4"/>
-                <Property columnName="PlotNumber" name="plotNumber" dataType="12"/>
+                <Property columnName="PlotId" name="plotId" dataType="12"/>
                 <Property columnName="BookingDate" name="bookingDateFrom" dataType="-101"/>
                 <Property columnName="BookingDate" name="bookingDateTo" dataType="-102"/>
             </PropertyMapping>
@@ -519,7 +536,7 @@
                 <Property columnName="FirmId" name="firmId" dataType="4"/>
                 <Property columnName="ProjectId" name="projectId" dataType="4"/>
                 <Property columnName="BlockId" name="blockId" dataType="4"/>
-                <Property columnName="PlotNumber" name="plotNumber" dataType="12"/>
+                <Property columnName="PlotId" name="plotId" dataType="12"/>
                 <Property columnName="PaymentDate" name="paymentDateFrom" dataType="-101"/>
                 <Property columnName="PaymentDate" name="paymentDateTo" dataType="-102"/>
             </PropertyMapping>
@@ -540,7 +557,7 @@
                 <Property columnName="FirmId" name="firmId" dataType="4"/>
                 <Property columnName="ProjectId" name="projectId" dataType="4"/>
                 <Property columnName="BlockId" name="blockId" dataType="4"/>
-                <Property columnName="PlotNumber" name="plotNumber" dataType="12"/>
+                <Property columnName="PlotId" name="plotId" dataType="12"/>
             </PropertyMapping>
         </Search>
         <Search id="propertyStatus"><!-- Property Availability Report-->
@@ -555,7 +572,7 @@
                 <Property columnName="FirmId" name="firmId" dataType="4"/>
                 <Property columnName="ProjectId" name="projectId" dataType="4"/>
                 <Property columnName="BlockId" name="blockId" dataType="4"/>
-                <Property columnName="PlotNumber" name="plotNumber" dataType="12"/>
+                <Property columnName="PlotId" name="plotId" dataType="12"/>
                 <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
                 <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
                 <Property columnName="Status" name="status" dataType="12"/>
