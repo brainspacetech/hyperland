@@ -61,6 +61,7 @@ public class MasterService implements IMasterService {
                         statusCode = "2";
                     statusMessage = "Success";
                 } catch (Exception e) {
+                    e.printStackTrace();
                     statusCode = "0";
                     statusMessage = "Failed";
                 }

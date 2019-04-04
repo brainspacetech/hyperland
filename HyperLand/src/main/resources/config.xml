@@ -221,9 +221,28 @@
             <Property name="propertyName" columnName="PropertyName" dataType='12'/>
             <Property name="plcName" columnName="PLCName" dataType='12'/>
             <Property name="plcCharge" columnName="PLCCharge" dataType='3'/>
-            <Property name="chargeType" columnName="ChargesType" dataType='12'/>
+            <Property name="chargeType" columnName="ChargeType" dataType='12'/>
         </PropertyMapping>
     </Service>
+
+    <Service id="plot">
+        <SelectQuery>select Id as id, PlotSize as plotSize, SqFtRate as sqftRate, PLCType as PLCType, PLCTypeId as plcTypeId,Status as status from PlotDetails</SelectQuery>
+        <SelectQueryById>select Id as id, PlotSize as plotSize, SqFtRate as sqftRate, PLCType as plcType, PLCTypeId as plcTypeId,Status as status from PlotDetails where Id = ?</SelectQueryById>
+     <!--   <InsertQuery>INSERT INTO PLCMaster (FirmId,FirmName,PropertyId,PropertyName,PLCName,PLCCharge, ChargeType ) VALUES (?,?,?,?,?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE PLCMaster SET FirmId=?,  FirmName = ?,PropertyId = ?, PropertyName = ?,PLCName =?,PLCCharge =?, ChargeType = ? WHERE Id = ?</UpdateQuery>
+        <DeleteQuery>DELETE FROM PLCMaster WHERE Id = ?</DeleteQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="firmId" columnName="FirmId" dataType='4'/>
+            <Property name="firmName" columnName="FirmName" dataType='12'/>
+            <Property name="propertyId" columnName="PropertyId" dataType='4'/>
+            <Property name="propertyName" columnName="PropertyName" dataType='12'/>
+            <Property name="plcName" columnName="PLCName" dataType='12'/>
+            <Property name="plcCharge" columnName="PLCCharge" dataType='3'/>
+            <Property name="chargeType" columnName="ChargesType" dataType='12'/>
+        </PropertyMapping>
+-->    </Service>
+
     <Service id="block">
         <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,Block as block,BlockId as blockId from BlockMaster</SelectQuery>
         <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,Block as block,BlockId as blockId from BlockMaster where Id = ?</SelectQueryById>

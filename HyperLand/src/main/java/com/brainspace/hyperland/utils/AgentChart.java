@@ -14,11 +14,6 @@ public class AgentChart {
     {
 
 
-      /*  12	Mustafa
-        13	Mustafa	12
-        14	Mustafa	13
-        16	Arati	13
-        15	pankaj	14*/
         List<Map<String,Object>> obj = new ArrayList<>();
         Map a = new HashMap();
         AgentNode node1 = new AgentNode("Pankaj", "12", null,"SelfBusiness - 3232099    chainbusiness - 3000.00");
