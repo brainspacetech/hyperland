@@ -279,7 +279,7 @@
         <SelectQuery>select Id as id, InvestorName as investorName, Address as address , PhoneNumber as phoneNumber from InvestorMaster</SelectQuery>
         <SelectQueryById>select Id as id,  InvestorName as investorName, Address as address , PhoneNumber as phoneNumber from InvestorMaster where id = ?
         </SelectQueryById>
-        <InsertQuery>INSERT INTO InvestorMaster (InvestorName,Address,PhoneNumber) VALUES (?,?,?)</InsertQuery>
+        <InsertQuery>INSERT INTO InvestorMaster (InvestorName,Address,PhoneNumber)  VALUES (?,?,?)</InsertQuery>
         <UpdateQuery>UPDATE InvestorMaster SET Address = ? , PhoneNumber = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM InvestorMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
@@ -559,7 +559,7 @@
                 <Property columnName="Id" name="id" dataType="4"/>
                 <Property columnName="CustomerId" name="customerId" dataType="12"/>
                 <Property columnName="CustomerName" name="customerName" dataType="12"/>
-                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="b.FirmId" name="firmId" dataType="4"/>
                 <Property columnName="ProjectId" name="projectId" dataType="4"/>
                 <Property columnName="BlockId" name="blockId" dataType="4"/>
                 <Property columnName="PlotId" name="plotId" dataType="12"/>
