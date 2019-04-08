@@ -85,7 +85,7 @@
             <Property name="location" columnName="Location" dataType='12'/>
         </PropertyMapping>
     </Service>
-    <Service id="PropertyType">
+    <Service id="propertyType">
         <SelectQuery>select Id as id, PropertyType as PropertyType from PropertyTypeMaster</SelectQuery>
         <SelectQueryById>select Id as id, PropertyType as PropertyType from PropertyTypeMaster where id = ?
         </SelectQueryById>
@@ -97,7 +97,6 @@
             <Property name="PropertyType" columnName="PropertyType" dataType='12'/>
         </PropertyMapping>
     </Service>
-
     <Service id="bank">
         <SelectQuery>select Id as id, BankName as bankName, Branch as branch,AccountNumber as accountNumber,IFSCCode as
             ifscCode from BankMaster
@@ -224,7 +223,6 @@
             <Property name="chargeType" columnName="ChargeType" dataType='12'/>
         </PropertyMapping>
     </Service>
-
     <Service id="plot">
         <SelectQuery>select Id as id, PlotSize as plotSize, SqFtRate as sqftRate, PLCType as PLCType, PLCTypeId as plcTypeId,Status as status from PlotDetails</SelectQuery>
         <SelectQueryById>select Id as id, PlotSize as plotSize, SqFtRate as sqftRate, PLCType as plcType, PLCTypeId as plcTypeId,Status as status from PlotDetails where Id = ?</SelectQueryById>
@@ -242,7 +240,6 @@
             <Property name="chargeType" columnName="ChargesType" dataType='12'/>
         </PropertyMapping>
 -->    </Service>
-
     <Service id="block">
         <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,Block as block,BlockId as blockId from BlockMaster</SelectQuery>
         <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,Block as block,BlockId as blockId from BlockMaster where Id = ?</SelectQueryById>
@@ -276,6 +273,39 @@
             <Property name="additionalCharges" columnName="AdditionalCharges" dataType='12'/>
             <Property name="rate" columnName="Rate" dataType='3'/>
             <Property name="chargesType" columnName="ChargesType" dataType='12'/>
+        </PropertyMapping>
+    </Service>
+    <Service id="investor">
+        <SelectQuery>select Id as id, InvestorName as investorName, Address as address , PhoneNumber as phoneNumber from InvestorMaster</SelectQuery>
+        <SelectQueryById>select Id as id,  InvestorName as investorName, Address as address , PhoneNumber as phoneNumber from InvestorMaster where id = ?
+        </SelectQueryById>
+        <InsertQuery>INSERT INTO InvestorMaster (InvestorName,Address,PhoneNumber) VALUES (?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE InvestorMaster SET Address = ? , PhoneNumber = ? WHERE Id = ?</UpdateQuery>
+        <DeleteQuery>DELETE FROM InvestorMaster WHERE Id = ?</DeleteQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="investorName" columnName="InvestorName" dataType='12'/>
+            <Property name="address" columnName="Address" dataType='12'/>
+            <Property name="phoneNumber" columnName="PhoneNumber" dataType='12'/>
+        </PropertyMapping>
+    </Service>
+    <Service id="investment">
+        <SelectQuery>select Id as id,InvestorId as investorId, InvestorName as investorName, FirmId as firmId ,FirmName as firmName, PropertyId as propertyId, PropertyName as propertyName,InvestmentDate as investmentDate, Amount as amount from InvestmentMaster</SelectQuery>
+        <SelectQueryById>select Id as id, InvestorId as investorId, InvestorName as investorName, FirmId as firmId ,FirmName as firmName, PropertyId as propertyId, PropertyName as propertyName,InvestmentDate as investmentDate, Amount as amount from InvestmentMaster where id = ?
+        </SelectQueryById>
+        <InsertQuery>INSERT INTO InvestmentMaster (InvestorId,InvestorName,FirmId,FirmName,PropertyId,PropertyName,InvestmentDate,Amount) VALUES (?,?,?,?,?,?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE InvestmentMaster SET FirmId = ? , FirmName = ?,PropertyId = ?,PropertyName=? ,InvestmentDate =?, Amount =? WHERE Id = ?</UpdateQuery>
+        <DeleteQuery>DELETE FROM InvestmentMaster WHERE Id = ?</DeleteQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="investorId" columnName="InvestorId" dataType='4'/>
+            <Property name="investorName" columnName="InvestorName" dataType='12'/>
+            <Property name="firmId" columnName="FirmId" dataType='4'/>
+            <Property name="firmName" columnName="FirmName" dataType='12'/>
+            <Property name="propertyId" columnName="PropertyId" dataType='4'/>
+            <Property name="propertyName" columnName="PropertyName" dataType='12'/>
+            <Property name="investmentDate" columnName="InvestmentDate" dataType='91'/>
+            <Property name="amount" columnName="Amount" dataType='3'/>
         </PropertyMapping>
     </Service>
     <Transactions>
@@ -371,7 +401,7 @@
 
             </PropertyMapping>
         </Transaction>
-        <Transaction id="farmer">
+        <Transaction id="farmerPayment">
             <InsertQuery>INSERT INTO FarmerPayment (FarmerId,LandId,FarmerName,PaymentDate, PaymentMode,BankName,
                 PaymentAmount, ChequeNo, TransactionId, TransactionDate, ChequeDate,
                 CreatedBy,CreatedOn,ApprovedOn,ApprovedBy) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
@@ -396,7 +426,7 @@
                 <Property columnName="IsApproved" name="isApproved" dataType="1"/>
             </PropertyMapping>
         </Transaction>
-        <Transaction id="agent">
+        <Transaction id="agentPayment">
             <InsertQuery>INSERT INTO AgentPayment (AgentId,AgentName,PaymentDate, PaymentMode,BankName, PaymentAmount,
                 ChequeNo, TransactionId, TransactionDate, ChequeDate, CreatedBy,CreatedOn,ApprovedOn,ApprovedBy) VALUES
                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
@@ -420,7 +450,7 @@
                 <Property columnName="IsApproved" name="isApproved" dataType="1"/>
             </PropertyMapping>
         </Transaction>
-        <Transaction id="expense">
+        <Transaction id="dailyExpense">
             <InsertQuery>INSERT INTO ExpenseDetails (ExpenseCategory,Amount,CreatedBy,CreatedOn,TransactionDetail,TransactionId,FirmId,FirmName,PropertyId,PropertyName,InvoiceNo,PaidTo,PaymentMode,ChequeNo,BankName,ChequeDate,ExpenseDate) VALUES
                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
@@ -595,10 +625,8 @@
                 <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
                 <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
                 <Property columnName="Status" name="status" dataType="12"/>
-
             </PropertyMapping>
         </Search>
-
         <Search id="dayBook"><!-- Day Book Report--> <!-- add all transaction details in this table -->
             <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
                 propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize FROM PlotDetails
@@ -614,7 +642,6 @@
             </PropertyMapping>
         </Search>
     </Searches>
-
 </Configuration>
 
         <!--
