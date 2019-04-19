@@ -641,7 +641,7 @@
                 <Property columnName="PlotId" name="plotId" dataType="12"/>
             </PropertyMapping>
         </Search>
-        <Search id="propertyStatus"><!-- Property Availability Report-->
+        <Search id="propertyAvailableStatus"><!-- Property Availability Report-->
             <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
                 propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize FROM PlotDetails
                 WHERE {MACRO}
@@ -659,6 +659,47 @@
                 <Property columnName="Status" name="status" dataType="12"/>
             </PropertyMapping>
         </Search>
+
+        <Search id="propertyBookedStatus"><!-- Property Availability Report-->
+            <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
+                propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize FROM PlotDetails
+                WHERE {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="CustomerName" name="customerName" dataType="12"/>
+                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="BlockId" name="blockId" dataType="4"/>
+                <Property columnName="PlotId" name="plotId" dataType="12"/>
+                <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
+                <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
+                <Property columnName="Status" name="status" dataType="12"/>
+            </PropertyMapping>
+        </Search>
+
+
+        <Search id="propertyHoldStatus"><!-- Property Availability Report-->
+            <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
+                propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize FROM PlotDetails
+                WHERE {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="CustomerName" name="customerName" dataType="12"/>
+                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="BlockId" name="blockId" dataType="4"/>
+                <Property columnName="PlotId" name="plotId" dataType="12"/>
+                <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
+                <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
+                <Property columnName="Status" name="status" dataType="12"/>
+            </PropertyMapping>
+        </Search>
+
+
         <Search id="dayBook"><!-- Day Book Report--> <!-- add all transaction details in this table -->
             <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
                 propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize FROM PlotDetails
