@@ -66,10 +66,13 @@ public class SelectorDAO implements ISelectorDAO {
 				sql = "SELECT Id as Code, FarmerName as Value FROM FarmerMaster where LandId = ?";
 				break;
 			case "bank":
-				sql = "SELECT Id as Code, bankName as Value FROM BankMaster";
+				sql = "SELECT Id as Code, BankName as Value FROM BankMaster";
 				break;
 			case "agent":
-				sql = "SELECT AgentId as Code, agentName as Value FROM AgentMaster";
+				sql = "SELECT AgentId as Code, AgentName as Value FROM AgentMaster";
+				break;
+			case "investor":
+				sql = "SELECT Id as Code, InvestorName as Value FROM InvestorMaster";
 				break;
 			default: sql = "";
 

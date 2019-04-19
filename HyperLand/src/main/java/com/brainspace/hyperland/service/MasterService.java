@@ -99,8 +99,6 @@ public class MasterService implements IMasterService {
                         arguments[j] = colValue;
                         argumentTypes[j] = Integer.parseInt((String) jsonColTypeList.get(1));
                     }
-                    Object landId = masterDAO.addData(sql, arguments, argumentTypes);
-
                     statusCode = "1";
                     statusMessage = "Success";
                 } catch (Exception e) {
