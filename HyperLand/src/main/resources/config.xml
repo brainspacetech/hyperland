@@ -643,7 +643,7 @@
         </Search>
         <Search id="propertyAvailableStatus"><!-- Property Availability Report-->
             <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
-                propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize FROM PlotDetails
+                propertyTypeName,ProjectName as projectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize,Facing as facing FROM PlotDetails
                 WHERE {MACRO}
             </SearchQuery>
             <PropertyMapping>
@@ -682,7 +682,7 @@
 
         <Search id="propertyHoldStatus"><!-- Property Availability Report-->
             <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
-                propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize FROM PlotDetails
+                propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize, Facing as facing, HoldBy as holdBy, HoldOn as holdOn FROM PlotDetails
                 WHERE {MACRO}
             </SearchQuery>
             <PropertyMapping>
