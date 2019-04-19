@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
 import java.sql.Types;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -100,16 +101,6 @@ public class MasterService implements IMasterService {
                     }
                     Object landId = masterDAO.addData(sql, arguments, argumentTypes);
 
-                    //specially for Land and Farmer
-                    if (type.equalsIgnoreCase("land")) {
-                        // update farmer details
-                        List farmerIdList = (List) propertyMap.get("farmerIds");
-
-                        for (int k = 0; k < farmerIdList.size(); k++) {
-                            String updateFarmer = "UPDATE FarmerMaster SET LandId = "+landId+" WHERE Id = "+farmerIdList.get(k)+"";
-                            masterDAO.updateData(updateFarmer);
-                        }
-                    }
                     statusCode = "1";
                     statusMessage = "Success";
                 } catch (Exception e) {
@@ -191,5 +182,80 @@ public class MasterService implements IMasterService {
             }
         }
         return response;
+    }
+
+    public RestResponse addLandData(Object requestObject,String createdBy){
+        String type = "land";
+        RestResponse response = null;
+        for (int i = 0; i < configBO.getServiceObj().length; i++) {
+            if (configBO.getServiceObj()[i].getId().equalsIgnoreCase(type)) {
+                String statusCode = "";
+                String statusMessage = "";
+                try {
+                    String sql = configBO.getServiceObj()[i].getInsertQuery();
+                    String params = sql.substring(sql.indexOf('(') + 1, sql.indexOf(')'));
+                    String paramsArr[] = params.split(",");
+                    Map<String, Object> propertyMap = (Map) requestObject;
+                    PropertyMapping propertyMapping = configBO.getServiceObj()[i].getPropertyMapping();
+                    Property property[] = propertyMapping.getProperty();
+                    Map<String, List> jsonColumnMap = new ServiceUtils().propertyMapper(property);
+                    String value = "";
+                    Object arguments[] = new Object[paramsArr.length];
+                    int argumentTypes[] = new int[paramsArr.length];
+                    for (int j = 0; j < paramsArr.length; j++) {
+                        System.out.println("paramsArr[j].trim() -- "+paramsArr[j].trim());
+                        List jsonColTypeList = jsonColumnMap.get(paramsArr[j].trim());
+                        Object colValue = propertyMap.get(jsonColTypeList.get(0));
+                        arguments[j] = colValue;
+                        argumentTypes[j] = Integer.parseInt((String) jsonColTypeList.get(1));
+                    }
+                    BigInteger landId = (BigInteger)masterDAO.addData(sql, arguments, argumentTypes);
+                    //addFarmer
+                    Map<String,Object> requestMap = (Map<String, Object>) requestObject;
+                    List<Map> farmerList = (List<Map>) requestMap.get("farmers");
+                    for(Map farmer:farmerList){
+                        farmer.put("LandId",landId);
+                        farmer.put("FarmerName",farmer.get("farmerName"));
+                        farmer.put("PanNumber",farmer.get("panNumber"));
+                    }
+                    String farmerInsertQuery = "INSERT INTO FarmerMaster(LandId, FarmerName,AdhaarNo,PanNumber) VALUES (?,?,?,?) ";
+                    masterDAO.insertDataBatch(farmerInsertQuery, farmerList);
+
+                    statusCode = "1";
+                    statusMessage = "Success";
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    statusCode = "0";
+                    statusMessage = "Failed";
+                }
+                response = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
+                break;
+            }
+        }
+
+        return response;
+    }
+    @Override
+    public RestResponse getLandDataById(String type,int id){
+        String statusCode = "";
+        String statusMessage = "";
+        RestResponse restResponse = null;
+        Map landData = null;
+        try {
+            String landQuery = "SELECT KhasraNumber as khasraNumber, LandAmount as landAmount FROM LandMaster Where Id = ?";
+            landData = masterDAO.getDataById(landQuery, id);
+            String farmerQuery = "SELECT FarmerName as farmerName, panNumber as panNumber FROM FarmerMaster Where LandId = " + id;
+            List<Map> farmerData = masterDAO.getAllData(farmerQuery);
+            landData.put("farmers",farmerData);
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        catch(Exception e)
+        {
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        restResponse = ServiceUtils.convertObjToResponse(statusCode,statusMessage,landData);
+        return restResponse;
     }
 }

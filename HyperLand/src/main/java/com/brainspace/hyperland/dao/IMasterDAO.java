@@ -12,4 +12,6 @@ public interface IMasterDAO {
     void updateData(String query,Object params[],int argTypes[]);
     void updateData(String query);
     void deleteData(String sql,int id);
+    public void insertDataBatch(final String sql, List<Map> dataList);
+
 }

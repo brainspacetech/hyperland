@@ -18,9 +18,11 @@ public class SearchController {
     private ISearchService searchService;
 
     @RequestMapping(value = "/{type}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
-    public ResponseEntity<RestResponse> searchDailyExpense(@RequestBody Object restRequest, @PathVariable String type) {
+    public ResponseEntity<RestResponse> searchDataByType(@RequestBody Object restRequest, @PathVariable String type) {
         RestResponse response  =   searchService.searchObject((Map) restRequest,type);
         return  new ResponseEntity<RestResponse>(response, HttpStatus.OK);
     }
+
+
 
 }

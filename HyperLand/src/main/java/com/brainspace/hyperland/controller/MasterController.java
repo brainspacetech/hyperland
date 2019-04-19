@@ -36,6 +36,13 @@ public class MasterController {
         return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
     }
 
+    @PostMapping(value = "/addLand")
+    public ResponseEntity<RestResponse> addLand(@RequestBody Object request) {
+        RestResponse response = masterService.addLandData(request,"");
+        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+    }
+
+
 
     @GetMapping(value = "/get/{type}/{id}")
     public ResponseEntity<RestResponse> get(@PathVariable(name = "type") String type,@PathVariable("id") int id) {
@@ -53,4 +60,10 @@ public class MasterController {
         RestResponse response = masterService.deleteData(type,id);
         return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
     }
+    @GetMapping(value = "/getLand/{id}")
+    public ResponseEntity<RestResponse> getLand(@PathVariable("id") int id) {
+        RestResponse response = masterService.getLandDataById("land",id);
+        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+    }
+
 }

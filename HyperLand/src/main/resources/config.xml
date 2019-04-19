@@ -120,8 +120,7 @@
         <SelectQuery>select Id as id, KhasraNumber as khasraNumber,LandAmount as landValue, PaidAmount as paidAmount
             from LandMaster
         </SelectQuery>
-        <SelectQueryById>select Id as id, KhasraNumber as khasraNumber,LandAmount as landValue, PaidAmount as paidAmount
-            from LandMaster where id = ?
+        <SelectQueryById>select l.Id as id, KhasraNumber as khasraNumber,LandAmount as landAmount, PaidAmount as paidAmount, f.FarmerName as farmerName,f.PanNumber as panNumber from hyperland.LandMaster l INNER JOIN hyperland.FarmerMaster f on f.LandId = l.Id where l.Id = ?
         </SelectQueryById>
         <InsertQuery>INSERT INTO LandMaster (KhasraNumber,LandAmount) VALUES (?,?)</InsertQuery>
         <UpdateQuery>UPDATE LandMaster SET KhasraNumber = ?, LandAmount = ? WHERE Id = ?</UpdateQuery>
@@ -134,15 +133,15 @@
     </Service>
     <Service id="farmer">
         <SelectQuery>select Id as id, FarmerName as farmerName,AdhaarNo as adhaarNo, PanNumber as panNumber,Bank as
-            bank, Branch as branch, IFSCCode as ifscCode from FarmerMaster
+            bank, Branch as branch, IFSCCode as ifscCode, PaidAmount as paidAmount   from FarmerMaster
         </SelectQuery>
         <SelectQueryById>select Id as id, FarmerName as farmerName,AdhaarNo as adhaarNo, PanNumber as panNumber,Bank as
-            bank, Branch as branch, IFSCCode as ifscCode from FarmerMaster where id = ?
+            bank, Branch as branch, IFSCCode as ifscCode, PaidAmount as paidAmount from FarmerMaster where id = ?
         </SelectQueryById>
-        <InsertQuery>INSERT INTO FarmerMaster (FarmerName,AdhaarNo,PanNumber,Bank, Branch, IFSCCode) VALUES (?,?,?)
+        <InsertQuery>INSERT INTO FarmerMaster (FarmerName,AdhaarNo,PanNumber,Bank, Branch, IFSCCode,PaidAmount) VALUES (?,?,?,?,?,?,?)
         </InsertQuery>
         <UpdateQuery>UPDATE FarmerMaster SET FarmerName = ?, AdhaarNo = ?,PanNumber = ?,Bank = ?, Branch = ?, IFSCCode
-            =? WHERE Id = ?
+            =?, PaidAmount = ? WHERE Id = ?
         </UpdateQuery>
         <DeleteQuery>DELETE FROM FarmerMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
@@ -154,6 +153,7 @@
             <Property name="branch" columnName="Branch" dataType='12'/>
             <Property name="ifscCode" columnName="IFSCCode" dataType='12'/>
             <Property name="landId" columnName="LandId" dataType='4'/>
+            <Property name="paidAmount" columnName="PaidAmount" dataType='3'/>
         </PropertyMapping>
     </Service>
     <Service id="agent">
@@ -167,7 +167,8 @@
             ,Address as address ,City as city ,State as state ,PinCode as pinCode ,emailId as emailId ,PhoneNo as
             phoneNo ,DateOfJoining as dateOfJoining,DateOfBirth as dateOfBirth,Occupation as occupation ,sponsorId as
             sponsorId ,sponsorName as sponsorName ,Bank as bank ,Branch as branch ,AccountNumber as accountNumber
-            ,IFSCCode as ifscCode ,Status as status ,LoginId as loginId ,Designation as designation from AgentMaster
+            ,IFSCCode as ifscCode ,Status as status ,LoginId as loginId ,Designation as designation, TotalAmount as totalAmount,
+            AmountPaidTillNow as paidAmount from AgentMaster
             where AgentId = ?
         </SelectQueryById>
         <InsertQuery>INSERT INTO AgentMaster (AgentName ,PanNumber ,AdhaarNo ,Address ,City ,State ,PinCode ,emailId
@@ -191,8 +192,8 @@
             <Property name="pinCode" columnName="PinCode" dataType="12"/>
             <Property name="emailId" columnName="emailId" dataType="12"/>
             <Property name="phoneNo" columnName="PhoneNo" dataType="12"/>
-            <Property name="dateOfJoining" columnName="DateOfJoining" dataType="91"/>
-            <Property name="dateOfBirth " columnName="DateOfBirth" dataType="91"/>
+            <Property name="dateOfJoining" columnName="DateOfJoining" dataType="93"/>
+            <Property name="dateOfBirth " columnName="DateOfBirth" dataType="93"/>
             <Property name="occupation" columnName="Occupation" dataType="12"/>
             <Property name="sponsorId" columnName="sponsorId" dataType="12"/>
             <Property name="sponsorName" columnName="sponsorName" dataType="12"/>
@@ -203,6 +204,9 @@
             <Property name="status" columnName="Status" dataType="12"/>
             <Property name="loginId" columnName="LoginId" dataType="12"/>
             <Property name="designation" columnName="Designation" dataType="12"/>
+            <Property name="totalAmount" columnName="TotalAmount" dataType="3"/>
+            <Property name="paidAmount" columnName="AmountPaidTillNow" dataType="3"/>
+            <Property name="tds" columnName="TDS" dataType="3"/>
 
         </PropertyMapping>
     </Service>
@@ -304,7 +308,7 @@
             <Property name="firmName" columnName="FirmName" dataType='12'/>
             <Property name="propertyId" columnName="PropertyId" dataType='4'/>
             <Property name="propertyName" columnName="PropertyName" dataType='12'/>
-            <Property name="investmentDate" columnName="InvestmentDate" dataType='91'/>
+            <Property name="investmentDate" columnName="InvestmentDate" dataType='93'/>
             <Property name="amount" columnName="Amount" dataType='3'/>
         </PropertyMapping>
     </Service>
@@ -312,10 +316,10 @@
         <Transaction id="booking">
             <UpdateQuery>UPDATE BookingDetails SET CustomerId =? , FirmId = ?,FirmName = ?,ProjectId = ?,ProjectName =
                 ?,PropertyType = ?,PropertyTypeId = ?,BlockId = ?,Block = ?,PlotNumber = ?,PaymentType = ?,TokenAmount =
-                ?,BookingAmount = ?,DownPayment = ?,ReceiptNumber = ?,BookingDate = ?,BaseSellingPrice =
-                ?,BaseSellingPriceTax = ?,PLCCharges = ?,PLCChargesTax = ?,TotalAmount = ?,BookedBy = ?,BookingType =
-                ?,InstallmentStartDate = ?,AgentId = ?,AdditionalCharges = ?,AdditionalChargesTax = ?,CreatedBy = ?
-                WHERE BookingId = ?
+                ?,BookingAmount = ?,DownPayment = ?,BookingDate = ?,BaseSellingPrice =
+                ?,PLCCharges = ?, TotalAmount = ?,BookedBy = ?,BookingType =
+                ?,InstallmentStartDate = ?,AgentId = ?, AdditionalCharges = ?,AdditionalChargesTax = ?,CreatedBy = ?, Discount = ?,
+                DiscountType = ?  WHERE BookingId = ?
             </UpdateQuery>
             <PropertyMapping>
                 <Property columnName="BookingId" name="bookingId" dataType="4"/>
@@ -333,8 +337,8 @@
                 <Property columnName="TokenAmount" name="tokenAmount" dataType="3"/>
                 <Property columnName="BookingAmount" name="bookingAmount" dataType="3"/>
                 <Property columnName="DownPayment" name="downPayment" dataType="3"/>
-                <Property columnName="ReceiptNumber" name="receiptNumber" dataType="12"/>
-                <Property columnName="BookingDate" name="bookingDate" dataType="91"/>
+                <Property columnName="ReceiptNo" name="receiptNo" dataType="12"/>
+                <Property columnName="BookingDate" name="bookingDate" dataType="93"/>
                 <Property columnName="BaseSellingPrice" name="baseSellingPrice" dataType="3"/>
                 <Property columnName="BaseSellingPriceTax" name="baseSellingPriceTax" dataType="3"/>
                 <Property columnName="PLCCharges" name="plcCharges" dataType="3"/>
@@ -343,12 +347,14 @@
                 <Property columnName="TotalAmount" name="totalAmount" dataType="3"/>
                 <Property columnName="BookedBy" name="bookedBy" dataType="12"/>
                 <Property columnName="BookingType" name="bookingType" dataType="12"/>
-                <Property columnName="InstallmentStartDate" name="installmentStartDate" dataType="91"/>
+                <Property columnName="InstallmentStartDate" name="installmentStartDate" dataType="93"/>
                 <Property columnName="AgentId" name="agentId" dataType="12"/>
                 <Property columnName="AdditionalCharges" name="additionalCharges" dataType="3"/>
                 <Property columnName="AdditionalChargesTax" name="additionalChargesTax" dataType="3"/>
                 <Property columnName="NumberOfInstallment" name="numberOfInstallment" dataType="4"/>
-                <Property columnName="CreatedOn" name="createdOn" dataType="91"/>
+                <Property columnName="Discount" name="discount" dataType="3"/>
+                <Property columnName="DiscountType" name="discountType" dataType="12"/>
+                <Property columnName="CreatedOn" name="createdOn" dataType="93"/>
                 <Property columnName="CreatedBy" name="createdBy" dataType="12"/>
             </PropertyMapping>
         </Transaction>
@@ -372,53 +378,79 @@
                 <Property columnName="PinCode" name="pinCode" dataType="12"/>
                 <Property columnName="EmailId" name="emailId" dataType="12"/>
                 <Property columnName="PhoneNo" name="phoneNo" dataType="12"/>
-                <Property columnName="DateOfBirth" name="dateOfBirth" dataType="91"/>
+                <Property columnName="DateOfBirth" name="dateOfBirth" dataType="93"/>
                 <Property columnName="Occupation" name="occupation" dataType="12"/>
                 <Property columnName="CustomerType" name="customerType" dataType="12"/>
             </PropertyMapping>
         </Transaction>
         <Transaction id="payment">
             <InsertQuery>INSERT INTO PaymentDetails (CustomerId,BookingId,CollectedBy,PaymentType,PaymentMode, ChequeNo,
-                TransactionId, PaymentDate, ReceiptNo,BankName,ChequeDate,InstallmentAmount,DueDate,Status) VALUES
-                (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                TransactionId, PaymentDate, ReceiptNo,BankName,ChequeDate,Amount) VALUES
+                (?,?,?,?,?,?,?,?,?,?,?,?)
+            </InsertQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="BookingId" name="bookingId" dataType="4"/>
+                <Property columnName="Amount" name="amount" dataType="3"/>
+                <Property columnName="PaymentType" name="paymentType" dataType="12"/>
+                <Property columnName="CollectedBy" name="collectedBy" dataType="12"/>
+                <Property columnName="PaymentMode" name="paymentMode" dataType="12"/>
+                <Property columnName="ChequeNo" name="chequeNo" dataType="12"/>
+                <Property columnName="TransactionId" name="transactionId" dataType="12"/>
+                <Property columnName="PaymentDate" name="paymentDate" dataType="93"/>
+                <Property columnName="ReceiptNo" name="receiptNo" dataType="4"/>
+                <Property columnName="BankName" name="bankName" dataType="12"/>
+                <Property columnName="ChequeDate" name="ChequeDate" dataType="93"/>
+            </PropertyMapping>
+        </Transaction>
+        <Transaction id="installment">
+            <InsertQuery>INSERT INTO InstallmentDetails (CustomerId,BookingId,CollectedBy,PaymentType,DueDate,PaymentMode, AmountPaid , Status , ChequeNo,
+                TransactionId, PaymentDate, ReceiptNo,BankName,ChequeDate,InstallmentAmount,DueDate,Interest,WaiveOff,CollectedBy,CollectedOn,ChequeDate ) VALUES
+                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
                 <Property columnName="CustomerId" name="customerId" dataType="12"/>
                 <Property columnName="BookingId" name="bookingId" dataType="4"/>
                 <Property columnName="InstallmentAmount" name="installmentAmount" dataType="3"/>
-                <Property columnName="DueDate" name="dueDate" dataType="91"/>
+                <Property columnName="PaymentType" name="paymentType" dataType="12"/>
+                <Property columnName="DueDate" name="dueDate" dataType="93"/>
+                <Property columnName="AmountPaid" name="amountPaid" dataType="3"/>
                 <Property columnName="Status" name="status" dataType="12"/>
                 <Property columnName="PaymentType" name="paymentType" dataType="12"/>
-                <Property columnName="CollectedBy" name="collectedBy" dataType="12"/>
                 <Property columnName="PaymentMode" name="paymentMode" dataType="12"/>
                 <Property columnName="ChequeNo" name="chequeNo" dataType="12"/>
                 <Property columnName="TransactionId" name="transactionId" dataType="12"/>
-                <Property columnName="PaymentDate" name="paymentDate" dataType="91"/>
+                <Property columnName="PaymentDate" name="paymentDate" dataType="93"/>
                 <Property columnName="ReceiptNo" name="receiptNo" dataType="4"/>
                 <Property columnName="BankName" name="bankName" dataType="12"/>
-                <Property columnName="ChequeDate" name="ChequeDate" dataType="91"/>
-
+                <Property columnName="Interest" name="interest" dataType="3"/>
+                <Property columnName="WaiveOff" name="waiveOff" dataType="3"/>
+                <Property columnName="CollectedBy" name="collectedBy" dataType="12"/>
+                <Property columnName="CollectedOn" name="collectedOn" dataType="93"/>
+                <Property columnName="ChequeDate" name="chequeDate" dataType="93"/>
+                <Property columnName="TransactionDate" name="transactionDate" dataType="93"/>
             </PropertyMapping>
         </Transaction>
         <Transaction id="farmerPayment">
             <InsertQuery>INSERT INTO FarmerPayment (FarmerId,LandId,FarmerName,PaymentDate, PaymentMode,BankName,
-                PaymentAmount, ChequeNo, TransactionId, TransactionDate, ChequeDate,
-                CreatedBy,CreatedOn,ApprovedOn,ApprovedBy) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                PaymentAmount, TransactionId, TransactionDate,
+                CreatedBy,CreatedOn,ApprovedOn,ApprovedBy) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
                 <Property columnName="FarmerId" name="farmerId" dataType="4"/>
                 <Property columnName="LandId" name="landId" dataType="4"/>
                 <Property columnName="FarmerName" name="farmerName" dataType="12"/>
-                <Property columnName="PaymentDate" name="paymentDate" dataType="91"/>
+                <Property columnName="PaymentDate" name="paymentDate" dataType="93"/>
                 <Property columnName="PaymentMode" name="paymentMode" dataType="12"/>
                 <Property columnName="BankName" name="bankName" dataType="12"/>
                 <Property columnName="PaymentAmount" name="paymentAmount" dataType="12"/>
                 <Property columnName="ChequeNo" name="chequeNo" dataType="12"/>
                 <Property columnName="TransactionId" name="transactionId" dataType="12"/>
-                <Property columnName="ChequeDate" name="chequeDate" dataType="91"/>
-                <Property columnName="TransactionDate" name="transactionDate" dataType="91"/>
+                <Property columnName="ChequeDate" name="chequeDate" dataType="93"/>
+                <Property columnName="TransactionDate" name="transactionDate" dataType="93"/>
                 <Property columnName="CreatedBy" name="createdBy " dataType="12"/>
                 <Property columnName="CreatedOn" name="createdOn " dataType="93"/>
                 <Property columnName="ApprovedOn" name="approvedOn" dataType="93"/>
@@ -428,21 +460,21 @@
         </Transaction>
         <Transaction id="agentPayment">
             <InsertQuery>INSERT INTO AgentPayment (AgentId,AgentName,PaymentDate, PaymentMode,BankName, PaymentAmount,
-                ChequeNo, TransactionId, TransactionDate, ChequeDate, CreatedBy,CreatedOn,ApprovedOn,ApprovedBy) VALUES
-                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                TransactionId, TransactionDate, CreatedBy,CreatedOn) VALUES
+                (?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
                 <Property columnName="AgentId" name="agentId" dataType="4"/>
                 <Property columnName="AgentName" name="agentName" dataType="12"/>
-                <Property columnName="PaymentDate" name="paymentDate" dataType="91"/>
+                <Property columnName="PaymentDate" name="paymentDate" dataType="93"/>
                 <Property columnName="PaymentMode" name="paymentMode" dataType="12"/>
                 <Property columnName="BankName" name="bankName" dataType="12"/>
                 <Property columnName="PaymentAmount" name="paymentAmount" dataType="12"/>
                 <Property columnName="ChequeNo" name="chequeNo" dataType="12"/>
                 <Property columnName="TransactionId" name="transactionId" dataType="12"/>
-                <Property columnName="ChequeDate" name="chequeDate" dataType="91"/>
-                <Property columnName="TransactionDate" name="transactionDate" dataType="91"/>
+                <Property columnName="ChequeDate" name="chequeDate" dataType="93"/>
+                <Property columnName="TransactionDate" name="transactionDate" dataType="93"/>
                 <Property columnName="CreatedBy" name="createdBy " dataType="12"/>
                 <Property columnName="CreatedOn" name="createdOn " dataType="93"/>
                 <Property columnName="ApprovedOn" name="approvedOn" dataType="93"/>
@@ -460,23 +492,23 @@
                 <Property name="expenseCategory" columnName="ExpenseCategory" dataType="12"/>,
                 <Property name="amount" columnName="Amount" dataType="3"/>
                 <Property name="createdBy" columnName="CreatedBy" dataType="12"/>
-                <Property name="createdOn" columnName="CreatedOn" dataType="91"/>
+                <Property name="createdOn" columnName="CreatedOn" dataType="93"/>
                 <Property name="transactionDetail" columnName="TransactionDetail" dataType="12"/>
                 <Property name="transactionId" columnName="TransactionId" dataType="12"/>
                 <Property name="firmId" columnName="FirmId" dataType="4"/>
                 <Property name="firmName" columnName="FirmName" dataType="12"/>
                 <Property name="propertyId" columnName="PropertyId" dataType="4"/>
                 <Property name="propertyName" columnName="PropertyName" dataType="12"/>
-                <Property name="approvedOn" columnName="ApprovedOn" dataType="91"/>
+                <Property name="approvedOn" columnName="ApprovedOn" dataType="93"/>
                 <Property name="approvedBy" columnName="ApprovedBy" dataType="12"/>
                 <Property name="invoiceNo" columnName="InvoiceNo" dataType="12"/>
-                <Property name="expenseDate" columnName="ExpenseDate" dataType="91"/>
+                <Property name="expenseDate" columnName="ExpenseDate" dataType="93"/>
                 <Property name="paidTo" columnName="PaidTo" dataType="12"/>
                 <Property name="paymentMode" columnName="PaymentMode" dataType="12"/>
                 <Property name="chequeNo" columnName="ChequeNo" dataType="12"/>
                 <Property name="bankName" columnName="BankName" dataType="12"/>
-                <Property name="chequeDate" columnName="ChequeDate" dataType="91"/>
-                <Property name="expenseDate" columnName="ExpenseDate" dataType="91"/>
+                <Property name="chequeDate" columnName="ChequeDate" dataType="93"/>
+                <Property name="expenseDate" columnName="ExpenseDate" dataType="93"/>
                 <Property name="isApproved" columnName="IsApproved" dataType="1"/>
             </PropertyMapping>
         </Transaction>
@@ -492,22 +524,22 @@
                 <Property name="expenseCategory" columnName="ExpenseCategory" dataType="12"/>,
                 <Property name="amount" columnName="Amount" dataType="3"/>
                 <Property name="createdBy" columnName="CreatedBy" dataType="12"/>
-                <Property name="createdOn" columnName="CreatedOn" dataType="91"/>
+                <Property name="createdOn" columnName="CreatedOn" dataType="93"/>
                 <Property name="transactionDetail" columnName="TransactionDetail" dataType="12"/>
                 <Property name="transactionId" columnName="TransactionId" dataType="12"/>
                 <Property name="firmId" columnName="FirmId" dataType="4"/>
                 <Property name="firmName" columnName="FirmName" dataType="12"/>
                 <Property name="propertyId" columnName="PropertyId" dataType="4"/>
                 <Property name="propertyName" columnName="PropertyName" dataType="12"/>
-                <Property name="approvedOn" columnName="ApprovedOn" dataType="91"/>
+                <Property name="approvedOn" columnName="ApprovedOn" dataType="93"/>
                 <Property name="approvedBy" columnName="ApprovedBy" dataType="12"/>
                 <Property name="invoiceNo" columnName="InvoiceNo" dataType="12"/>
-                <Property name="expenseDate" columnName="ExpenseDate" dataType="91"/>
+                <Property name="expenseDate" columnName="ExpenseDate" dataType="93"/>
                 <Property name="paidTo" columnName="PaidTo" dataType="12"/>
                 <Property name="paymentMode" columnName="PaymentMode" dataType="12"/>
                 <Property name="chequeNo" columnName="ChequeNo" dataType="12"/>
                 <Property name="bankName" columnName="BankName" dataType="12"/>
-                <Property name="chequeDate" columnName="ChequeDate" dataType="91"/>
+                <Property name="chequeDate" columnName="ChequeDate" dataType="93"/>
                 <Property name="expenseFrom" columnName="ExpenseDate" dataType="-101"/> <!--(-101) for from date -->
                 <Property name="expenseTo" columnName="ExpenseDate" dataType="-102"/> <!--(-101) for to date -->
                 <Property name="isApproved" columnName="IsApproved" dataType="1"/>
@@ -536,7 +568,7 @@
                 <Property columnName="PinCode" name="pinCode" dataType="12"/>
                 <Property columnName="EmailId" name="emailId" dataType="12"/>
                 <Property columnName="PhoneNo" name="phoneNo" dataType="12"/>
-                <Property columnName="DateOfBirth" name="dateOfBirth" dataType="91"/>
+                <Property columnName="DateOfBirth" name="dateOfBirth" dataType="93"/>
                 <Property columnName="Occupation" name="occupation" dataType="12"/>
                 <Property columnName="CustomerType" name="customerType" dataType="12"/>
                 <Property columnName="FirmId" name="firmId" dataType="4"/>
@@ -560,9 +592,9 @@
                 <Property columnName="CustomerId" name="customerId" dataType="12"/>
                 <Property columnName="CustomerName" name="customerName" dataType="12"/>
                 <Property columnName="b.FirmId" name="firmId" dataType="4"/>
-                <Property columnName="ProjectId" name="projectId" dataType="4"/>
-                <Property columnName="BlockId" name="blockId" dataType="4"/>
-                <Property columnName="PlotId" name="plotId" dataType="12"/>
+                <Property columnName="b.ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="b.BlockId" name="blockId" dataType="4"/>
+                <Property columnName="b.PlotId" name="plotId" dataType="12"/>
                 <Property columnName="BookingDate" name="bookingDateFrom" dataType="-101"/>
                 <Property columnName="BookingDate" name="bookingDateTo" dataType="-102"/>
             </PropertyMapping>
@@ -641,6 +673,24 @@
                 <Property columnName="PaymentMode" name="paymentMode" dataType="12"/>
             </PropertyMapping>
         </Search>
+        <Search id="landPayment"><!-- Day Book Report--> <!-- add all transaction details in this table -->
+            <SearchQuery>SELECT  Id as id, KhasraNumber as khasraNumber, LandAmount as landValue, PaidAmount as paidAmount ,( LandAmount -  PaidAmount )as remainingAmount
+                from LandMaster WHERE {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="LandId" name="landId" dataType="4"/>
+            </PropertyMapping>
+        </Search>
+        <Search id="agentPaymentDetails">
+            <SearchQuery>SELECT  AgentId as agentId, AgentName as agentName, PaymentMode as paymentMode, PaymentAmount as paymentAmount,BankName as bank, PaymentDate as paymentDate from AgentPayment WHERE {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="AgentId" name="agentId" dataType="4"/>
+            </PropertyMapping>
+        </Search>
+
     </Searches>
 </Configuration>
 
@@ -651,7 +701,7 @@
         TINYINT: -6
         INTEGER: 4
         DECIMAL: 3
-        DATE: 91
+        DATE: 93
         BLOB: 2004
         BOOLEAN: 16
         CLOB: 2005

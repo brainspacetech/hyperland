@@ -27,6 +27,7 @@ public class TransactionDAO implements ITransactionDAO {
     }
 
     public void insertDataBatch(final String sql, List<Map> dataList) {
+
         this.jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement preparedStatement, int j) throws SQLException {
@@ -40,11 +41,11 @@ public class TransactionDAO implements ITransactionDAO {
                     } else if (dataList.get(j).get(paramsArr[i].trim()) instanceof Integer) {
                         preparedStatement.setInt((i + 1), (Integer) dataList.get(j).get(paramsArr[i].trim()));
                     } else if (dataList.get(j).get(paramsArr[i].trim()) instanceof Date) {
-                        preparedStatement.setDate((i + 1), (Date) dataList.get(j).get(paramsArr[i].trim()));
+                        preparedStatement.setObject((i + 1), (Date) dataList.get(j).get(paramsArr[i].trim()));
                     } else if (dataList.get(j).get(paramsArr[i].trim()) instanceof Double) {
                         preparedStatement.setDouble((i + 1), (Double) dataList.get(j).get(paramsArr[i].trim()));
                     } else {
-                        preparedStatement.setDate((i + 1), null);
+                        preparedStatement.setObject((i + 1), null);
                     }
 
                 }
@@ -104,4 +105,8 @@ public class TransactionDAO implements ITransactionDAO {
             }
         });
     }
+    public void insertDataBatch(final String sql[]) {
+        this.jdbcTemplate.batchUpdate(sql);
+    }
+
 }

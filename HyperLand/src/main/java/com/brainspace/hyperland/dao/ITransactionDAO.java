@@ -9,5 +9,6 @@ public interface ITransactionDAO {
     public void updateData(final String sql, Map dataMap,String idColName);
     public void addData(String query,Object params[], int argTypes[]);
     public void updateData(String query);
+    public void insertDataBatch(final String sql[]);
 
 }

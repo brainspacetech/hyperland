@@ -62,8 +62,17 @@ public class SelectorDAO implements ISelectorDAO {
 			case "plot":
 						sql = "SELECT Id as Code, PlotNo as Value FROM PlotDetails where BlockId = ?";
 						break;
+			case "farmer":
+				sql = "SELECT Id as Code, FarmerName as Value FROM FarmerMaster where LandId = ?";
+				break;
+			case "bank":
+				sql = "SELECT Id as Code, bankName as Value FROM BankMaster";
+				break;
+			case "agent":
+				sql = "SELECT AgentId as Code, agentName as Value FROM AgentMaster";
+				break;
 			default: sql = "";
-					
+
 		}
 		return sql;
 	}
