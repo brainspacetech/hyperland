@@ -729,6 +729,7 @@
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
                 <Property columnName="AgentId" name="agentId" dataType="4"/>
+                <Property columnName="IsApproved" name="isApproved" dataType="1"/>
             </PropertyMapping>
         </Search>
 
