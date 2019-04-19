@@ -36,7 +36,7 @@ public class SearchService implements ISearchService {
                             whereClause += colDataType.get(0) + " >= CAST('" + searchCriteria.get(key) + "' AS DATE) AND ";
                         } else if (colDataType.get(1).equalsIgnoreCase("-102")) {
                             whereClause += colDataType.get(0) + " <= CAST('" + searchCriteria.get(key) + "' AS DATE) AND ";
-                        } else if (colDataType.get(1).equalsIgnoreCase("-12")) {
+                        } else if (colDataType.get(1).equalsIgnoreCase("12")) {
                             whereClause += colDataType.get(0) + " = '" + searchCriteria.get(key) + "' AND ";
                         } else {
                             whereClause += colDataType.get(0) + " = " + searchCriteria.get(key) + " AND ";
