@@ -6,6 +6,9 @@ import com.brainspace.hyperland.bo.RestResponse;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 public class ServiceUtils {
@@ -84,5 +87,11 @@ public class ServiceUtils {
             }
         }
         return customerMap;
+    }
+    public static java.sql.Date convertStrToSQLDate(String strDate)
+    {
+        Instant instant = Instant.parse(strDate);
+        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
+       return new java.sql.Date(java.util.Date.from(zonedDateTime.toInstant()).getTime());
     }
 }

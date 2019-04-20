@@ -40,8 +40,9 @@ public class TransactionService implements ITransactionService {
             PropertyMapping propertyMapping = transactions.getTransaction()[i].getPropertyMapping();
             Property property[] = propertyMapping.getProperty();
             ServiceUtils serviceUtils = new ServiceUtils();
-            Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
+
             if (transactions.getTransaction()[i].getId().equalsIgnoreCase("booking")) {
+                Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
                 String updateQuery = transactions.getTransaction()[i].getUpdateQuery();
                 bookingDetails.put("firmId",mainObject.get("firmId"));
                 bookingDetails.put("firmName",mainObject.get("firmName"));
@@ -55,14 +56,14 @@ public class TransactionService implements ITransactionService {
                 bookingDetails.put("plotNumber",mainObject.get("plotNumber"));
                 bookingDetails.put("paymentType",mainObject.get("paymentType"));
                 bookingDetails.put("bookingAmount",mainObject.get("bookingAmount"));
-                bookingDetails.put("bookingDate",mainObject.get("bookingDate"));
+                bookingDetails.put("bookingDate",mainObject.get("bookingDate")!=null?ServiceUtils.convertStrToSQLDate((String)mainObject.get("bookingDate")):null);
                 bookingDetails.put("baseSellingPrice",mainObject.get("baseSellingPrice"));
                 bookingDetails.put("plcChargesType",mainObject.get("plcChargesType"));
                 bookingDetails.put("plcCharges",mainObject.get("plcCharges"));
                 bookingDetails.put("bookingType",mainObject.get("bookingType"));
                 bookingDetails.put("numberOfInstallment",mainObject.get("numberOfInstallment"));
                 bookingDetails.put("additionalCharges",mainObject.get("additionalCharges"));
-                bookingDetails.put("installmentStartDate",mainObject.get("installmentStartDate"));
+                bookingDetails.put("installmentStartDate",mainObject.get("installmentStartDate")!=null?ServiceUtils.convertStrToSQLDate((String)mainObject.get("installmentStartDate")):null);
                 bookingDetails.put("totalAmount",mainObject.get("totalAmount"));
                 bookingDetails.put("discount",mainObject.get("discount"));
                 bookingDetails.put("discountType",mainObject.get("discountType"));
@@ -71,7 +72,15 @@ public class TransactionService implements ITransactionService {
                 bookingDetails.put("createdBy", createdBy);
                 Map bookingMap = serviceUtils.customerMap(bookingDetails, jsonColumnMap);
                 transactionDAO.updateData(updateQuery, bookingMap, "BookingId");
+                //update plot details table
+                String updatePlotDetails = "UPDATE PlotDetails SET Status = 'Booked'";
+                //insert into Plot transaction
+                String insertPlotTransaction = "INSERT INTO PlotTransaction (PlotId,BookingId,BookedBy,BookedOn,AgentId) VALUES ("+mainObject.get("plotId")+","+bookingId+",'"+bookingId + "_P_1"+"',now(),"+mainObject.get("agentId")+")";
+
+                System.out.println("insertPlotTransaction  -- "+insertPlotTransaction);
+                transactionDAO.insertDataBatch(new String[]{updatePlotDetails,insertPlotTransaction});
             } else if (transactions.getTransaction()[i].getId().equalsIgnoreCase("customer")) {
+                Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
                 insertQuery = transactions.getTransaction()[i].getInsertQuery();
                 List<Map> customerList = new ArrayList<>();
                 customerDetails.put("customerId", bookingId + "_P_1");
@@ -91,7 +100,7 @@ public class TransactionService implements ITransactionService {
                 transactionDAO.insertDataBatch(insertQuery, customerList);
             } else if (transactions.getTransaction()[i].getId().equalsIgnoreCase("payment")) {
                 Map paymentDetails = new HashMap<>();
-
+                Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
                 insertQuery = transactions.getTransaction()[i].getInsertQuery();
                 Map paymentMap = new HashMap();
                 paymentMap.put("customerId", bookingId + "_P_1");
@@ -101,12 +110,18 @@ public class TransactionService implements ITransactionService {
                 paymentMap.put("paymentMode", paymentDetails.get("paymentMode"));
                 paymentMap.put("chequeNo", paymentDetails.get("chequeNo"));
                 paymentMap.put("transactionId", paymentDetails.get("transactionId"));
-                paymentMap.put("paymentDate", paymentDetails.get("paymentDate"));
+                paymentMap.put("paymentDate", paymentDetails.get("paymentDate")!=null?ServiceUtils.convertStrToSQLDate((String)paymentDetails.get("paymentDate")):null);
                 paymentMap.put("receiptNo", paymentDetails.get("receiptNo"));
                 paymentMap.put("bankName", paymentDetails.get("bankName"));
                 paymentMap.put("amount", bookingDetails.get("bookingAmount"));
-                installmentList.add(serviceUtils.customerMap(paymentMap, jsonColumnMap));
-                Double pendingAmount = 0.0;
+             //   installmentList.add(serviceUtils.customerMap(paymentMap, jsonColumnMap));
+
+                Map convertedPaymentMap = serviceUtils.customerMap(paymentMap, jsonColumnMap);
+                ArrayList paymentMapList = new ArrayList();
+                paymentMapList.add(convertedPaymentMap);
+                transactionDAO.insertDataBatch(insertQuery, paymentMapList);
+
+              /*  Double pendingAmount = 0.0;
                 Double totalAmount = 0.00;
 
                 if (bookingDetails.get("totalAmount") != null) {
@@ -116,22 +131,25 @@ public class TransactionService implements ITransactionService {
                     Double bookingAmount = Double.valueOf(bookingDetails.get("bookingAmount").toString());
                     pendingAmount = totalAmount - bookingAmount;
 
-                }
+                }*/
+
 
             }
-            if (((String) bookingDetails.get("paymentType")).equalsIgnoreCase("installment")) {
+            if (((String) bookingDetails.get("paymentType")).equalsIgnoreCase("installment") && transactions.getTransaction()[i].getId().equalsIgnoreCase("installment")){
+                Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
                 insertQuery = transactions.getTransaction()[i].getInsertQuery();
                 String installlmentDueDate = (String) mainObject.get("installmentStartDate");
-                DateFormat sourceDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Calendar cal = null;
                 int numberOfInstallment = Integer.parseInt(bookingDetails.get("numberOfInstallment").toString());
+                /*DateFormat sourceDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Calendar cal = null;
                 try {
                     Date dt = sourceDateFormat.parse(installlmentDueDate);
                     cal = Calendar.getInstance();
                     cal.setTime(dt);
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
+                }*/
+                java.sql.Date installmentDueDateSql = ServiceUtils.convertStrToSQLDate(installlmentDueDate);
                 installmentList = new ArrayList<>();
                 Map installmentMap = new HashMap();
                 Double installmentAmount = Double.valueOf(mainObject.get("installmentAmount").toString());
@@ -140,12 +158,16 @@ public class TransactionService implements ITransactionService {
                     installmentMap.put("customerId", bookingId + "_P_1");
                     installmentMap.put("bookingId", bookingId);
                     installmentMap.put("installmentAmount", installmentAmount);
-                    installmentMap.put("dueDate", installlmentDueDate);
+                    installmentMap.put("dueDate", installmentDueDateSql);
                     installmentMap.put("status", "Pending");
                     installmentMap.put("paymentType", "Installment");
+                  /*  cal.add(Calendar.MONTH,1);
+                    Date currentDatePlusOne = cal.getTime();*/
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTimeInMillis(installmentDueDateSql.getTime());
                     cal.add(Calendar.MONTH,1);
-                    Date currentDatePlusOne = cal.getTime();
-                    installlmentDueDate = sourceDateFormat.format(currentDatePlusOne);
+                    installmentDueDateSql = new java.sql.Date(cal.getTimeInMillis());
+               //     installlmentDueDate = sourceDateFormat.format(currentDatePlusOne);
                     installmentList.add(serviceUtils.customerMap(installmentMap,jsonColumnMap));
                 }
                 TransactionUtils transactionUtils = new TransactionUtils();
@@ -249,5 +271,7 @@ public class TransactionService implements ITransactionService {
     {
 
     }
+
+
 
 }

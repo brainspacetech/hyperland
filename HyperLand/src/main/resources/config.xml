@@ -294,8 +294,8 @@
         </PropertyMapping>
     </Service>
     <Service id="investment">
-        <SelectQuery>select Id as id,InvestorId as investorId, InvestorName as investorName, FirmId as firmId ,FirmName as firmName, PropertyId as propertyId, PropertyName as propertyName,InvestmentDate as investmentDate, Amount as amount from InvestmentMaster</SelectQuery>
-        <SelectQueryById>select Id as id, InvestorId as investorId, InvestorName as investorName, FirmId as firmId ,FirmName as firmName, PropertyId as propertyId, PropertyName as propertyName,InvestmentDate as investmentDate, Amount as amount from InvestmentMaster where id = ?
+        <SelectQuery>select Id as id,InvestorId as investorId, InvestorName as investorName, FirmId as firmId ,FirmName as firmName, PropertyId as propertyId, PropertyName as propertyName,DATE_FORMAT(InvestmentDate ,'%d/%m/%Y') as investmentDate, Amount as amount from InvestmentMaster</SelectQuery>
+        <SelectQueryById>select Id as id, InvestorId as investorId, InvestorName as investorName, FirmId as firmId ,FirmName as firmName, PropertyId as propertyId, PropertyName as propertyName,DATE_FORMAT(InvestmentDate,'%d/%m/%Y')  as investmentDate, Amount as amount from InvestmentMaster where id = ?
         </SelectQueryById>
         <InsertQuery>INSERT INTO InvestmentMaster (InvestorId,InvestorName,FirmId,FirmName,PropertyId,PropertyName,InvestmentDate,Amount) VALUES (?,?,?,?,?,?,?,?)</InsertQuery>
         <UpdateQuery>UPDATE InvestmentMaster SET FirmId = ? , FirmName = ?,PropertyId = ?,PropertyName=? ,InvestmentDate =?, Amount =? WHERE Id = ?</UpdateQuery>
@@ -315,8 +315,7 @@
     <Transactions>
         <Transaction id="booking">
             <UpdateQuery>UPDATE BookingDetails SET CustomerId =? , FirmId = ?,FirmName = ?,ProjectId = ?,ProjectName =
-                ?,PropertyType = ?,PropertyTypeId = ?,BlockId = ?,Block = ?,PlotNumber = ?,PaymentType = ?,TokenAmount =
-                ?,BookingAmount = ?,DownPayment = ?,BookingDate = ?,BaseSellingPrice =
+                ?,PropertyType = ?,PropertyTypeId = ?,BlockId = ?,Block = ?,PlotNumber = ?,PaymentType = ?,BookingAmount = ?,BookingDate = ?,BaseSellingPrice =
                 ?,PLCCharges = ?, TotalAmount = ?,BookedBy = ?,BookingType =
                 ?,InstallmentStartDate = ?,AgentId = ?, AdditionalCharges = ?,AdditionalChargesTax = ?,CreatedBy = ?, Discount = ?,
                 DiscountType = ?  WHERE BookingId = ?
@@ -384,9 +383,9 @@
             </PropertyMapping>
         </Transaction>
         <Transaction id="payment">
-            <InsertQuery>INSERT INTO PaymentDetails (CustomerId,BookingId,CollectedBy,PaymentType,PaymentMode, ChequeNo,
-                TransactionId, PaymentDate, ReceiptNo,BankName,ChequeDate,Amount) VALUES
-                (?,?,?,?,?,?,?,?,?,?,?,?)
+            <InsertQuery>INSERT INTO PaymentDetails (CustomerId,BookingId,CollectedBy,PaymentType,PaymentMode,
+                TransactionId, PaymentDate, ReceiptNo,BankName,Amount) VALUES
+                (?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
@@ -405,9 +404,9 @@
             </PropertyMapping>
         </Transaction>
         <Transaction id="installment">
-            <InsertQuery>INSERT INTO InstallmentDetails (CustomerId,BookingId,CollectedBy,PaymentType,DueDate,PaymentMode, AmountPaid , Status , ChequeNo,
-                TransactionId, PaymentDate, ReceiptNo,BankName,ChequeDate,InstallmentAmount,DueDate,Interest,WaiveOff,CollectedBy,CollectedOn,ChequeDate ) VALUES
-                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            <InsertQuery>INSERT INTO InstallmentDetails (CustomerId,BookingId,CollectedBy,PaymentType,DueDate,PaymentMode, AmountPaid , Status ,
+                TransactionId, PaymentDate, ReceiptNo,BankName,InstallmentAmount,Interest,WaiveOff,CollectedOn ) VALUES
+                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
@@ -438,6 +437,7 @@
                 PaymentAmount, TransactionId, TransactionDate,
                 CreatedBy,CreatedOn,ApprovedOn,ApprovedBy) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
+            <UpdateQuery>UPDATE FarmerPayment SET ApprovedBy = {1} , ApprovedOn = SYSDATE(),IsApproved = 'Y' WHERE Id = {2} AND ApprovedOn is null</UpdateQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
                 <Property columnName="FarmerId" name="farmerId" dataType="4"/>
@@ -463,6 +463,7 @@
                 TransactionId, TransactionDate, CreatedBy,CreatedOn) VALUES
                 (?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
+            <UpdateQuery>UPDATE AgentPayment SET ApprovedBy = {1} , ApprovedOn = SYSDATE(),IsApproved = 'Y' WHERE Id = {2} AND ApprovedOn is null</UpdateQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
                 <Property columnName="AgentId" name="agentId" dataType="4"/>
@@ -495,6 +496,7 @@
                 <Property name="createdOn" columnName="CreatedOn" dataType="93"/>
                 <Property name="transactionDetail" columnName="TransactionDetail" dataType="12"/>
                 <Property name="transactionId" columnName="TransactionId" dataType="12"/>
+                <Property name="transactionDate" columnName="TransactionDate" dataType="93"/>
                 <Property name="firmId" columnName="FirmId" dataType="4"/>
                 <Property name="firmName" columnName="FirmName" dataType="12"/>
                 <Property name="propertyId" columnName="PropertyId" dataType="4"/>
@@ -505,9 +507,7 @@
                 <Property name="expenseDate" columnName="ExpenseDate" dataType="93"/>
                 <Property name="paidTo" columnName="PaidTo" dataType="12"/>
                 <Property name="paymentMode" columnName="PaymentMode" dataType="12"/>
-                <Property name="chequeNo" columnName="ChequeNo" dataType="12"/>
                 <Property name="bankName" columnName="BankName" dataType="12"/>
-                <Property name="chequeDate" columnName="ChequeDate" dataType="93"/>
                 <Property name="expenseDate" columnName="ExpenseDate" dataType="93"/>
                 <Property name="isApproved" columnName="IsApproved" dataType="1"/>
             </PropertyMapping>
@@ -515,7 +515,7 @@
     </Transactions>
     <Searches>
         <Search id="expense">
-            <SearchQuery>SELECT Id as id, FirmName as firmName,ExpenseCategory as category,ExpenseDate as expenseDate,
+            <SearchQuery>SELECT Id as id, FirmName as firmName,ExpenseCategory as category, DATE_FORMAT(ExpenseDate,'%d/%m/%Y') as expenseDate,
                 PaidTo as paidTo, Amount as amount, PaymentMode as paymentMode,IsApproved as isApproved FROM
                 ExpenseDetails WHERE {MACRO}
             </SearchQuery>
@@ -579,9 +579,9 @@
         </Search>
         <Search id="booking"> <!-- Booking report-->
             <SearchQuery>SELECT a.Id as id, a.CustomerId as customerId, a.CustomerName as customerName,c.AgentName as
-                agentName,b.BookingDate as bookingDate,b.ProjectName as projectName,b.FirmName as firmName,b.Block as
+                agentName,DATE_FORMAT(b.BookingDate,'%d/%m/%Y') as bookingDate,b.ProjectName as projectName,b.FirmName as firmName,b.Block as
                 block,b.PlotNumber as plotNumber,b.TotalAmount as totalAmount,
-                b.BookingType as bookingType,b.LastPaymentDate as paymentDate,e.PlotSize as plotSize,e.SqFtRate as
+                b.BookingType as bookingType,DATE_FORMAT(b.LastPaymentDate,'%d/%m/%Y') as paymentDate,e.PlotSize as plotSize,e.SqFtRate as
                 sqftRate FROM CustomerDetails a INNER JOIN BookingDetails b on b.BookingId = a.BookingId INNER JOIN
                 AgentMaster c on b.AgentId = c.AgentId INNER JOIN PlotTransaction d
                 ON d.BookingId = b.BookingId INNER JOIN PlotDetails e ON e.Id = d.PlotId WHERE a.CustomerType =
@@ -602,7 +602,7 @@
         <Search id="transaction"><!-- Transaction Report-->
             <SearchQuery>
                 SELECT a.CustomerName as customerName, b.FirmName as firmName,b.ProjectName as projectName,b.block as
-                block,b.PlotNumber as plotNumber,c.AgentName as agentName,d.PaymentDate as paymentDate,d.PaymentMode as
+                block,b.PlotNumber as plotNumber,c.AgentName as agentName,DATE_FORMAT(d.PaymentDate,'%d/%m/%Y') as paymentDate,d.PaymentMode as
                 paymentMode,CASE WHEN d.PaymentMode = 'Cheque' THEN d.ChequeDate ELSE d.TransactionDate END as
                 transactionDate, CASE WHEN d.PaymentMode = 'Cheque' THEN d.ChequeNo ELSE d.TransactionId END as
                 transactionId,d.BankName as bankName,d.InstallmentAmount as installmentAmount, d.PaidInstallment as
@@ -624,7 +624,7 @@
         </Search>
         <Search id="paymentDue"><!-- Payment Due Report-->
             <SearchQuery>SELECT a.CustomerName as customerName,a.PhoneNo as phoneNo, c.AgentName as agentName,
-                sum(d.InstallmentAmount) as pendingInstallment,b.BookingDate as bookingDate, b.FirmName as
+                sum(d.InstallmentAmount) as pendingInstallment,DATE_FORMAT(b.BookingDate,'%d/%m/%Y')  as bookingDate, b.FirmName as
                 firmName,b.ProjectName as projectName,b.block as block,b.PlotNumber as plotNumber FROM CustomerDetails a
                 INNER JOIN
                 BookingDetails b ON a.CustomerId = b.CustomerId INNER JOIN AgentMaster c ON c.AgentId = b.AgentId INNER
@@ -723,8 +723,10 @@
                 <Property columnName="LandId" name="landId" dataType="4"/>
             </PropertyMapping>
         </Search>
+
+
         <Search id="agentPaymentDetails">
-            <SearchQuery>SELECT  AgentId as agentId, AgentName as agentName, PaymentMode as paymentMode, PaymentAmount as paymentAmount,BankName as bank, PaymentDate as paymentDate from AgentPayment WHERE {MACRO}
+            <SearchQuery>SELECT Id as id, AgentId as agentId, AgentName as agentName, PaymentMode as paymentMode, PaymentAmount as paymentAmount,BankName as bank, DATE_FORMAT(TransactionDate,'%d/%m/%Y')  as transactionDate, TransactionId as transactionId, CreatedBy as createdBy, DATE_FORMAT(CreatedOn,'%d/%m/%Y')  as createdOn from AgentPayment WHERE {MACRO}
             </SearchQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
@@ -732,7 +734,39 @@
                 <Property columnName="IsApproved" name="isApproved" dataType="1"/>
             </PropertyMapping>
         </Search>
+        <Search id="farmerPaymentDetails">
+            <SearchQuery>SELECT f.Id as id, f.FarmerName as farmerName,f.PaymentMode as paymentMode,f.BankName as bankName,f.CreatedOn as createdOn, f.CreatedBy as createdBY,DATE_FORMAT(f.TransactionDate ,'%d/%m/%Y') as transactionDate, f.PaymentAmount as paymentAmount, l.KhasraNumber as khasraNumber,l.LandAmount as landAmount,l.PaidAmount as paidAmount from FarmerPayment f INNER JOIN LandMaster l ON l.id = f.LandId where {MACRO};
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="IsApproved" name="isApproved" dataType="1"/>
+            </PropertyMapping>
+        </Search>
 
+        <Search id="expenseDetails">
+            <SearchQuery>SELECT f.Id as id, f.FarmerName as farmerName,f.PaymentMode as paymentMode,BankName as bankName, DATE_FORMAT(f.TransactionDate,'%d/%m/%Y')  as transactionDate, f.PaymentAmount as paymentAmount, l.KhasraNumber as khasraNumber,l.LandAmount as landAmount,l.PaidAmount as paidAmount,DATE_FORMAT(f.CreatedOn,'%d/%m/%Y')  as createdOn, f.CreatedBy as createdBy from FarmerPayment f INNER JOIN LandMaster l ON l.id = f.LandId where {MACRO};
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="IsApproved" name="isApproved" dataType="1"/>
+            </PropertyMapping>
+        </Search>
+
+        <Search id="customerPaymentDetails">
+            <SearchQuery>SELECT a.BookingId as bookingId,a.CustomerId as customerId,InstallmentAmount as installmentAmount,AmountPaid as amountPaid,
+                Interest as totalInterest, WaiveOff as interestWaiveOff,InterestPaid as interestPaid, TotalAmountPaid as totalAmountPaid,
+                PendingAmount as pendingAmount,Status as status FROM InstallmentDetails a  INNER JOIN BookingDetails b
+                ON a.BookingId = b.BookingId WHERE {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="BlockId" name="blockId" dataType="4"/>
+                <Property columnName="PlotNumber" name="plotNumber" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+            </PropertyMapping>
+        </Search>
     </Searches>
 </Configuration>
 
