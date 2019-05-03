@@ -53,32 +53,20 @@ public class ServiceUtils {
                 System.out.println(key + " -- " + customerDetails.get(key));
                 Object value = "";
 
-                if (Integer.parseInt((String) columnNameList.get(1)) == 4) {
+                if (Integer.parseInt((String) columnNameList.get(1)) == 4 && customerDetails.get(key)!=null) {
                     value = customerDetails.get(key) != null ? Integer.valueOf(customerDetails.get(key).toString()) : null;
-                } else if (Integer.parseInt((String) columnNameList.get(1)) == 91) {
+                } else if (Integer.parseInt((String) columnNameList.get(1)) == 93 && customerDetails.get(key)!=null) {
                   //  DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                     String date1 = "";
                     if (customerDetails.get(key) != null) {
-                        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                        DateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
-
-                        try {
-                            java.util.Date date = sdf.parse("2019-04-09T00:00:26Z");
-                            sdf.setTimeZone(TimeZone.getTimeZone("IST"));
-                            date1 = sdf1.format(date);
-                            System.out.println(date1);
-                            System.out.println(Date.valueOf(date1));
-                            value = Date.valueOf(date1);
-                        }
-                        catch(Exception e)
-                        {
-                            e.printStackTrace();
-                        }
+                        Instant instant = Instant.parse((String) customerDetails.get(key));
+                        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
+                        value = new java.sql.Timestamp(java.util.Date.from(zonedDateTime.toInstant()).getTime());
 
                     } else {
                         value = null;
                     }
-                } else if (Integer.parseInt((String) columnNameList.get(1)) == 3) {
+                } else if (Integer.parseInt((String) columnNameList.get(1)) == 3 && customerDetails.get(key)!=null) {
                     value = customerDetails.get(key) != null ? Double.valueOf(customerDetails.get(key).toString()) : null;
                 } else {
                     value = customerDetails.get(key);
@@ -90,6 +78,7 @@ public class ServiceUtils {
     }
     public static java.sql.Date convertStrToSQLDate(String strDate)
     {
+        System.out.println("strDate -- "+strDate);
         Instant instant = Instant.parse(strDate);
         ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
        return new java.sql.Date(java.util.Date.from(zonedDateTime.toInstant()).getTime());

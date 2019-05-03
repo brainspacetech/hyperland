@@ -5,9 +5,14 @@ import com.brainspace.hyperland.dao.IMasterDAO;
 import com.brainspace.hyperland.utils.ConfigReader;
 import com.brainspace.hyperland.utils.ServiceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.math.BigInteger;
 import java.sql.Types;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +103,33 @@ public class MasterService implements IMasterService {
                         Object colValue = propertyMap.get(jsonColTypeList.get(0));
                         arguments[j] = colValue;
                         argumentTypes[j] = Integer.parseInt((String) jsonColTypeList.get(1));
+                        if(argumentTypes[j] == 93 && arguments[j] !=null ){
+                            Instant instant = Instant.parse((String) arguments[j]);
+                            ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
+                            arguments[j] = new java.sql.Date(Date.from(zonedDateTime.toInstant()).getTime());
+                        }
+                    }
+                    Object  agentIdObj = masterDAO.addData(sql,arguments,argumentTypes);
+                    //if type == agent create user and user roles ->AGENT
+                    if(type.equalsIgnoreCase("agent"))
+                    {
+                        // make entry in agent business details table
+                        String password = "";
+                        if(propertyMap.get("panNumber")!=null)
+                        {
+                            password += propertyMap.get("panNumber");
+                        }
+                        if(propertyMap.get("dateOfBirth")!=null)
+                        {
+                            password += propertyMap.get("dateOfBirth");
+                        }
+                        String encodedPassword = new BCryptPasswordEncoder().encode(password);
+                        String insertBDQuery = "INSERT INTO AgentBusinessDetails(AgentId) VALUE ("+Integer.parseInt(agentIdObj.toString())+")";
+                        String insertUser = "INSERT INTO user (username,password) VALUES ('A"+agentIdObj+"','"+encodedPassword+"')";
+                        String insertUserRole = "INSERT INTO user_roles (username,role) VALUES ("+propertyMap.get("phoneNo")+",'ROLE_AGENT')";
+                        masterDAO.updateData(insertBDQuery);
+                        masterDAO.updateData(insertUser);
+                        masterDAO.updateData(insertUserRole);
                     }
                     statusCode = "1";
                     statusMessage = "Success";

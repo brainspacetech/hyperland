@@ -4,6 +4,7 @@ import com.brainspace.hyperland.bo.RestResponse;
 import com.brainspace.hyperland.service.IMasterService;
 import com.brainspace.hyperland.service.ITransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,19 @@ public class BookingController {
         return null;
     }
 
+    @RequestMapping(value = "/update/{type}/{id}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public ResponseEntity<RestResponse> updateTransaction(@RequestBody Object restRequest,@PathVariable(name="type") String type,@PathVariable(name="id") String id) {
+        System.out.println(restRequest);
+        String createdBy = "";
+        transactionService.updateTransaction((Map)restRequest,type,id,createdBy);
+        return null;
+    }
+
+    @RequestMapping(value = "/get/receiptNumber/", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public ResponseEntity<RestResponse> generateRecieptNumber()
+    {
+        return new ResponseEntity<RestResponse>(transactionService.generateRecieptNumber(), HttpStatus.OK);
+    }
 
 
 

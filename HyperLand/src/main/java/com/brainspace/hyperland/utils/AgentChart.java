@@ -10,17 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 public class AgentChart {
-    public static void generateAgentChart()
+    public  void generateAgentChart()
     {
-
-
-        List<Map<String,Object>> obj = new ArrayList<>();
         Map a = new HashMap();
-        AgentNode node1 = new AgentNode("Pankaj", "12", null,"SelfBusiness - 3232099    chainbusiness - 3000.00");
-        AgentNode node2 = new AgentNode("Arati", "13", "12","SelfBusiness - 3232099    chainbusiness - 3000.00");
-        AgentNode node3 = new AgentNode("Niraj",  "14", "13","SelfBusiness - 3232099    chainbusiness - 3000.00");
-        AgentNode node4 = new AgentNode("Divit", "16", "13","SelfBusiness - 3232099    chainbusiness - 3000.00");
-        AgentNode node5 = new AgentNode("Divyansh",   "15", "14","SelfBusiness -  3232099    chainbusiness - 3000.00");
+        AgentNode node1 = new AgentNode("Pankaj", "12", null,"SB - 3232099    CB - 3000.00");
+        AgentNode node2 = new AgentNode("Arati", "13", "12","SB - 3232099    CB - 3000.00");
+        AgentNode node3 = new AgentNode("Niraj",  "14", "13","SB - 3232099    CB - 3000.00");
+        AgentNode node4 = new AgentNode("Divit", "16", "13","SB - 3232099    CB - 3000.00");
+        AgentNode node5 = new AgentNode("Divyansh",   "15", "14","SB -  3232099    CB - 3000.00");
 
         List<AgentNode> nodes = new ArrayList<>();
         nodes.add(node1);
@@ -31,13 +28,14 @@ public class AgentChart {
 
         createTree(nodes);
 
-    System.out.println(obj);
+
 
     }
 
-    private static void createTree(List<AgentNode> nodes) {
+    public String createTree(List<AgentNode> nodes) {
 
         Map<String, AgentNode> mapTmp = new HashMap<>();
+        String jsonInString = "";
 
         //Save all nodes to a map
         for (AgentNode current : nodes) {
@@ -69,18 +67,20 @@ public class AgentChart {
 String str = "";
         try {
             ObjectMapper mapper = new ObjectMapper();
-            String jsonInString = mapper.writeValueAsString(root);
+            jsonInString = mapper.writeValueAsString(root);
+            jsonInString = jsonInString.replaceAll("\"agentId\":\"\\d+\",\"sponsorId\":\"\\d+\",","");
+            jsonInString = jsonInString.replaceAll("\"agentId\":\"\\d+\",\"sponsorId\":null,","");
             System.out.println(jsonInString);
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-
+        return jsonInString;
     }
 
-    public static void main(String s[])
+  /*  public static void main(String s[])
     {
         generateAgentChart();
-    }
+    }*/
 }

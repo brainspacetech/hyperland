@@ -6,4 +6,6 @@ import java.util.Map;
 
 public interface ISearchService {
     public RestResponse searchObject(Map searchCriteria, String type);
+
+    public RestResponse getChainAgent(String agentId);
 }

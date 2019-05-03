@@ -23,6 +23,11 @@ public class SearchController {
         return  new ResponseEntity<RestResponse>(response, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/agent/legreport/{id}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public ResponseEntity<RestResponse> agentLegReport(@PathVariable String id) {
+        RestResponse response  =   searchService.getChainAgent(id);
+        return  new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+    }
 
 
 }

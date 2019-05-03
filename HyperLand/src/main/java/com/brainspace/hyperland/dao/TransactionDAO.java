@@ -7,11 +7,9 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +38,8 @@ public class TransactionDAO implements ITransactionDAO {
                         preparedStatement.setString((i + 1), (String) dataList.get(j).get(paramsArr[i].trim()));
                     } else if (dataList.get(j).get(paramsArr[i].trim()) instanceof Integer) {
                         preparedStatement.setInt((i + 1), (Integer) dataList.get(j).get(paramsArr[i].trim()));
-                    } else if (dataList.get(j).get(paramsArr[i].trim()) instanceof Date) {
-                        preparedStatement.setObject((i + 1), (Date) dataList.get(j).get(paramsArr[i].trim()));
+                    } else if (dataList.get(j).get(paramsArr[i].trim()) instanceof Timestamp) {
+                        preparedStatement.setObject((i + 1), (Timestamp) dataList.get(j).get(paramsArr[i].trim()));
                     } else if (dataList.get(j).get(paramsArr[i].trim()) instanceof Double) {
                         preparedStatement.setDouble((i + 1), (Double) dataList.get(j).get(paramsArr[i].trim()));
                     } else {
@@ -90,8 +88,8 @@ public class TransactionDAO implements ITransactionDAO {
                         preparedStatement.setString((i + 1), (String) dataMap.get(paramName));
                     } else if (dataMap.get(paramName) instanceof Integer) {
                         preparedStatement.setInt((i + 1), (Integer) dataMap.get(paramName));
-                    } else if (dataMap.get(paramName) instanceof Date) {
-                        preparedStatement.setDate((i + 1), (Date) dataMap.get(paramName));
+                    } else if (dataMap.get(paramName) instanceof Timestamp) {
+                        preparedStatement.setTimestamp((i + 1), (Timestamp) dataMap.get(paramName));
                     } else if (dataMap.get(paramName) instanceof Double) {
                         preparedStatement.setDouble((i + 1), (Double) dataMap.get(paramName));
                     } else {
@@ -107,6 +105,49 @@ public class TransactionDAO implements ITransactionDAO {
     }
     public void insertDataBatch(final String sql[]) {
         this.jdbcTemplate.batchUpdate(sql);
+    }
+    public void updateDataBatch(final String sql, List<Map> dataList,int id) {
+
+        this.jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement preparedStatement, int j) throws SQLException {
+                String params = sql.substring(sql.indexOf(" SET") + 4, sql.indexOf("WHERE"));
+                String paramsArr[] = params.split(",");
+                int count = 0 ;
+                for (int i = 0; i < paramsArr.length; i++) {
+                    String paramKey = paramsArr[i].replace("=","");
+                    paramKey = paramKey.replace("?","").trim();
+                    System.out.println(paramKey + "-- " + dataList.get(j).get(paramKey));
+                    if (dataList.get(j).get(paramKey) instanceof String) {
+                        preparedStatement.setString((i + 1), (String) dataList.get(j).get(paramKey));
+                    } else if (dataList.get(j).get(paramKey) instanceof Integer) {
+                        preparedStatement.setInt((i + 1), (Integer) dataList.get(j).get(paramKey));
+                    } else if (dataList.get(j).get(paramKey) instanceof Timestamp) {
+                        preparedStatement.setObject((i + 1), (Timestamp) dataList.get(j).get(paramKey));
+                    } else if (dataList.get(j).get(paramKey) instanceof Double) {
+                        preparedStatement.setDouble((i + 1), (Double) dataList.get(j).get(paramKey));
+                    } else {
+                        preparedStatement.setObject((i + 1), null);
+                    }
+                    count++;
+                }
+                preparedStatement.setObject(count+1, dataList.get(j).get("Id"));
+                System.out.println("preparedStatement  -- " + preparedStatement);
+            }
+
+            @Override
+            public int getBatchSize() {
+                System.out.println("dataList.size() -- "+dataList.size());
+                return dataList.size();
+            }
+        });
+    }
+
+    @Override
+    public Object getReceiptNumber(String query) {
+        jdbcTemplate.update(query);
+        Map<String, Object> idMap = jdbcTemplate.queryForMap("SELECT LAST_INSERT_ID() as receiptNumber from ReceiptNumber");
+        return idMap.get("receiptNumber");
     }
 
 }

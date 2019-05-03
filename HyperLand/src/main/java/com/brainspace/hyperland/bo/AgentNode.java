@@ -13,6 +13,7 @@ public class AgentNode {
     private String sponsorId;
     private String name;
     private String designation;
+    private String img = "";
     @JsonBackReference
     private AgentNode parent;
     @JsonManagedReference
@@ -80,10 +81,20 @@ public class AgentNode {
         this.subordinates = subordinates;
     }
 
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
     public void addChild(AgentNode child) {
         if (!this.subordinates.contains(child) && child != null)
             this.subordinates.add(child);
     }
+
+
 
     @Override
     public String toString() {
