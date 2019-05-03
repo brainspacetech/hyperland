@@ -84,7 +84,6 @@ public class TransactionService implements ITransactionService {
                 //insert into Plot transaction
                 System.out.println("updatePlotDetails " + updatePlotDetails);
                 String insertPlotTransaction = "INSERT INTO PlotTransaction (PlotId,BookingId,BookedBy,BookedOn,AgentId) VALUES (" + mainObject.get("plotId") + "," + bookingId + ",'" + bookingId + "_P_1" + "',now()," + mainObject.get("agentId") + ")";
-
                 System.out.println("insertPlotTransaction  -- " + insertPlotTransaction);
                 transactionDAO.insertDataBatch(new String[]{updatePlotDetails, insertPlotTransaction});
             } else if (transactions.getTransaction()[i].getId().equalsIgnoreCase("customer")) {
