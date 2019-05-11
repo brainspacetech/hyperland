@@ -10,6 +10,7 @@ import com.brainspace.hyperland.utils.TransactionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import sun.java2d.pipe.SpanShapeRenderer;
 
 import java.math.BigInteger;
 import java.sql.Types;
@@ -30,7 +31,7 @@ public class TransactionService implements ITransactionService {
 
     @Override
     public RestResponse createBooking(Object requestObject, String createdBy) {
-        List<Map> installmentList = null;
+        List<Map> installmentList = new ArrayList<>();
         ConfigBO configBO = ConfigReader.getConfig();
         Transactions transactions = configBO.getTransactions();
         String insertQuery;
@@ -86,6 +87,26 @@ public class TransactionService implements ITransactionService {
                 String insertPlotTransaction = "INSERT INTO PlotTransaction (PlotId,BookingId,BookedBy,BookedOn,AgentId) VALUES (" + mainObject.get("plotId") + "," + bookingId + ",'" + bookingId + "_P_1" + "',now()," + mainObject.get("agentId") + ")";
                 System.out.println("insertPlotTransaction  -- " + insertPlotTransaction);
                 transactionDAO.insertDataBatch(new String[]{updatePlotDetails, insertPlotTransaction});
+
+                //if token amount paid and booking amount is pending then insert into installment details along with installment details
+                if(((String)mainObject.get("amountType")).equalsIgnoreCase("Token"))
+                {
+                    Double bookingAmount = Double.parseDouble(mainObject.get("bookingAmount").toString());
+                   Double remainingBookingAmount  = Double.parseDouble(mainObject.get("toakenAmount").toString()) - bookingAmount;
+                   if(remainingBookingAmount>0)
+                   {
+                       Map installmentMap = new HashMap();
+                       installmentMap.put("customerId", bookingId + "_P_1");
+                       installmentMap.put("bookingId", bookingId);
+                       installmentMap.put("installmentAmount", remainingBookingAmount);
+                       installmentMap.put("dueDate", mainObject.get("installmentStartDate"));
+                       installmentMap.put("status", "Pending");
+                       installmentMap.put("paymentType", "Booking");
+                       installmentList.add(installmentMap);
+                   }
+                }
+
+
             } else if (transactions.getTransaction()[i].getId().equalsIgnoreCase("customer")) {
                 Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
                 insertQuery = transactions.getTransaction()[i].getInsertQuery();
@@ -113,8 +134,12 @@ public class TransactionService implements ITransactionService {
                 }
                 if(customerDetails.get("dateOfBirth")!=null)
                 {
-                    password += customerDetails.get("dateOfBirth");
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
+                    Instant instant = Instant.parse((String) customerDetails.get("dateOfBirth"));
+                    ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
+                    password+=zonedDateTime.getMonthValue()+""+zonedDateTime.getMonthValue()+""+zonedDateTime.getYear();
                 }
+                System.out.println("C"+bookingId.toString()+" === "+password);
                     createUserAndRole("C"+bookingId.toString(), password, "ROLE_CUSTOMER");
             } else if (transactions.getTransaction()[i].getId().equalsIgnoreCase("payment")) {
                 Map paymentDetails = (Map<String, Object>) mainObject.get("paymentDetails");
@@ -123,7 +148,7 @@ public class TransactionService implements ITransactionService {
                 Map paymentMap = new HashMap();
                 paymentMap.put("customerId", bookingId + "_P_1");
                 paymentMap.put("bookingId", bookingId);
-                paymentMap.put("paymentType", "Booking");
+                paymentMap.put("paymentType", mainObject.get("amountType"));
                 paymentMap.put("collectedBy", createdBy);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
                 String currentDate = sdf.format(new Date());
@@ -147,6 +172,11 @@ public class TransactionService implements ITransactionService {
                 Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
                 insertQuery = transactions.getTransaction()[i].getInsertQuery();
                 String installlmentDueDate = (String) mainObject.get("installmentStartDate");
+                if(installmentList.size() > 0)
+                {
+                    installmentList.remove(0);
+                    installmentList.add(serviceUtils.customerMap(installmentList.get(0), jsonColumnMap));
+                }
                 int numberOfInstallment = Integer.parseInt(bookingDetails.get("numberOfInstallment").toString());
                 DateFormat sourceDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
                 Calendar cal = null;
@@ -158,8 +188,8 @@ public class TransactionService implements ITransactionService {
                     e.printStackTrace();
                 }
                 //  java.sql.Date installmentDueDateSql = ServiceUtils.convertStrToSQLDate(installlmentDueDate);
-                installmentList = new ArrayList<>();
-                Map installmentMap = new HashMap();
+
+                Map installmentMap = null;
                 Double installmentAmount = Double.valueOf(mainObject.get("installmentAmount").toString());
                 for (int k = 0; k < numberOfInstallment; k++) {
                     installmentMap = new HashMap();

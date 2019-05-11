@@ -2,6 +2,8 @@ package com.brainspace.hyperland.utils;
 
 import com.brainspace.hyperland.bo.Property;
 import com.brainspace.hyperland.bo.RestResponse;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Date;
 import java.text.DateFormat;
@@ -83,4 +85,15 @@ public class ServiceUtils {
         ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
        return new java.sql.Date(java.util.Date.from(zonedDateTime.toInstant()).getTime());
     }
+
+     public String  getUserName() {
+         String username ="";
+         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+         if (principal instanceof UserDetails) {
+              username = ((UserDetails) principal).getUsername();
+         } else {
+              username = principal.toString();
+         }
+         return username;
+     }
 }

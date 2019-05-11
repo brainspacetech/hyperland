@@ -808,10 +808,8 @@
     </Search>
 
         <Search id="customerPaymentDetails">
-            <SearchQuery>SELECT a.Id as id,DATE_FORMAT(a.DueDate,'%d/%m/%Y') as dueDate, a.BookingId as bookingId,a.CustomerId as customerId,InstallmentAmount as installmentAmount,AmountPaid as amountPaid,
-                Interest as interest, WaiveOff as interestWaiveOff,InterestPaid as interestPaid, TotalAmountPaid as totalAmountPaid,
-                PendingAmount as pendingAmount,Status as status FROM InstallmentDetails a  INNER JOIN BookingDetails b
-                ON a.BookingId = b.BookingId WHERE {MACRO}
+            <SearchQuery>select a.Amount as amount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate from hyperland.PaymentDetails a INNER JOIN  hyperland.BookingDetails b ON b.BookingId = a.BookingId
+                WHERE {MACRO}
             </SearchQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>

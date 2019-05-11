@@ -47,6 +47,9 @@ public class SelectorDAO implements ISelectorDAO {
 			case "project":
 						sql = "SELECT Id as Code, ProjectName as Value FROM ProjectMaster where FirmId = ?";
 						break;
+			case "property":
+				sql = "SELECT Id as Code, ProjectName as Value FROM ProjectMaster where FirmId = ?";
+				break;
 			case "city":
 						sql = "SELECT Id as Code, City as Value FROM CityMaster";
 						break;

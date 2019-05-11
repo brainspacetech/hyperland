@@ -5,10 +5,13 @@ import com.brainspace.hyperland.dao.IMasterDAO;
 import com.brainspace.hyperland.utils.ConfigReader;
 import com.brainspace.hyperland.utils.ServiceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.math.BigInteger;
 import java.sql.Types;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -121,9 +124,16 @@ public class MasterService implements IMasterService {
                         }
                         if(propertyMap.get("dateOfBirth")!=null)
                         {
-                            password += propertyMap.get("dateOfBirth");
+                            if(propertyMap.get("dateOfBirth")!=null)
+                            {
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
+                                Instant instant = Instant.parse((String) propertyMap.get("dateOfBirth"));
+                                ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
+                                password+=zonedDateTime.getMonthValue()+""+zonedDateTime.getMonthValue()+""+zonedDateTime.getYear();
+                            }
                         }
                         String encodedPassword = new BCryptPasswordEncoder().encode(password);
+                        System.out.println(Integer.parseInt(agentIdObj.toString())+" === "+password);
                         String insertBDQuery = "INSERT INTO AgentBusinessDetails(AgentId) VALUE ("+Integer.parseInt(agentIdObj.toString())+")";
                         String insertUser = "INSERT INTO user (username,password) VALUES ('A"+agentIdObj+"','"+encodedPassword+"')";
                         String insertUserRole = "INSERT INTO user_roles (username,role) VALUES ("+propertyMap.get("phoneNo")+",'ROLE_AGENT')";
@@ -286,6 +296,75 @@ public class MasterService implements IMasterService {
             statusMessage = "Success";
         }
         restResponse = ServiceUtils.convertObjToResponse(statusCode,statusMessage,landData);
+        return restResponse;
+    }
+
+    @Override
+    public RestResponse addMenuConfig(String menuConfig) {
+
+        RestResponse response = null;
+        String deleteQuery = "DELETE FROM MenuConfig";
+        masterDAO.updateData(deleteQuery);
+        String query = "INSERT INTO MenuConfig (MenuConfig) VALUES ('"+menuConfig+"')";
+        masterDAO.updateData(query);
+        return response;
+    }
+    @Override
+    public RestResponse addRoleMenuConfig(String menuConfig,String role) {
+        RestResponse response = null;
+        String deleteQuery = "DELETE FROM RoleMenuConfig WHERE Role = 'ROLE_"+role+"'";
+        System.out.println("deleteQuery -- "+deleteQuery);
+        masterDAO.updateData(deleteQuery);
+        String query = "INSERT INTO RoleMenuConfig (Role,MenuConfig) VALUES ('ROLE_"+role+"','"+menuConfig+"')";
+        masterDAO.updateData(query);
+        return response;
+    }
+
+    @Override
+    public RestResponse getMenuConfig(){
+        String statusCode = "";
+        String statusMessage = "";
+        RestResponse restResponse = null;
+        Map landData = null;
+        try {
+           /* String landQuery = "SELECT KhasraNumber as khasraNumber, LandAmount as landAmount FROM LandMaster Where Id = ?";
+            landData = masterDAO.getDataById(landQuery, id);
+            String farmerQuery = "SELECT FarmerName as farmerName, panNumber as panNumber FROM FarmerMaster Where LandId = " + id;
+            List<Map> farmerData = masterDAO.getAllData(farmerQuery);
+            landData.put("farmers",farmerData);*/
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        catch(Exception e)
+        {
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        restResponse = ServiceUtils.convertObjToResponse(statusCode,statusMessage,landData);
+        return restResponse;
+    }
+
+    @Override
+    public RestResponse getRoleMenuConfig(){
+        String statusCode = "";
+        String statusMessage = "";
+        RestResponse restResponse = null;
+        Map menuConfig = null;
+        try
+        {
+            String userName = new ServiceUtils().getUserName();
+            String fetchMenuConfig = "select rm.MenuConfig as MenuConfig from  hyperland.RoleMenuConfig rm INNER JOIN hyperland.user_roles ur ON ur.role = rm.Role where username  = '"+userName+"'";
+            List<Map> menuConfigList = masterDAO.getAllData(fetchMenuConfig);
+            menuConfig = menuConfigList.get(0);
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        catch(Exception e)
+        {
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        restResponse = ServiceUtils.convertObjToResponse(statusCode,statusMessage,menuConfig);
         return restResponse;
     }
 }

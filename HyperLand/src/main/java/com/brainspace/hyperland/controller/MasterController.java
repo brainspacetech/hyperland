@@ -7,6 +7,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.brainspace.hyperland.bo.RestResponse;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.annotation.MultipartConfig;
+import java.util.Map;
 
 
 @RestController
@@ -36,12 +40,30 @@ public class MasterController {
         return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
     }
 
+
+
+    @PostMapping(value = "/create/Firm")
+
+    public ResponseEntity<RestResponse> createFirm(@RequestParam("logoFile") MultipartFile logoFile) {
+     //   String firmName = (String) ((Map)requestBody).get("firmName");
+        System.out.println(logoFile);
+       // System.out.println(firmName);
+     //   RestResponse response = masterService.addData(type,request,"");
+       // return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        return null;
+    }
+
     @PostMapping(value = "/addLand")
     public ResponseEntity<RestResponse> addLand(@RequestBody Object request) {
         RestResponse response = masterService.addLandData(request,"");
         return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
     }
 
+    @PostMapping(value = "/add/menuConfig")
+    public ResponseEntity<RestResponse> addMenuConfig(@RequestBody Object request) {
+        RestResponse response = masterService.addMenuConfig((String) ((Map)request).get("menuConfig"));
+        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+    }
 
 
     @GetMapping(value = "/get/{type}/{id}")
@@ -65,5 +87,12 @@ public class MasterController {
         RestResponse response = masterService.getLandDataById("land",id);
         return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
     }
+
+    @PostMapping(value = "/add/roleMenuConfig")
+    public ResponseEntity<RestResponse> addRoleMenuConfig(@RequestBody Object request) {
+        RestResponse response = masterService.addRoleMenuConfig((String) ((Map)request).get("roleMenuConfig"),(String)((Map)request).get("role"));
+        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+    }
+
 
 }

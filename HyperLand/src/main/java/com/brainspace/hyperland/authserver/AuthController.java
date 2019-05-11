@@ -22,6 +22,5 @@ public class AuthController {
         public void init(AuthenticationManagerBuilder auth) throws Exception {
             auth.inMemoryAuthentication().withUser("user").password("pass").roles("USER");
         }
-
     }
 }
