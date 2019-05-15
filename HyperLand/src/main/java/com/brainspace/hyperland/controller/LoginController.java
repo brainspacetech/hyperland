@@ -19,4 +19,10 @@ public class LoginController {
         RestResponse response = masterService.getRoleMenuConfig();
         return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
     }
+    @GetMapping(value = "/get/menuConfig")
+    public ResponseEntity<RestResponse> getMenuConfig() {
+        RestResponse response = masterService.getMenuConfig();
+        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+    }
 }
+

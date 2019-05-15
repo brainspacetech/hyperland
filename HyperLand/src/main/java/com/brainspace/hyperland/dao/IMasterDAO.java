@@ -10,8 +10,9 @@ public interface IMasterDAO {
     Map<String,Object> getDataById(String query, int firmId);
     Object addData(String query,Object params[],int argTypes[]);
     void updateData(String query,Object params[],int argTypes[]);
-    void updateData(String query);
+    Object updateData(String query);
     void deleteData(String sql,int id);
-    public void insertDataBatch(final String sql, List<Map> dataList);
+    void insertDataBatch(final String sql, List<Map> dataList);
+    void insertDataBatch(final String sql[]);
 
 }

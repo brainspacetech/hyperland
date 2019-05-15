@@ -7,8 +7,12 @@ import java.util.Map;
 
 public interface ITransactionService {
     RestResponse createBooking(Object requestObject,String createdBy);
-    public void createPayment(Map paymentMap, String type,String createdBy);
-    public void approvePayment(String id,String type,String approvedBy);
-    public void updateTransaction(Map restRequest,String type,String id,String createdBy);
+    public RestResponse createPayment(Map paymentMap, String type,String createdBy);
+    public RestResponse approvePayment(String id,String type,String approvedBy);
+    public RestResponse updateTransaction(Map restRequest,String type,String id,String createdBy);
     public RestResponse generateRecieptNumber();
+    public RestResponse generatePrintReceipt(Integer bookingId, Integer paymentId) ;
+    public RestResponse getAllChequeEntries();
+    public RestResponse udpateChequeEntry(String id);
+
 }

@@ -65,13 +65,19 @@ public class TransactionDAO implements ITransactionDAO {
     }
 
     @Override
-    public void addData(String query, Object params[], int argTypes[]) {
+    public Object addData(String query, Object params[], int argTypes[]) {
         jdbcTemplate.update(query, params, argTypes);
+        String selectQuery = "SELECT LAST_INSERT_ID() as bookingId";
+        Map<String, Object> idMap = jdbcTemplate.queryForMap(selectQuery);
+        return idMap.get("id");
     }
 
     @Override
-    public void updateData(String query) {
+    public Object updateData(String query) {
         jdbcTemplate.update(query);
+        String selectQuery = "SELECT LAST_INSERT_ID() as bookingId";
+        Map<String, Object> idMap = jdbcTemplate.queryForMap(selectQuery);
+        return idMap.get("id");
     }
     public void updateData(final String sql, Map dataMap, String idColName) {
         jdbcTemplate.update(sql, new PreparedStatementSetter() {

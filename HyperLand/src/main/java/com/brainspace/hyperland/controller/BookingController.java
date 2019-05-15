@@ -24,39 +24,85 @@ public class BookingController {
     public ResponseEntity<RestResponse> createBooking(@RequestBody Object restRequest) {
         System.out.println(restRequest);
         String createdBy = new ServiceUtils().getUserName();
-        transactionService.createBooking(restRequest,createdBy);
-        return null;
+        RestResponse  restResponse = transactionService.createBooking(restRequest,createdBy);
+        if(restResponse.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(restResponse, HttpStatus.OK);
+        else
+            return  new ResponseEntity<RestResponse>(restResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+
     }
 
     @RequestMapping(value = "/approve/{type}/{id}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<RestResponse> approvePayment(@PathVariable(name="id") String id,@PathVariable(name="type") String type) {
         String approvedBy = new ServiceUtils().getUserName();
-        transactionService.approvePayment(id,type,approvedBy);
-        return null;
+        RestResponse response = transactionService.approvePayment(id,type,approvedBy);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return  new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
     }
 
     @RequestMapping(value = "/add/{type}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<RestResponse> createTransaction(@RequestBody Object restRequest,@PathVariable(name="type") String type) {
         System.out.println(restRequest);
         String createdBy = new ServiceUtils().getUserName();
-        transactionService.createPayment((Map)restRequest,type,createdBy);
-        return null;
+        RestResponse response = transactionService.createPayment((Map)restRequest,type,createdBy);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return  new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
     }
 
     @RequestMapping(value = "/update/{type}/{id}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<RestResponse> updateTransaction(@RequestBody Object restRequest,@PathVariable(name="type") String type,@PathVariable(name="id") String id) {
         System.out.println(restRequest);
         String createdBy =new ServiceUtils().getUserName();
-        transactionService.updateTransaction((Map)restRequest,type,id,createdBy);
-        return null;
+        RestResponse response = transactionService.updateTransaction((Map)restRequest,type,id,createdBy);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return  new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @RequestMapping(value = "/get/receiptNumber/", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    @RequestMapping(value = "/get/receiptNumber", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public ResponseEntity<RestResponse> generateRecieptNumber()
     {
         return new ResponseEntity<RestResponse>(transactionService.generateRecieptNumber(), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/get/printReceipt", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public ResponseEntity<RestResponse> generateReciept(@RequestBody Object restRequest)
+    {
+        String bookingId= ((Map)restRequest).get("bookingId").toString();
+        Integer bookingIdInt = bookingId!=null?Integer.parseInt(bookingId):null;
 
+        Object paymentId= ((Map)restRequest).get("paymentId");
+
+        Integer paymentIdInt = paymentId!=null?Integer.parseInt(paymentId.toString()):null;
+        return new ResponseEntity<RestResponse>(transactionService.generatePrintReceipt(bookingIdInt,paymentIdInt), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/update/{id}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public ResponseEntity<RestResponse> udpateChequeEntry(@PathVariable(name="id") String id)
+    {
+        RestResponse response = transactionService.udpateChequeEntry(id);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @RequestMapping(value = "/get/chequeEntry", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public ResponseEntity<RestResponse> getAllChequeEntry()
+    {
+        RestResponse response = transactionService.getAllChequeEntries();
+
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
 }

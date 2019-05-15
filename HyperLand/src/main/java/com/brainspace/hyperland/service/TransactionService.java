@@ -3,14 +3,14 @@ package com.brainspace.hyperland.service;
 import com.brainspace.hyperland.bo.*;
 import com.brainspace.hyperland.dao.IMasterDAO;
 import com.brainspace.hyperland.dao.ITransactionDAO;
-
 import com.brainspace.hyperland.utils.ConfigReader;
+import com.brainspace.hyperland.utils.PrintReceiptTemplate;
 import com.brainspace.hyperland.utils.ServiceUtils;
 import com.brainspace.hyperland.utils.TransactionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import sun.java2d.pipe.SpanShapeRenderer;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.sql.Types;
@@ -30,272 +30,360 @@ public class TransactionService implements ITransactionService {
     private IMasterDAO masterDAO;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public RestResponse createBooking(Object requestObject, String createdBy) {
-        List<Map> installmentList = new ArrayList<>();
-        ConfigBO configBO = ConfigReader.getConfig();
-        Transactions transactions = configBO.getTransactions();
-        String insertQuery;
-        Map<String, Object> mainObject = (Map) requestObject;
-        Map<String, Object> customerDetails = (Map<String, Object>) mainObject.get("customerDetails");
-        Map<String, Object> bookingDetails = new HashMap<>();
-        //insert blank data in booking details to get booking id;
-        String bookingQuery = "INSERT INTO BookingDetails(receiptNo,CreatedOn) values (?,SYSDATE()) ";
-        BigInteger bookingId = (BigInteger) transactionDAO.getBookingId(bookingQuery, new Object[]{mainObject.get("receiptNo")}, new int[]{Types.VARCHAR});
+        RestResponse restReponse = null;
+        String statusCode = "";
+        String statusMessage = "";
+        BigInteger bookingId = null;
+        try {
+            List<Map> installmentList = new ArrayList<>();
+            ConfigBO configBO = ConfigReader.getConfig();
+            Transactions transactions = configBO.getTransactions();
+            String insertQuery;
+            Map<String, Object> mainObject = (Map) requestObject;
+            Map<String, Object> customerDetails = (Map<String, Object>) mainObject.get("customerDetails");
+            Map<String, Object> bookingDetails = new HashMap<>();
+            //insert blank data in booking details to get booking id;
+            String bookingQuery = "INSERT INTO BookingDetails(receiptNo,CreatedOn) values (?,SYSDATE()) ";
+            bookingId = (BigInteger) transactionDAO.getBookingId(bookingQuery, new Object[]{mainObject.get("receiptNo")}, new int[]{Types.VARCHAR});
 
-        for (int i = 0; i < transactions.getTransaction().length; i++) {
-            PropertyMapping propertyMapping = transactions.getTransaction()[i].getPropertyMapping();
-            Property property[] = propertyMapping.getProperty();
-            ServiceUtils serviceUtils = new ServiceUtils();
+            for (int i = 0; i < transactions.getTransaction().length; i++) {
+                PropertyMapping propertyMapping = transactions.getTransaction()[i].getPropertyMapping();
+                Property property[] = propertyMapping.getProperty();
+                ServiceUtils serviceUtils = new ServiceUtils();
 
-            if (transactions.getTransaction()[i].getId().equalsIgnoreCase("booking")) {
-                Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
-                String updateQuery = transactions.getTransaction()[i].getUpdateQuery();
-                bookingDetails.put("firmId", mainObject.get("firmId"));
-                bookingDetails.put("firmName", mainObject.get("firmName"));
-                bookingDetails.put("projectId", mainObject.get("projectId"));
-                bookingDetails.put("projectName", mainObject.get("projectName"));
-                bookingDetails.put("propertyTypeId", mainObject.get("propertyTypeId"));
-                bookingDetails.put("propertyType", mainObject.get("propertyType"));
-                bookingDetails.put("blockId", mainObject.get("blockId"));
-                bookingDetails.put("block", mainObject.get("block"));
-                bookingDetails.put("agentId", mainObject.get("agentId"));
-                bookingDetails.put("plotNumber", mainObject.get("plotNumber"));
-                bookingDetails.put("paymentType", mainObject.get("paymentType"));
-                bookingDetails.put("bookingAmount", mainObject.get("bookingAmount"));
-                bookingDetails.put("bookingDate", mainObject.get("bookingDate"));
-                bookingDetails.put("baseSellingPrice", mainObject.get("baseSellingPrice"));
-                bookingDetails.put("plcChargesType", mainObject.get("plcChargesType"));
-                bookingDetails.put("plcCharges", mainObject.get("plcCharges"));
-                bookingDetails.put("bookingType", mainObject.get("bookingType"));
-                bookingDetails.put("numberOfInstallment", mainObject.get("numberOfInstallment"));
-                bookingDetails.put("additionalCharges", mainObject.get("additionalCharges"));
-                bookingDetails.put("installmentStartDate", mainObject.get("installmentStartDate"));
-                bookingDetails.put("totalAmount", mainObject.get("totalAmount"));
-                bookingDetails.put("totalPaidAmount", mainObject.get("totalAmount"));
-                bookingDetails.put("discount", mainObject.get("discount"));
-                bookingDetails.put("discountType", mainObject.get("discountType"));
-                bookingDetails.put("customerId", bookingId + "_P_1");
-                bookingDetails.put("bookingId", bookingId);
-                bookingDetails.put("createdBy", createdBy);
+                if (transactions.getTransaction()[i].getId().equalsIgnoreCase("booking")) {
+                    Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
+                    String updateQuery = transactions.getTransaction()[i].getUpdateQuery();
+                    bookingDetails.put("firmId", mainObject.get("firmId"));
+                    bookingDetails.put("firmName", mainObject.get("firmName"));
+                    bookingDetails.put("projectId", mainObject.get("projectId"));
+                    bookingDetails.put("projectName", mainObject.get("projectName"));
+                    bookingDetails.put("propertyTypeId", mainObject.get("propertyTypeId"));
+                    bookingDetails.put("propertyType", mainObject.get("propertyType"));
+                    bookingDetails.put("blockId", mainObject.get("blockId"));
+                    bookingDetails.put("block", mainObject.get("block"));
+                    bookingDetails.put("agentId", mainObject.get("agentId"));
+                    bookingDetails.put("plotNumber", mainObject.get("plotNumber"));
+                    bookingDetails.put("paymentType", mainObject.get("paymentType"));
+                    bookingDetails.put("bookingAmount", mainObject.get("bookingAmount"));
+                    bookingDetails.put("bookingDate", mainObject.get("bookingDate"));
+                    bookingDetails.put("baseSellingPrice", mainObject.get("baseSellingPrice"));
+                    bookingDetails.put("plcChargesType", mainObject.get("plcChargesType"));
+                    bookingDetails.put("plcCharges", mainObject.get("plcCharges"));
+                    bookingDetails.put("bookingType", mainObject.get("bookingType"));
+                    bookingDetails.put("numberOfInstallment", mainObject.get("numberOfInstallment"));
+                    bookingDetails.put("additionalCharges", mainObject.get("additionalCharges"));
+                    bookingDetails.put("installmentStartDate", mainObject.get("installmentStartDate"));
+                    bookingDetails.put("totalAmount", mainObject.get("totalAmount"));
+                    bookingDetails.put("totalPaidAmount", mainObject.get("totalPaidAmount"));
+                    bookingDetails.put("discount", mainObject.get("discount"));
+                    bookingDetails.put("discountType", mainObject.get("discountType"));
+                    bookingDetails.put("customerId", bookingId + "_P_1");
+                    bookingDetails.put("bookingId", bookingId);
+                    bookingDetails.put("createdBy", createdBy);
 
-                Map bookingMap = serviceUtils.customerMap(bookingDetails, jsonColumnMap);
-                transactionDAO.updateData(updateQuery, bookingMap, "BookingId");
-                //update plot details table
-                String updatePlotDetails = "UPDATE PlotDetails SET Status = 'Booked' WHERE FirmId = " + mainObject.get("firmId") + " and ProjectId = " + mainObject.get("projectId") + " and BlockId = " + mainObject.get("blockId") + " and PlotNo = " + mainObject.get("plotNumber");
-                //insert into Plot transaction
-                System.out.println("updatePlotDetails " + updatePlotDetails);
-                String insertPlotTransaction = "INSERT INTO PlotTransaction (PlotId,BookingId,BookedBy,BookedOn,AgentId) VALUES (" + mainObject.get("plotId") + "," + bookingId + ",'" + bookingId + "_P_1" + "',now()," + mainObject.get("agentId") + ")";
-                System.out.println("insertPlotTransaction  -- " + insertPlotTransaction);
-                transactionDAO.insertDataBatch(new String[]{updatePlotDetails, insertPlotTransaction});
-
-                //if token amount paid and booking amount is pending then insert into installment details along with installment details
-                if(((String)mainObject.get("amountType")).equalsIgnoreCase("Token"))
-                {
-                    Double bookingAmount = Double.parseDouble(mainObject.get("bookingAmount").toString());
-                   Double remainingBookingAmount  = Double.parseDouble(mainObject.get("toakenAmount").toString()) - bookingAmount;
-                   if(remainingBookingAmount>0)
-                   {
-                       Map installmentMap = new HashMap();
-                       installmentMap.put("customerId", bookingId + "_P_1");
-                       installmentMap.put("bookingId", bookingId);
-                       installmentMap.put("installmentAmount", remainingBookingAmount);
-                       installmentMap.put("dueDate", mainObject.get("installmentStartDate"));
-                       installmentMap.put("status", "Pending");
-                       installmentMap.put("paymentType", "Booking");
-                       installmentList.add(installmentMap);
-                   }
-                }
-
-
-            } else if (transactions.getTransaction()[i].getId().equalsIgnoreCase("customer")) {
-                Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
-                insertQuery = transactions.getTransaction()[i].getInsertQuery();
-                List<Map> customerList = new ArrayList<>();
-                customerDetails.put("customerId", bookingId + "_P_1");
-                Map customerMap = serviceUtils.customerMap(customerDetails, jsonColumnMap);
-                customerList.add(customerMap);
-                if (mainObject.get("coApplicantDetails") != null) {
-                    customerMap = new HashMap();
-                    List coApplicantList = (List) mainObject.get("coApplicantDetails");
-                    for (int count = 0; count < coApplicantList.size(); count++) {
-                        Map coAppMap = (Map) coApplicantList.get(count);
-                        coAppMap.put("customerId", bookingId + "_C_" + (count + 1));
-                        customerMap = serviceUtils.customerMap(coAppMap, jsonColumnMap);
-                        customerMap.put("customerId", bookingId + "_C_" + (count + 1));
-                        customerList.add(customerMap);
+                    Map bookingMap = serviceUtils.customerMap(bookingDetails, jsonColumnMap);
+                    transactionDAO.updateData(updateQuery, bookingMap, "BookingId");
+                    //update plot details table
+                    String updatePlotDetails = "UPDATE PlotDetails SET Status = 'Booked' WHERE FirmId = " + mainObject.get("firmId") + " and ProjectId = " + mainObject.get("projectId") + " and BlockId = " + mainObject.get("blockId") + " and PlotNo = " + mainObject.get("plotNumber");
+                    //insert into Plot transaction
+                    System.out.println("updatePlotDetails " + updatePlotDetails);
+                    String insertPlotTransaction = "INSERT INTO PlotTransaction (PlotId,BookingId,BookedBy,BookedOn,AgentId) VALUES (" + mainObject.get("plotId") + "," + bookingId + ",'" + bookingId + "_P_1" + "',now()," + mainObject.get("agentId") + ")";
+                    System.out.println("insertPlotTransaction  -- " + insertPlotTransaction);
+                    transactionDAO.insertDataBatch(new String[]{updatePlotDetails, insertPlotTransaction});
+                    //if token amount paid and booking amount is pending then insert into installment details along with installment details
+                    if (((String) mainObject.get("amountType")).equalsIgnoreCase("Token")) {
+                        Double totalAmount = Double.parseDouble(mainObject.get("totalAmount").toString());
+                        Double bookingAmount = totalAmount * 25 / 100;
+                        Double remainingBookingAmount = bookingAmount - Double.parseDouble(mainObject.get("tokenAmount").toString());
+                        if (remainingBookingAmount > 0) {
+                            Map installmentMap = new HashMap();
+                            installmentMap.put("customerId", bookingId + "_P_1");
+                            installmentMap.put("bookingId", bookingId);
+                            installmentMap.put("installmentAmount", remainingBookingAmount);
+                            installmentMap.put("dueDate", mainObject.get("installmentStartDate"));
+                            installmentMap.put("status", "Pending");
+                            installmentMap.put("paymentType", "Booking");
+                            installmentList.add(installmentMap);
+                            // add this entry in installment details
+                            //transactionDAO.insertDataBatch("");
+                        }
                     }
-                }
 
-                transactionDAO.insertDataBatch(insertQuery, customerList);
-                String password = "";
-                if(customerDetails.get("panNumber")!=null)
-                {
-                    password += customerDetails.get("panNumber");
-                }
-                if(customerDetails.get("dateOfBirth")!=null)
-                {
+
+                } else if (transactions.getTransaction()[i].getId().equalsIgnoreCase("customer")) {
+                    Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
+                    insertQuery = transactions.getTransaction()[i].getInsertQuery();
+                    List<Map> customerList = new ArrayList<>();
+                    customerDetails.put("customerId", bookingId + "_P_1");
+                    Map customerMap = serviceUtils.customerMap(customerDetails, jsonColumnMap);
+                    customerList.add(customerMap);
+                    if (mainObject.get("coApplicantDetails") != null) {
+                        customerMap = new HashMap();
+                        List coApplicantList = (List) mainObject.get("coApplicantDetails");
+                        for (int count = 0; count < coApplicantList.size(); count++) {
+                            Map coAppMap = (Map) coApplicantList.get(count);
+                            coAppMap.put("customerId", bookingId + "_C_" + (count + 1));
+                            customerMap = serviceUtils.customerMap(coAppMap, jsonColumnMap);
+                            customerMap.put("customerId", bookingId + "_C_" + (count + 1));
+                            customerList.add(customerMap);
+                        }
+                    }
+
+                    transactionDAO.insertDataBatch(insertQuery, customerList);
+                    String password = "";
+                    if (customerDetails.get("panNumber") != null) {
+                        password += customerDetails.get("panNumber");
+                    }
+                    if (customerDetails.get("dateOfBirth") != null) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
+                        Instant instant = Instant.parse((String) customerDetails.get("dateOfBirth"));
+                        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
+                        password += zonedDateTime.getMonthValue() + "" + zonedDateTime.getMonthValue() + "" + zonedDateTime.getYear();
+                    }
+                    System.out.println("C" + bookingId.toString() + " === " + password);
+                    createUserAndRole("C" + bookingId.toString(), password, "ROLE_CUSTOMER");
+                } else if (transactions.getTransaction()[i].getId().equalsIgnoreCase("payment")) {
+                    Map paymentDetails = (Map<String, Object>) mainObject.get("paymentDetails");
+                    Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
+                    insertQuery = transactions.getTransaction()[i].getInsertQuery();
+                    Map paymentMap = new HashMap();
+                    paymentMap.put("customerId", bookingId + "_P_1");
+                    paymentMap.put("bookingId", bookingId);
+                    paymentMap.put("paymentType", mainObject.get("amountType"));
+                    paymentMap.put("collectedBy", createdBy);
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
-                    Instant instant = Instant.parse((String) customerDetails.get("dateOfBirth"));
-                    ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
-                    password+=zonedDateTime.getMonthValue()+""+zonedDateTime.getMonthValue()+""+zonedDateTime.getYear();
-                }
-                System.out.println("C"+bookingId.toString()+" === "+password);
-                    createUserAndRole("C"+bookingId.toString(), password, "ROLE_CUSTOMER");
-            } else if (transactions.getTransaction()[i].getId().equalsIgnoreCase("payment")) {
-                Map paymentDetails = (Map<String, Object>) mainObject.get("paymentDetails");
-                Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
-                insertQuery = transactions.getTransaction()[i].getInsertQuery();
-                Map paymentMap = new HashMap();
-                paymentMap.put("customerId", bookingId + "_P_1");
-                paymentMap.put("bookingId", bookingId);
-                paymentMap.put("paymentType", mainObject.get("amountType"));
-                paymentMap.put("collectedBy", createdBy);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
-                String currentDate = sdf.format(new Date());
-                paymentMap.put("collectedOn", currentDate);
-                paymentMap.put("paymentMode", mainObject.get("paymentMode"));
-                paymentMap.put("chequeNo", mainObject.get("chequeNo"));
-                paymentMap.put("transactionId", mainObject.get("transactionId"));
-                paymentMap.put("paymentDate", currentDate);
-                paymentMap.put("receiptNo", mainObject.get("receiptNo"));
-                paymentMap.put("bank", mainObject.get("bank"));
-                paymentMap.put("amount", mainObject.get("bookingAmount"));
-                paymentMap.put("transactionDate", mainObject.get("transactionDate"));
-                //   installmentList.add(serviceUtils.customerMap(paymentMap, jsonColumnMap));
+                    String currentDate = sdf.format(new Date());
+                    paymentMap.put("collectedOn", currentDate);
+                    paymentMap.put("paymentMode", mainObject.get("paymentMode"));
+                    paymentMap.put("chequeNo", mainObject.get("chequeNo"));
+                    paymentMap.put("transactionId", mainObject.get("transactionId"));
+                    paymentMap.put("paymentDate", currentDate);
+                    paymentMap.put("receiptNo", mainObject.get("receiptNo"));
+                    paymentMap.put("bank", mainObject.get("bank"));
+                    if (((String) mainObject.get("amountType")).equalsIgnoreCase("Token")) {
+                        paymentMap.put("amount", mainObject.get("tokenAmount"));
+                    }
+                    else{
+                        paymentMap.put("amount", mainObject.get("bookingAmount"));
+                    }
 
-                Map convertedPaymentMap = serviceUtils.customerMap(paymentMap, jsonColumnMap);
-                ArrayList paymentMapList = new ArrayList();
-                paymentMapList.add(convertedPaymentMap);
-                transactionDAO.insertDataBatch(insertQuery, paymentMapList);
+                    paymentMap.put("transactionDate", mainObject.get("transactionDate"));
+                    //   installmentList.add(serviceUtils.customerMap(paymentMap, jsonColumnMap));
+
+                    Map convertedPaymentMap = serviceUtils.customerMap(paymentMap, jsonColumnMap);
+                    ArrayList paymentMapList = new ArrayList();
+                    paymentMapList.add(convertedPaymentMap);
+                    transactionDAO.insertDataBatch(insertQuery, paymentMapList);
+                }
+                if ((((String) bookingDetails.get("paymentType")).equalsIgnoreCase("installment") || installmentList.size() > 0 )&& transactions.getTransaction()[i].getId().equalsIgnoreCase("installment")) {
+                    Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
+                    insertQuery = transactions.getTransaction()[i].getInsertQuery();
+                    if (installmentList.size() > 0) {
+                        Map tempObj = installmentList.get(0);
+                        installmentList.remove(0);
+                        installmentList.add(serviceUtils.customerMap(tempObj, jsonColumnMap));
+                    }
+
+                    if(mainObject.get("paymentType").toString().equalsIgnoreCase("installment"))
+                    {
+                        String installlmentDueDate = (String) mainObject.get("installmentStartDate");
+                        int numberOfInstallment = Integer.parseInt(bookingDetails.get("numberOfInstallment").toString());
+                        DateFormat sourceDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
+                        Calendar cal = null;
+                        Date dt = null;
+                        try {
+                            dt = sourceDateFormat.parse(installlmentDueDate);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        //  java.sql.Date installmentDueDateSql = ServiceUtils.convertStrToSQLDate(installlmentDueDate);
+
+                        Map installmentMap = null;
+                        Double installmentAmount = Double.valueOf(mainObject.get("installmentAmount").toString());
+                        for (int k = 0; k < numberOfInstallment; k++) {
+                            installmentMap = new HashMap();
+                            installmentMap.put("customerId", bookingId + "_P_1");
+                            installmentMap.put("bookingId", bookingId);
+                            installmentMap.put("installmentAmount", installmentAmount);
+                            installmentMap.put("dueDate", installlmentDueDate);
+                            installmentMap.put("status", "Pending");
+                            installmentMap.put("paymentType", "Installment");
+                            cal = Calendar.getInstance();
+                            cal.setTime(dt);
+                            //   cal.setTimeInMillis(new Date(installlmentDueDate).getTime());
+                            cal.add(Calendar.MONTH, 1);
+                            dt = cal.getTime();
+                            //  installmentDueDateSql = new java.sql.Date(cal.getTimeInMillis());
+                            installlmentDueDate = sourceDateFormat.format(dt);
+                            installmentList.add(serviceUtils.customerMap(installmentMap, jsonColumnMap));
+                        }
+                    }
+                    transactionDAO.insertDataBatch(insertQuery, installmentList);
+                 /*   TransactionUtils transactionUtils = new TransactionUtils();
+                    Double entryAmount = null;
+                    if(mainObject.get("amountType").toString().equalsIgnoreCase("Token"))
+                    {
+                        entryAmount = Double.valueOf(bookingDetails.get("tokenAmount").toString());
+                    }
+                    else{
+                         entryAmount = Double.valueOf(bookingDetails.get("bookingAmount").toString());
+                    }
+                    Double bookingAmount = Double.valueOf(bookingDetails.get("bookingAmount").toString());
+                    String particulars = bookingDetails.get("customerName") + " - " + bookingDetails.get("bookingAmount") + " - ";
+
+*/
+                }
             }
-            if (((String) bookingDetails.get("paymentType")).equalsIgnoreCase("installment") && transactions.getTransaction()[i].getId().equalsIgnoreCase("installment")) {
-                Map<String, List> jsonColumnMap = serviceUtils.jsonColumnNameMapper(property);
-                insertQuery = transactions.getTransaction()[i].getInsertQuery();
-                String installlmentDueDate = (String) mainObject.get("installmentStartDate");
-                if(installmentList.size() > 0)
-                {
-                    installmentList.remove(0);
-                    installmentList.add(serviceUtils.customerMap(installmentList.get(0), jsonColumnMap));
-                }
-                int numberOfInstallment = Integer.parseInt(bookingDetails.get("numberOfInstallment").toString());
-                DateFormat sourceDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
-                Calendar cal = null;
-                Date dt = null;
-                try {
-                    dt = sourceDateFormat.parse(installlmentDueDate);
+            if (bookingDetails.get("bookingType").toString().equalsIgnoreCase("MLM")) {
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                //  java.sql.Date installmentDueDateSql = ServiceUtils.convertStrToSQLDate(installlmentDueDate);
-
-                Map installmentMap = null;
-                Double installmentAmount = Double.valueOf(mainObject.get("installmentAmount").toString());
-                for (int k = 0; k < numberOfInstallment; k++) {
-                    installmentMap = new HashMap();
-                    installmentMap.put("customerId", bookingId + "_P_1");
-                    installmentMap.put("bookingId", bookingId);
-                    installmentMap.put("installmentAmount", installmentAmount);
-                    installmentMap.put("dueDate", installlmentDueDate);
-                    installmentMap.put("status", "Pending");
-                    installmentMap.put("paymentType", "Installment");
-                    cal = Calendar.getInstance();
-                    cal.setTime(dt);
-                    //   cal.setTimeInMillis(new Date(installlmentDueDate).getTime());
-                    cal.add(Calendar.MONTH, 1);
-                    dt = cal.getTime();
-                    //  installmentDueDateSql = new java.sql.Date(cal.getTimeInMillis());
-                    installlmentDueDate = sourceDateFormat.format(dt);
-                    installmentList.add(serviceUtils.customerMap(installmentMap, jsonColumnMap));
-                }
-                TransactionUtils transactionUtils = new TransactionUtils();
-                Double bookingAmount = Double.valueOf(bookingDetails.get("bookingAmount").toString());
-                String particulars = bookingDetails.get("customerName") + " - " + bookingDetails.get("bookingAmount") + " - ";
-                transactionUtils.addBalanceEntry(transactionDAO, (String) bookingDetails.get("paymentMode"), bookingAmount, particulars, null, createdBy);
-                transactionDAO.insertDataBatch(insertQuery, installmentList);
-
-            }
-        }
-        if (bookingDetails.get("bookingType").toString().equalsIgnoreCase("MLM")) {
-            try {
                 agentCommissionCalculation(Integer.parseInt(bookingDetails.get("firmId").toString()), Integer.parseInt(bookingDetails.get("projectId").toString()), Double.parseDouble(bookingDetails.get("totalPaidAmount").toString()), Integer.parseInt(bookingDetails.get("agentId").toString()));
-            } catch (Exception e) {
-                e.printStackTrace();
+
             }
-        }
-        return null;
+            if(mainObject.get("paymentMode").toString().equalsIgnoreCase("Cheque")){
+                String  transactionId = mainObject.get("transactionId")!=null?mainObject.get("transactionId").toString():null;
+                String  transactionDate = mainObject.get("transactionId")!=null?mainObject.get("transactionId").toString():null;
+                makeChequeEntry(transactionId,transactionDate, bookingId.intValue());
+            }
+            String firmName = mainObject.get("firmName")!=null?mainObject.get("firmName").toString():"";
+            Double paidAmount = mainObject.get("totalPaidAmount")!=null?Double.parseDouble(mainObject.get("totalPaidAmount").toString()):0.00;
+            dayBookEntry(Integer.parseInt(mainObject.get("firmId").toString()), firmName,mainObject.get("paymentMode").toString(),  paidAmount, "Credit", customerDetails.get("customerName").toString(), "New Booking");
+            statusCode = "1";
+            statusMessage = "Success";
+    }
+    catch(Exception e)
+    {
+        e.printStackTrace();
+        statusCode = "0";
+        statusMessage = "Failed";
+    }
+        restReponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, bookingId);
+        return restReponse;
     }
 
     //used for Farmer and Agent Payment Entry
-    public void createPayment(Map paymentMap, String type, String createdBy) {
-        ConfigBO configBO = ConfigReader.getConfig();
-        Transactions transactions = configBO.getTransactions();
-        ServiceUtils serviceUtils = new ServiceUtils();
-        for (int i = 0; i < transactions.getTransaction().length; i++) {
-            Transaction transaction = transactions.getTransaction()[i];
-            if (transaction.getId().equalsIgnoreCase(type)) {
-                String sql = transaction.getInsertQuery();
-                String params = sql.substring(sql.indexOf('(') + 1, sql.indexOf(')'));
-                String paramsArr[] = params.split(",");
-                PropertyMapping propertyMapping = transaction.getPropertyMapping();
-                Property property[] = propertyMapping.getProperty();
-                Map<String, List> jsonColumnMap = serviceUtils.propertyMapper(property);
-                String value = "";
-                Object arguments[] = new Object[paramsArr.length];
-                int argumentTypes[] = new int[paramsArr.length];
-                for (int j = 0; j < paramsArr.length; j++) {
-                    System.out.println("paramsArr[j].trim() -- " + paramsArr[j].trim());
-                    List jsonColTypeList = jsonColumnMap.get(paramsArr[j].trim());
-                    Object colValue = paymentMap.get(jsonColTypeList.get(0));
-                    arguments[j] = colValue;
-                    argumentTypes[j] = Integer.parseInt((String) jsonColTypeList.get(1));
-                    if (argumentTypes[j] == 93 && arguments[j] != null) {
-                        Instant instant = Instant.parse((String) arguments[j]);
-                        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
-                        arguments[j] = new java.sql.Date(Date.from(zonedDateTime.toInstant()).getTime());
+    public RestResponse createPayment(Map paymentMap, String type, String createdBy) {
+        RestResponse restResponse = null;
+        String statusMessage = "";
+        String statusCode = "";
+
+        try {
+            ConfigBO configBO = ConfigReader.getConfig();
+            Transactions transactions = configBO.getTransactions();
+            ServiceUtils serviceUtils = new ServiceUtils();
+            for (int i = 0; i < transactions.getTransaction().length; i++) {
+                Transaction transaction = transactions.getTransaction()[i];
+                if (transaction.getId().equalsIgnoreCase(type)) {
+                    String sql = transaction.getInsertQuery();
+                    String params = sql.substring(sql.indexOf('(') + 1, sql.indexOf(')'));
+                    String paramsArr[] = params.split(",");
+                    PropertyMapping propertyMapping = transaction.getPropertyMapping();
+                    Property property[] = propertyMapping.getProperty();
+                    Map<String, List> jsonColumnMap = serviceUtils.propertyMapper(property);
+                    String value = "";
+                    Object arguments[] = new Object[paramsArr.length];
+                    int argumentTypes[] = new int[paramsArr.length];
+                    for (int j = 0; j < paramsArr.length; j++) {
+                        System.out.println("paramsArr[j].trim() -- " + paramsArr[j].trim());
+                        List jsonColTypeList = jsonColumnMap.get(paramsArr[j].trim());
+                        Object colValue = paymentMap.get(jsonColTypeList.get(0));
+                        arguments[j] = colValue;
+                        argumentTypes[j] = Integer.parseInt((String) jsonColTypeList.get(1));
+                        if (argumentTypes[j] == 93 && arguments[j] != null) {
+                            Instant instant = Instant.parse((String) arguments[j]);
+                            ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
+                            arguments[j] = new java.sql.Date(Date.from(zonedDateTime.toInstant()).getTime());
+                        }
+                        if (paramsArr[j].trim().equalsIgnoreCase("CreatedBy")) {
+                            arguments[j] = createdBy;
+                        } else if (paramsArr[j].trim().equalsIgnoreCase("CreatedOn")) {
+                            java.sql.Date currentDate = new java.sql.Date(new Date().getTime());
+                            arguments[j] = currentDate;
+                        }
                     }
-                    if (paramsArr[j].trim().equalsIgnoreCase("CreatedBy")) {
-                        arguments[j] = createdBy;
-                    } else if (paramsArr[j].trim().equalsIgnoreCase("CreatedOn")) {
-                        java.sql.Date currentDate = new java.sql.Date(new Date().getTime());
-                        arguments[j] = currentDate;
+                    transactionDAO.addData(sql, arguments, argumentTypes); // add entry in table
+                    //In case of farmer payment update paid amount in LandMaster
+                    if (type.equalsIgnoreCase("farmerPayment")) {
+                        Double paidAmount = Double.valueOf(paymentMap.get("paymentAmount").toString());
+                        String updateQuery = "UPDATE LandMaster SET PaidAmount = CASE WHEN PaidAmount = 0.00 || PaidAmount is null THEN " + paidAmount + "  ELSE PaidAmount + " + paidAmount + " END WHERE Id = " + paymentMap.get("landId");
+                        String updateFarmerMasterQuery = "UPDATE FarmerMaster SET PaidAmount = CASE WHEN PaidAmount = 0.00  || PaidAmount is null  THEN " + paidAmount + "  ELSE PaidAmount + " + paidAmount + " END WHERE Id = " + paymentMap.get("farmerId");
+                        transactionDAO.insertDataBatch(new String[]{updateQuery, updateFarmerMasterQuery});
+                    } else if (type.equalsIgnoreCase("agentPayment")) {
+                        Double paidAmount = Double.valueOf(paymentMap.get("paymentAmount").toString());
+                        String updateQuery = " UPDATE AgentBusinessDetails SET AmountPaidTillNow = CASE WHEN AmountPaidTillNow = 0.00 || AmountPaidTillNow is null THEN " + paidAmount + "  ELSE AmountPaidTillNow " + paidAmount + " END WHERE Id = " + paymentMap.get("agentId");
+                        transactionDAO.updateData(updateQuery);
                     }
-                }
-                transactionDAO.addData(sql, arguments, argumentTypes); // add entry in table
-                //In case of farmer payment update paid amount in LandMaster
-                if (type.equalsIgnoreCase("farmerPayment")) {
-                    Double paidAmount = Double.valueOf(paymentMap.get("paymentAmount").toString());
-                    String updateQuery = "UPDATE LandMaster SET PaidAmount = CASE WHEN PaidAmount = 0.00  THEN " + paidAmount + "  ELSE PaidAmount + " + paidAmount + " END WHERE Id = " + paymentMap.get("landId");
-                    String updateFarmerMasterQuery = "UPDATE FarmerMaster SET PaidAmount = CASE WHEN PaidAmount = 0.00  THEN " + paidAmount + "  ELSE PaidAmount + " + paidAmount + " END WHERE Id = " + paymentMap.get("farmerId");
-                    transactionDAO.insertDataBatch(new String[]{updateQuery, updateFarmerMasterQuery});
-                } else if (type.equalsIgnoreCase("agentPayment")) {
-                    Double paidAmount = Double.valueOf(paymentMap.get("paymentAmount").toString());
-                    String updateQuery = " UPDATE AgentBusinessDetails SET AmountPaidTillNow = CASE WHEN AmountPaidTillNow = 0.00 THEN " + paidAmount + "  ELSE AmountPaidTillNow " + paidAmount + " END WHERE Id = " + paymentMap.get("agentId");
-                    transactionDAO.updateData(updateQuery);
+
                 }
 
             }
-
+            statusCode = "1";
+            statusMessage = "Success";
         }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
+        return restResponse;
 
     }
 
 
     //used for Daily Expense / Farmer Payment / Agent Payment Approval / Property Cancellation Payment - > make and entry in Day book Entry table
-    public void approvePayment(String id, String type, String approvedBy) {
-        ConfigBO configBO = ConfigReader.getConfig();
-        Transactions transactions = configBO.getTransactions();
-        String updateQuery;
-        for (Transaction transaction : transactions.getTransaction()) {
-            if (transaction.getId().equalsIgnoreCase(type)) {
-                updateQuery = transaction.getUpdateQuery();
-                updateQuery = updateQuery.replace("{1}", "'" + approvedBy + "'");
-                updateQuery = updateQuery.replace("{2}", id);
-                transactionDAO.updateData(updateQuery);
-                // after payment make an entry in DaybookEntry table
-
+    public RestResponse approvePayment(String id, String type, String approvedBy) {
+        RestResponse restResponse = null;
+        String statusMessage = "";
+        String statusCode = "";
+        try {
+            ConfigBO configBO = ConfigReader.getConfig();
+            Transactions transactions = configBO.getTransactions();
+            String updateQuery;
+            for (Transaction transaction : transactions.getTransaction()) {
+                if (transaction.getId().equalsIgnoreCase(type)) {
+                    updateQuery = transaction.getUpdateQuery();
+                    updateQuery = updateQuery.replace("{1}", "'" + approvedBy + "'");
+                    updateQuery = updateQuery.replace("{2}", id);
+                    transactionDAO.updateData(updateQuery);
+                    // after payment make an entry in DaybookEntry table
+                 }
             }
+            String fethQuery = "";
+            if(type.equalsIgnoreCase("agentPayment"))
+            {
+                fethQuery = "SELECT PaymentMode as paymentMode,PaymentAmount as paymentAmount,AgentName as agentName   from AgentPayment where id = ?";
+                Map data =  masterDAO.getDataById(fethQuery,Integer.parseInt(id));
+                dayBookEntry(null,null,data.get("paymentMode").toString(),Double.parseDouble(data.get("paymentAmount").toString()),"Debit",data.get("agentName").toString(),"Agent Payment");
+            }
+            else if(type.equalsIgnoreCase("farmerPayment"))
+            {
+                fethQuery = "SELECT PaymentMode as paymentMode,PaymentAmount as paymentAmount,FarmerName as farmerName   from FarmerPayment where id = ?";
+                Map data =  masterDAO.getDataById(fethQuery,Integer.parseInt(id));
+                dayBookEntry(null,null,data.get("paymentMode").toString(),Double.parseDouble(data.get("paymentAmount").toString()),"Debit",data.get("farmerName").toString(),"Farmer Payment");
+            }
+            else  if(type.equalsIgnoreCase("dailyExpense")){
+
+                fethQuery = "SELECT PaymentMode as paymentMode,Amount as paymentAmount,PaidTo as paidTo,ExpenseCategory as expenseCategory,   from ExpenseDetails where id = ?";
+                Map data =  masterDAO.getDataById(fethQuery,Integer.parseInt(id));
+                dayBookEntry(null,null,data.get("paymentMode").toString(),Double.parseDouble(data.get("paymentAmount").toString()),"Debit",data.get("paidTo").toString(),data.get("expenseCategory").toString());
+            }
+
+                    statusCode = "1";
+                   statusMessage = "Success";
         }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
+        return restResponse;
     }
 
     // cancel property, update IsCancelled = 'Y' in BookingDetails table
@@ -303,162 +391,171 @@ public class TransactionService implements ITransactionService {
 
     }
 
-    public void updateTransaction(Map restRequest, String type, String id, String createdBy) {
+    public RestResponse updateTransaction(Map restRequest, String type, String id, String createdBy) {
         // in case of installment update, update booking details table with total amount.
-        restRequest.put("collectedBy", createdBy);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
-        String currentDate = sdf.format(new Date());
-        restRequest.put("collectedOn", currentDate);
-        restRequest.put("id", Integer.parseInt(id));
-        int bookingId = Integer.parseInt(restRequest.get("bookingId").toString());
-        restRequest.remove("isDisabled");
-        ConfigBO configBO = ConfigReader.getConfig();
-        Transactions transactions = configBO.getTransactions();
-        ServiceUtils serviceUtils = new ServiceUtils();
-        for (int i = 0; i < transactions.getTransaction().length; i++) {
-            Transaction transaction = transactions.getTransaction()[i];
-            if (transaction.getId().equalsIgnoreCase("payment")) {
-                String sql = transaction.getInsertQuery();
+        RestResponse restResponse = null;
+        String statusMessage = "";
+        String statusCode = "";
+        Object objectId =  null;
+        try {
+            restRequest.put("collectedBy", createdBy);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
+            String currentDate = sdf.format(new Date());
+            restRequest.put("collectedOn", currentDate);
+            restRequest.put("id", Integer.parseInt(id));
+            int bookingId = Integer.parseInt(restRequest.get("bookingId").toString());
+            restRequest.remove("isDisabled");
+            ConfigBO configBO = ConfigReader.getConfig();
+            Transactions transactions = configBO.getTransactions();
+            ServiceUtils serviceUtils = new ServiceUtils();
+            for (int i = 0; i < transactions.getTransaction().length; i++) {
+                Transaction transaction = transactions.getTransaction()[i];
+                if (transaction.getId().equalsIgnoreCase("payment")) {
+                    String sql = transaction.getInsertQuery();
 
-                String params = sql.substring(sql.indexOf('(') + 1, sql.indexOf(')'));
-                String paramsArr[] = params.split(",");
-                PropertyMapping propertyMapping = transaction.getPropertyMapping();
-                Property property[] = propertyMapping.getProperty();
-                Map<String, List> jsonColumnMap = serviceUtils.propertyMapper(property);
-                String value = "";
-                Object arguments[] = new Object[paramsArr.length];
-                int argumentTypes[] = new int[paramsArr.length];
-                for (int j = 0; j < paramsArr.length; j++) {
-                    System.out.println("paramsArr[j].trim() -- " + paramsArr[j].trim());
-                    List jsonColTypeList = jsonColumnMap.get(paramsArr[j].trim());
-                    Object colValue = restRequest.get(jsonColTypeList.get(0));
-                    System.out.println(jsonColTypeList.get(0) + " ------- " + colValue);
-                    arguments[j] = colValue;
+                    String params = sql.substring(sql.indexOf('(') + 1, sql.indexOf(')'));
+                    String paramsArr[] = params.split(",");
+                    PropertyMapping propertyMapping = transaction.getPropertyMapping();
+                    Property property[] = propertyMapping.getProperty();
+                    Map<String, List> jsonColumnMap = serviceUtils.propertyMapper(property);
+                    String value = "";
+                    Object arguments[] = new Object[paramsArr.length];
+                    int argumentTypes[] = new int[paramsArr.length];
+                    for (int j = 0; j < paramsArr.length; j++) {
+                        System.out.println("paramsArr[j].trim() -- " + paramsArr[j].trim());
+                        List jsonColTypeList = jsonColumnMap.get(paramsArr[j].trim());
+                        Object colValue = restRequest.get(jsonColTypeList.get(0));
+                        System.out.println(jsonColTypeList.get(0) + " ------- " + colValue);
+                        arguments[j] = colValue;
 
-                    argumentTypes[j] = Integer.parseInt((String) jsonColTypeList.get(1));
-                    if (argumentTypes[j] == 3 && arguments[j] != null)
-                        arguments[j] = Double.parseDouble(arguments[j].toString());
-                    if (argumentTypes[j] == 4 && arguments[j] != null)
-                        arguments[j] = Integer.parseInt(arguments[j].toString());
-                    if (argumentTypes[j] == 93 && arguments[j] != null) {
-                        arguments[j] = serviceUtils.convertStrToSQLDate(arguments[j].toString());
+                        argumentTypes[j] = Integer.parseInt((String) jsonColTypeList.get(1));
+                        if (argumentTypes[j] == 3 && arguments[j] != null)
+                            arguments[j] = Double.parseDouble(arguments[j].toString());
+                        if (argumentTypes[j] == 4 && arguments[j] != null)
+                            arguments[j] = Integer.parseInt(arguments[j].toString());
+                        if (argumentTypes[j] == 93 && arguments[j] != null) {
+                            arguments[j] = serviceUtils.convertStrToSQLDate(arguments[j].toString());
+                        }
                     }
+                    objectId =  transactionDAO.addData(sql, arguments, argumentTypes); // add entry in table
                 }
-                transactionDAO.addData(sql, arguments, argumentTypes); // add entry in table
             }
-        }
-        if (type.equalsIgnoreCase("installment")) {
-            Double totalAmount = Double.parseDouble(restRequest.get("totalAmount").toString());
-            Double
-                    totalAmountPaid = Double.parseDouble(restRequest.get("amount").toString());
-            int totalEmi = 0;
-            Double remainder = 0.00;
-            Double installmentAmount = 0.00;
-            java.sql.Timestamp paymentDate = null;
-            if (totalAmountPaid > totalAmount) {
-                installmentAmount = Double.parseDouble(restRequest.get("installmentAmount").toString());
-                totalEmi = (int) ((totalAmountPaid - totalAmount) / installmentAmount);
-                remainder = (totalAmountPaid - totalAmount) % installmentAmount;
+            if (type.equalsIgnoreCase("installment")) {
+                Double totalAmount = Double.parseDouble(restRequest.get("totalAmount").toString());
+                Double
+                        totalAmountPaid = Double.parseDouble(restRequest.get("amount").toString());
+                int totalEmi = 0;
+                Double remainder = 0.00;
+                Double installmentAmount = 0.00;
+                java.sql.Timestamp paymentDate = null;
+                if (totalAmountPaid > totalAmount) {
+                    installmentAmount = Double.parseDouble(restRequest.get("installmentAmount").toString());
+                    totalEmi = (int) ((totalAmountPaid - totalAmount) / installmentAmount);
+                    remainder = (totalAmountPaid - totalAmount) % installmentAmount;
 
-            }
-            if (restRequest.get("paymentDate") != null) {
-                Instant instant = Instant.parse((String) restRequest.get("paymentDate"));
-                ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
-                paymentDate = new java.sql.Timestamp(Date.from(zonedDateTime.toInstant()).getTime());
-            }
-            String statusCode = "";
-            String statusMessage = "";
-            RestResponse response = null;
-            restRequest.remove("dueDate");
-            for (int i = 0; i < configBO.getTransactions().getTransaction().length; i++) {
-                if (configBO.getTransactions().getTransaction()[i].getId().equalsIgnoreCase(type)) {
-                    try {
-                        String sql = configBO.getTransactions().getTransaction()[i].getUpdateQuery();
-                        PropertyMapping propertyMapping = configBO.getTransactions().getTransaction()[i].getPropertyMapping();
-                        Property property[] = propertyMapping.getProperty();
-                        Map<String, List> jsonColumnMap = new ServiceUtils().jsonColumnNameMapper(property);
-                        restRequest.put("paymentDate", restRequest.get("paymentDate"));
-                        if (restRequest.get("pendingAmount") != null) {
-                            Double pendingAmount = Double.parseDouble(restRequest.get("pendingAmount").toString());
-                            if (pendingAmount < 0.00) {
-                                restRequest.put("pendingAmount", pendingAmount);
+                }
+                if (restRequest.get("paymentDate") != null) {
+                    Instant instant = Instant.parse((String) restRequest.get("paymentDate"));
+                    ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
+                    paymentDate = new java.sql.Timestamp(Date.from(zonedDateTime.toInstant()).getTime());
+                }
+
+                restRequest.remove("dueDate");
+                for (int i = 0; i < configBO.getTransactions().getTransaction().length; i++) {
+                    if (configBO.getTransactions().getTransaction()[i].getId().equalsIgnoreCase(type)) {
+
+                            String sql = configBO.getTransactions().getTransaction()[i].getUpdateQuery();
+                            PropertyMapping propertyMapping = configBO.getTransactions().getTransaction()[i].getPropertyMapping();
+                            Property property[] = propertyMapping.getProperty();
+                            Map<String, List> jsonColumnMap = new ServiceUtils().jsonColumnNameMapper(property);
+                            restRequest.put("paymentDate", restRequest.get("paymentDate"));
+                            if (restRequest.get("pendingAmount") != null) {
+                                Double pendingAmount = Double.parseDouble(restRequest.get("pendingAmount").toString());
+                                if (pendingAmount < 0.00) {
+                                    restRequest.put("pendingAmount", pendingAmount);
+                                }
                             }
-                        }
-                        Map convertedInstallmentMap = serviceUtils.customerMap(restRequest, jsonColumnMap);
-                        List<Map> installmentList = new ArrayList<>();
-                        installmentList.add(convertedInstallmentMap);
-                        Map map = new HashMap();
-                        int nextId = Integer.parseInt(id) + 1;
-                        for (int count = 0; count < totalEmi; count++) {
-                            map.put("status", "Completed");
-                            map.put("interestPaid", 0.00);
-                            map.put("interestWaiveOff", 0.00);
-                            map.put("installmentAmount", restRequest.get("installmentAmount"));
-                            map.put("pendingAmount", 0.00);
-                            map.put("paymentDate", restRequest.get("paymentDate"));
-                            map.put("receiptNo", restRequest.get("receiptNo"));
-                            map.put("interest", 0.00);
-                            map.put("amount", 0.00);
-                            map.put("amountPaid", restRequest.get("installmentAmount"));
-                            map.put("paymentMode", restRequest.get("paymentMode"));
-                            map.put("transactionId", restRequest.get("transactionId"));
-                            map.put("transactionDate", restRequest.get("transactionDate"));
-                            map.put("totalAmount", restRequest.get("installment"));
-                            map.put("collectedBy", createdBy);
-                            map.put("collectedOn", currentDate);
-                            map.put("bankName", restRequest.get("bankName"));
-                            map.put("id", nextId);
-                            nextId++;
-                            installmentList.add(serviceUtils.customerMap(map, jsonColumnMap));
-                        }
-                        if (remainder > 0.00) {
-                            map.put("status", "Pending");
-                            map.put("interestPaid", 0.00);
-                            map.put("amount", remainder);
-                            map.put("interestWaiveOff", 0.00);
-                            map.put("installmentAmount", restRequest.get("installmentAmount"));
-                            map.put("pendingAmount", (installmentAmount - remainder));
-                            map.put("paymentDate", restRequest.get("paymentDate"));
-                            map.put("receiptNo", restRequest.get("receiptNo"));
-                            map.put("interest", 0.00);
-                            map.put("amountPaid", remainder);
-                            map.put("paymentMode", restRequest.get("paymentMode"));
-                            map.put("transactionId", restRequest.get("transactionId"));
-                            map.put("transactionDate", restRequest.get("transactionDate"));
-                            map.put("totalAmount", remainder);
-                            map.put("collectedBy", createdBy);
-                            map.put("collectedOn", currentDate);
-                            map.put("bankName", restRequest.get("bankName"));
-                            map.put("id", nextId);
-                            installmentList.add(serviceUtils.customerMap(map, jsonColumnMap));
-                        }
-                        transactionDAO.updateDataBatch(sql, installmentList, Integer.parseInt(id));
-                        //update booking details - last payment date and total paid amount
-                        String updateBookingDetailsQuery = "UPDATE BookingDetails SET LastPaymentDate = '" + paymentDate + "' , TotalPaidAmount = CASE WHEN TotalPaidAmount is null || TotalPaidAmount = 0.00  THEN " + totalAmountPaid + "  ELSE TotalPaidAmount + " + totalAmountPaid + " END WHERE BookingId =" + bookingId;
-                        transactionDAO.updateData(updateBookingDetailsQuery);
-                        String selectQuery = "SELECT FirmId, ProjectId, AgentId,BookingType from BookingDetails WHERE BookingId = ?";
-                        Map<String, Object> bookingData = masterDAO.getDataById(selectQuery, bookingId);
-                        if (bookingData.get("BookingType").toString().equalsIgnoreCase("MLM")) {
-                            try {
-                                agentCommissionCalculation(Integer.parseInt(bookingData.get("FirmId").toString()), Integer.parseInt(bookingData.get("projectId").toString()), totalAmountPaid, Integer.parseInt(bookingData.get("agentId").toString()));
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                            Map convertedInstallmentMap = serviceUtils.customerMap(restRequest, jsonColumnMap);
+                            List<Map> installmentList = new ArrayList<>();
+                            installmentList.add(convertedInstallmentMap);
+                            Map map = new HashMap();
+                            int nextId = Integer.parseInt(id) + 1;
+                            for (int count = 0; count < totalEmi; count++) {
+                                map.put("status", "Completed");
+                                map.put("interestPaid", 0.00);
+                                map.put("interestWaiveOff", 0.00);
+                                map.put("installmentAmount", restRequest.get("installmentAmount"));
+                                map.put("pendingAmount", 0.00);
+                                map.put("paymentDate", restRequest.get("paymentDate"));
+                                map.put("receiptNo", restRequest.get("receiptNo"));
+                                map.put("interest", 0.00);
+                                map.put("amount", 0.00);
+                                map.put("amountPaid", restRequest.get("installmentAmount"));
+                                map.put("paymentMode", restRequest.get("paymentMode"));
+                                map.put("transactionId", restRequest.get("transactionId"));
+                                map.put("transactionDate", restRequest.get("transactionDate"));
+                                map.put("totalAmount", restRequest.get("installment"));
+                                map.put("collectedBy", createdBy);
+                                map.put("collectedOn", currentDate);
+                                map.put("bankName", restRequest.get("bankName"));
+                                map.put("id", nextId);
+                                nextId++;
+                                installmentList.add(serviceUtils.customerMap(map, jsonColumnMap));
                             }
-                        }
-                        statusCode = "1";
-                        statusMessage = "Success";
+                            if (remainder > 0.00) {
+                                map.put("status", "Pending");
+                                map.put("interestPaid", 0.00);
+                                map.put("amount", remainder);
+                                map.put("interestWaiveOff", 0.00);
+                                map.put("installmentAmount", restRequest.get("installmentAmount"));
+                                map.put("pendingAmount", (installmentAmount - remainder));
+                                map.put("paymentDate", restRequest.get("paymentDate"));
+                                map.put("receiptNo", restRequest.get("receiptNo"));
+                                map.put("interest", 0.00);
+                                map.put("amountPaid", remainder);
+                                map.put("paymentMode", restRequest.get("paymentMode"));
+                                map.put("transactionId", restRequest.get("transactionId"));
+                                map.put("transactionDate", restRequest.get("transactionDate"));
+                                map.put("totalAmount", remainder);
+                                map.put("collectedBy", createdBy);
+                                map.put("collectedOn", currentDate);
+                                map.put("bankName", restRequest.get("bankName"));
+                                map.put("id", nextId);
+                                installmentList.add(serviceUtils.customerMap(map, jsonColumnMap));
+                            }
+                            transactionDAO.updateDataBatch(sql, installmentList, Integer.parseInt(id));
+                            //update booking details - last payment date and total paid amount
+                            String updateBookingDetailsQuery = "UPDATE BookingDetails SET LastPaymentDate = '" + paymentDate + "' , TotalPaidAmount = CASE WHEN TotalPaidAmount is null || TotalPaidAmount = 0.00  THEN " + totalAmountPaid + "  ELSE TotalPaidAmount + " + totalAmountPaid + " END WHERE BookingId =" + bookingId;
+                            transactionDAO.updateData(updateBookingDetailsQuery);
+                            String selectQuery = "SELECT FirmId, ProjectId, AgentId,BookingType from BookingDetails WHERE BookingId = ?";
+                            Map<String, Object> bookingData = masterDAO.getDataById(selectQuery, bookingId);
+                            if (bookingData.get("BookingType").toString().equalsIgnoreCase("MLM")) {
+
+                              agentCommissionCalculation(Integer.parseInt(bookingData.get("FirmId").toString()), Integer.parseInt(bookingData.get("projectId").toString()), totalAmountPaid, Integer.parseInt(bookingData.get("agentId").toString()));
+
+                            }
+                            if(restRequest.get("paymentMode").toString().equalsIgnoreCase("Cheque")){
+                                String  transactionId = restRequest.get("transactionId")!=null?restRequest.get("transactionId").toString():null;
+                                String  transactionDate = restRequest.get("transactionId")!=null?restRequest.get("transactionId").toString():null;
+                                makeChequeEntry(transactionId,transactionDate, bookingId);
+                            }
+                            dayBookEntry(Integer.parseInt(bookingData.get("FirmId").toString()), null,restRequest.get("paymentMode").toString(),  Double.parseDouble(restRequest.get("amount").toString()), "Credit", Integer.toString(bookingId), "Installment");
                         break;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        statusCode = "0";
-                        statusMessage = "Failed";
                     }
-                    response = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
-                    break;
                 }
             }
-        }
+            statusCode = "1";
+            statusMessage = "Success";
 
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, objectId);
+        return restResponse;
     }
 
     private void agentCommissionCalculation(int firmId, int projectId, Double amount, int agentId) throws Exception {
@@ -524,8 +621,8 @@ public class TransactionService implements ITransactionService {
                     commissionAmount = businessValue * commissionPerc / 100;
                     //update in agent business details
                 }
-
-                String updateABQuery = "UPDATE AgentBusinessDetails SET  TotalBusiness = CASE WHEN TotalBusiness = 0.00  THEN " + businessValue + "  ELSE TotalBusiness + " + businessValue + " END, SelfBusiness = CASE WHEN SelfBusiness = 0.00  THEN " + businessValue + "  ELSE SelfBusiness + " + businessValue + " END,  TotalCommission = CASE WHEN TotalCommission = 0.00  THEN " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END WHERE AgentId = " + agentMap.get("agentId");
+                //update chain business value
+                String updateABQuery = "UPDATE AgentBusinessDetails SET  TotalBusiness = CASE WHEN TotalBusiness = 0.00 || TotalBusiness is null  THEN " + businessValue + "  ELSE TotalBusiness + " + businessValue + " END, SelfBusiness = CASE WHEN SelfBusiness = 0.00  THEN " + businessValue + "  ELSE SelfBusiness + " + businessValue + " END,  TotalCommission = CASE WHEN TotalCommission = 0.00  THEN " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END WHERE AgentId = " + agentMap.get("agentId");
                 queries[count] = updateABQuery;
             } else {
                 Double chainAgentCommission = Double.parseDouble(agentMap.get("Commission").toString());
@@ -536,7 +633,8 @@ public class TransactionService implements ITransactionService {
 
                 }
                 sellerAgentCommission = chainAgentCommission;
-                String updateABQuery = "UPDATE AgentBusinessDetails SET TotalCommission = CASE WHEN TotalCommission = 0.00  THEN " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END WHERE AgentId = " + agentMap.get("agentId");
+                //update chain business value
+                String updateABQuery = "UPDATE AgentBusinessDetails SET TotalCommission = CASE WHEN TotalCommission = 0.00  || TotalCommission is null THEN  " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END , ChainBusiness = CASE WHEN ChainBusiness = 0.00  || ChainBusiness is null THEN " + businessValue + "  ELSE ChainBusiness + "+ businessValue  +" END WHERE AgentId = " + agentMap.get("agentId");
                 queries[count] = updateABQuery;
             }
             count++;
@@ -583,8 +681,8 @@ public class TransactionService implements ITransactionService {
 
     public void createUserAndRole(String userid, String password, String role) {
         String encodedPassword = new BCryptPasswordEncoder().encode(password);
-        String insertquery = "INSERT INTO user (username,password) VALUES (" + userid + ",'" + encodedPassword + "')";
-        String insertRole = "INSERT INTO user_roles(username,role) VALUES (" + userid + ",'" + role + "')";
+        String insertquery = "INSERT INTO user (username,password) VALUES ('" + userid + "','" + encodedPassword + "')";
+        String insertRole = "INSERT INTO user_roles(username,role) VALUES ('" + userid + "','" + role + "')";
         transactionDAO.insertDataBatch(new String[]{insertquery, insertRole});
     }
 
@@ -604,5 +702,121 @@ public class TransactionService implements ITransactionService {
 
         }
         return  response = ServiceUtils.convertObjToResponse(statusCode, statusMessage, receiptNumber);
+    }
+
+    public RestResponse generatePrintReceipt(Integer bookingId, Integer paymnentId){
+        String statusCode = "";
+        String statusMessage = "";
+        RestResponse response = null;
+        String paymentDetailsQuery = "";
+       if(paymnentId == null) {
+           paymentDetailsQuery = "select a.Amount as amount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate from PaymentDetails a INNER JOIN  BookingDetails b ON b.BookingId = a.BookingId WHERE b.BookingId = " + bookingId + " Order by PaymentDate asc";
+       }
+       else {
+           paymentDetailsQuery = "select a.Amount as amount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate from PaymentDetails a INNER JOIN  BookingDetails b ON b.BookingId = a.BookingId WHERE b.BookingId = " + bookingId + "  AND PaymentId = "+paymnentId+" Order by PaymentDate asc";
+       }
+           String receiptTemplate ="";
+           try {
+               receiptTemplate =  PrintReceiptTemplate.getReceiptTemplate();
+                             List paymentDeatils = null;
+               paymentDeatils = masterDAO.getAllData(paymentDetailsQuery);
+               if(paymentDeatils!=null && paymentDeatils.size()>0)
+               {
+                   Map paymentDetail  = (Map) paymentDeatils.get(0);
+                  // receiptTemplate =  receiptTemplate.replaceAll("","");
+//                  / receiptTemplate =  receiptTemplate.replace("@irmName","");
+                   String replaceString[] = {"amount","receiptNo","paymentDate","paymentMode","transactionId","transactionDate"};
+                   for(int i = 0 ; i < replaceString.length;i++)
+                   {
+                       System.out.println(replaceString[i]+" -- "+paymentDetail.get(replaceString[i]));
+                       String replaceValue = replaceString[i]!=null?replaceString[i].toString():"";
+                       receiptTemplate =   receiptTemplate.replaceAll("@"+replaceString[i],replaceValue);
+                   }
+               }
+               statusCode = "1";
+               statusMessage = "Success";
+           } catch (Exception e) {
+               e.printStackTrace();
+               statusCode = "0";
+               statusMessage = "Failed";
+           }
+           return  response = ServiceUtils.convertObjToResponse(statusCode, statusMessage, receiptTemplate);
+ }
+
+
+    // for agent payment / farmer payment / booking/installment/ daily expense - make an entry in table
+
+    private void dayBookEntry(Integer firmId, String firmName,String paymentMode, Double amount,String transactionType,String personName,String type )
+    {
+        String particulars = "";
+        Double debitTransAmount = 0.00;
+        Double creditTrasAmount = 0.00;
+        if(transactionType.equalsIgnoreCase("Debit")) {
+            debitTransAmount = amount;
+            amount = -amount;
+            particulars = "Paid To - "+personName +" | " + type   ;
+        }
+        else {
+            creditTrasAmount = amount;
+            particulars = "Customer Name - "+personName +" |  " + type ;
+        }
+        String insertQuery = "INSERT INTO DaybookEntry(TransactionDate,FirmId,FirmName,PaymentMode,Particulars,Debit,Credit)" +
+                " VALUES (now(),'"+firmId+"','"+firmName+"','"+paymentMode+"','"+particulars+"',"+debitTransAmount+","+creditTrasAmount+")";
+        Object id = transactionDAO.updateData(insertQuery);
+        String updateBalance = "UPDATE DaybookEntry SET Balance = CASE WHEN Balance = 0.00 || Balance is null THEN " + amount + "  ELSE Balance + " + amount + " END WHERE Id = "+id ;
+        transactionDAO.updateData(updateBalance);
+    }
+
+    private void makeChequeEntry(String chequeNumber,String chequeDate,Integer bookingId)
+    {
+        try {
+            String chequeEntryQuery = "INSERT INTO  ChequeEntry (ChequeNumber, ChequeDate,  BookingId, Status) VALUES ('" + chequeNumber + "'+" + chequeDate + "," + bookingId + ", 'Pending')";
+            transactionDAO.updateData(chequeEntryQuery);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public RestResponse udpateChequeEntry(String id)
+    {
+        RestResponse restResponse = null;
+        String statusMessage = "";
+        String statusCode = "";
+        try {
+            String chequeUpdateQuery = "Update ChequeEntry set Status = 'Completed', ClearanceDate = now() WHERE Id = "+id;
+            transactionDAO.updateData(chequeUpdateQuery);
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        return  restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
+    }
+
+    @Override
+    public RestResponse getAllChequeEntries()
+    {
+        List chequeList = new ArrayList();
+        RestResponse restResponse = null;
+        String statusMessage = "";
+        String statusCode = "";
+        String fetchChequeQuery = "SELECT Id as id, BookingId as bookingId, ChequeNumber as chequeNumber, ChequeDate as chequeDate FROM ChequeEntry where Status = 'Pending'";
+        try {
+            masterDAO.getAllData(fetchChequeQuery);
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        return  restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
     }
 }

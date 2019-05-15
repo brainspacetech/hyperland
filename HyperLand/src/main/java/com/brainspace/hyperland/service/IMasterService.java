@@ -4,6 +4,8 @@ import com.brainspace.hyperland.bo.Firm;
 import com.brainspace.hyperland.bo.RestResponse;
 import com.brainspace.hyperland.bo.Service;
 
+import java.io.InputStream;
+
 public interface IMasterService {
 
 	RestResponse getAllData(String type)  throws Exception;
@@ -17,7 +19,7 @@ public interface IMasterService {
 	RestResponse addRoleMenuConfig(String menuConfig,String role);
 	RestResponse getMenuConfig();
 	RestResponse getRoleMenuConfig();
-
+    RestResponse createPlots(InputStream inputStream);
 	/*RestResponse updateFirm(Firm firm);
 	RestResponse deleteFirm(int firmId);*/
 }

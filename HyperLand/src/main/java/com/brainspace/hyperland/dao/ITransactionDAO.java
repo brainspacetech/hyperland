@@ -8,8 +8,8 @@ public interface ITransactionDAO {
     public void updateDataBatch(String sql, List<Map> dataList,int id);
     public Object getBookingId(String query, Object params[], int argTypes[]);
     public void updateData(final String sql, Map dataMap,String idColName);
-    public void addData(String query,Object params[], int argTypes[]);
-    public void updateData(String query);
+    public Object addData(String query,Object params[], int argTypes[]);
+    public Object updateData(String query);
     public void insertDataBatch(final String sql[]);
     public Object getReceiptNumber(String query);
 

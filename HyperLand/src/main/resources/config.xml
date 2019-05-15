@@ -214,7 +214,7 @@
         <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName,PropertyId as propertyId,PropertyName as propertyName,PLCName as plcName ,PLCCharge as plcCharge,Id as id , ChargeType as chargeType from PLCMaster</SelectQuery>
         <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName,PropertyId as propertyId,PropertyName as propertyName,PLCName as plcName ,PLCCharge as plcCharge,Id as id , ChargeType as chargeType from PLCMaster where Id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO PLCMaster (FirmId,FirmName,PropertyId,PropertyName,PLCName,PLCCharge, ChargeType ) VALUES (?,?,?,?,?,?,?)</InsertQuery>
-        <UpdateQuery>UPDATE PLCMaster SET FirmId=?,  FirmName = ?,PropertyId = ?, PropertyName = ?,PLCName =?,PLCCharge =?, ChargeType = ? WHERE Id = ?</UpdateQuery>
+        <UpdateQuery>UPDATE PLCMaster SET FirmId = ?,  FirmName = ?,PropertyId = ?, PropertyName = ?,PLCName =?,PLCCharge =?, ChargeType = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM PLCMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType='4'/>
@@ -247,8 +247,8 @@
     <Service id="block">
         <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,Block as block,BlockId as blockId from BlockMaster</SelectQuery>
         <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,PropertyTypeId as propertyTypeId,PropertyType as propertyType,Block as block,BlockId as blockId from BlockMaster where Id = ?</SelectQueryById>
-        <InsertQuery>INSERT INTO BlockMaster (FirmId,FirmName,PropertyId,PropertyName,PropertyTypeId,PropertyType, BlockId,Block ) VALUES (?,?,?,?,?,?,?,?)</InsertQuery>
-        <UpdateQuery>UPDATE BlockMaster SET FirmId=?,  FirmName = ?,PropertyId = ?, PropertyName = ?,PropertyTypeId =?,PropertyType =?, BlockId = ?, Block = ? WHERE Id = ?</UpdateQuery>
+        <InsertQuery>INSERT INTO BlockMaster (FirmId,FirmName,PropertyId,PropertyName, BlockId,Block ) VALUES (?,?,?,?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE BlockMaster SET FirmId=?,  FirmName = ?,PropertyId = ?, PropertyName = ? , BlockId = ?, Block = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM BlockMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType='4'/>
@@ -312,6 +312,29 @@
             <Property name="amount" columnName="Amount" dataType='3'/>
         </PropertyMapping>
     </Service>
+
+    <Service id="user">
+        <SelectQuery>select Name as name, role as Role, UserId as userId from UserMaster      </SelectQuery>
+        <SelectQueryById>select Name as name, role as Role, UserId as userId from UserMaster where Id = ?
+        </SelectQueryById>
+        <InsertQuery>INSERT INTO UserMaster (Name ,Role, PanNumber , DateOfBirth ) VALUES (?,?,?,?)
+        </InsertQuery>
+      <!--  <UpdateQuery>UPDATE AgentMaster SET AgentName = ?,PanNumber = ?,AdhaarNo = ?,Address = ?,City = ?,State =
+            ?,PinCode nj= ?,emailId = ?,PhoneNo = ?,DateOfJoining = ?,DateOfBirth = ?,Occupation = ?,sponsorId =
+            ?,sponsorName = ?,Bank = ?,Branch = ?,AccountNumber = ?,IFSCCode = ?,Status = ?,LoginId = ?,Designation = ?
+            WHERE AgentId = ?
+        </UpdateQuery>-->
+        <DeleteQuery>DELETE FROM UserMaster WHERE Id = ?</DeleteQuery>
+        <PropertyMapping>
+            <Property name="id" columnName="Id" dataType="4"/>
+            <Property name="name" columnName="Name" dataType="12"/>
+            <Property name="panNumber" columnName="PanNumber" dataType="12"/>
+            <Property name="dateOfBirth " columnName="DateOfBirth" dataType="93"/>
+            <Property name="role " columnName="Role" dataType="12"/>
+            <Property name="userId " columnName="UserId" dataType="12"/>
+        </PropertyMapping>
+    </Service>
+
     <Transactions>
         <Transaction id="booking">
             <UpdateQuery>UPDATE BookingDetails SET CustomerId =? , FirmId = ?,FirmName = ?,ProjectId = ?,ProjectName =
@@ -496,8 +519,8 @@
             </PropertyMapping>
         </Transaction>
         <Transaction id="dailyExpense">
-            <InsertQuery>INSERT INTO ExpenseDetails (ExpenseCategory,Amount,CreatedBy,CreatedOn,TransactionDetail,TransactionId,FirmId,FirmName,PropertyId,PropertyName,InvoiceNo,PaidTo,PaymentMode,ChequeNo,BankName,ChequeDate,ExpenseDate) VALUES
-                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            <InsertQuery>INSERT INTO ExpenseDetails (ExpenseCategory,Amount,CreatedBy,CreatedOn,TransactionDetail,TransactionId,FirmId,FirmName,PropertyId,PropertyName,InvoiceNo,PaidTo,PaymentMode,BankName,TransactionDate,ExpenseDate,Narration) VALUES
+                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
             <UpdateQuery>UPDATE ExpenseDetails SET ApprovedBy = {1} , ApprovedOn = SYSDATE(),IsApproved = 'Y' WHERE Id = {2} AND ApprovedOn is null</UpdateQuery>
             <PropertyMapping>
@@ -808,7 +831,7 @@
     </Search>
 
         <Search id="customerPaymentDetails">
-            <SearchQuery>select a.Amount as amount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate from hyperland.PaymentDetails a INNER JOIN  hyperland.BookingDetails b ON b.BookingId = a.BookingId
+            <SearchQuery>select a.BookingId as bookingId, a.PaymentId as paymentId, a.Amount as amount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate from hyperland.PaymentDetails a INNER JOIN  hyperland.BookingDetails b ON b.BookingId = a.BookingId
                 WHERE {MACRO}
             </SearchQuery>
             <PropertyMapping>

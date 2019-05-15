@@ -3,13 +3,22 @@ package com.brainspace.hyperland.service;
 import com.brainspace.hyperland.bo.*;
 import com.brainspace.hyperland.dao.IMasterDAO;
 import com.brainspace.hyperland.utils.ConfigReader;
+import com.brainspace.hyperland.utils.PlotCreation;
 import com.brainspace.hyperland.utils.ServiceUtils;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.sql.PreparedStatement;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -112,15 +121,15 @@ public class MasterService implements IMasterService {
                             arguments[j] = new java.sql.Date(Date.from(zonedDateTime.toInstant()).getTime());
                         }
                     }
-                    Object  agentIdObj = masterDAO.addData(sql,arguments,argumentTypes);
+                    Object  objId = masterDAO.addData(sql,arguments,argumentTypes);
                     //if type == agent create user and user roles ->AGENT
-                    if(type.equalsIgnoreCase("agent"))
+                    if(type.equalsIgnoreCase("agent") || type.equalsIgnoreCase("user"))
                     {
                         // make entry in agent business details table
                         String password = "";
                         if(propertyMap.get("panNumber")!=null)
                         {
-                            password += propertyMap.get("panNumber");
+                            password += propertyMap.get("panNumber").toString().toLowerCase();
                         }
                         if(propertyMap.get("dateOfBirth")!=null)
                         {
@@ -129,15 +138,21 @@ public class MasterService implements IMasterService {
                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'");
                                 Instant instant = Instant.parse((String) propertyMap.get("dateOfBirth"));
                                 ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
-                                password+=zonedDateTime.getMonthValue()+""+zonedDateTime.getMonthValue()+""+zonedDateTime.getYear();
+                                password+=zonedDateTime.getDayOfMonth()+""+zonedDateTime.getMonthValue()+""+zonedDateTime.getYear();
                             }
                         }
                         String encodedPassword = new BCryptPasswordEncoder().encode(password);
-                        System.out.println(Integer.parseInt(agentIdObj.toString())+" === "+password);
-                        String insertBDQuery = "INSERT INTO AgentBusinessDetails(AgentId) VALUE ("+Integer.parseInt(agentIdObj.toString())+")";
-                        String insertUser = "INSERT INTO user (username,password) VALUES ('A"+agentIdObj+"','"+encodedPassword+"')";
-                        String insertUserRole = "INSERT INTO user_roles (username,role) VALUES ("+propertyMap.get("phoneNo")+",'ROLE_AGENT')";
-                        masterDAO.updateData(insertBDQuery);
+                        String userid = "O"+objId;
+                        System.out.println(Integer.parseInt(objId.toString()) + " === " + password);
+                        if(type.equalsIgnoreCase("agent") ) {
+                            userid = "A"+objId;
+                            String insertBDQuery = "INSERT INTO AgentBusinessDetails(AgentId) VALUE (" + Integer.parseInt(objId.toString()) + ")";
+                            masterDAO.updateData(insertBDQuery);
+                        }
+
+                        String insertUser = "INSERT INTO user (username,password) VALUES ('"+userid+"','" + encodedPassword + "')";
+                        String insertUserRole = "INSERT INTO user_roles (username,role) VALUES ('" + userid + "','ROLE_AGENT')";
+
                         masterDAO.updateData(insertUser);
                         masterDAO.updateData(insertUserRole);
                     }
@@ -148,7 +163,7 @@ public class MasterService implements IMasterService {
                     statusCode = "0";
                     statusMessage = "Failed";
                 }
-                response = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
+                response = ServiceUtils.convertObjToResponse(statusCode, statusMessage,null);
                 break;
             }
         }
@@ -326,12 +341,14 @@ public class MasterService implements IMasterService {
         String statusMessage = "";
         RestResponse restResponse = null;
         Map landData = null;
+        String menuConfig = "";
         try {
-           /* String landQuery = "SELECT KhasraNumber as khasraNumber, LandAmount as landAmount FROM LandMaster Where Id = ?";
-            landData = masterDAO.getDataById(landQuery, id);
-            String farmerQuery = "SELECT FarmerName as farmerName, panNumber as panNumber FROM FarmerMaster Where LandId = " + id;
-            List<Map> farmerData = masterDAO.getAllData(farmerQuery);
-            landData.put("farmers",farmerData);*/
+            String userName = new ServiceUtils().getUserName();
+            String fetchMenuConfig = "select rm.MenuConfig as MenuConfig from  MenuConfig rm";
+            List<Map> menuConfigList = masterDAO.getAllData(fetchMenuConfig);
+            if(menuConfigList.size()>0) {
+                menuConfig = (String)((Map)menuConfigList.get(0)).get("MenuConfig");
+            }
             statusCode = "1";
             statusMessage = "Success";
         }
@@ -340,7 +357,7 @@ public class MasterService implements IMasterService {
             statusCode = "1";
             statusMessage = "Success";
         }
-        restResponse = ServiceUtils.convertObjToResponse(statusCode,statusMessage,landData);
+        restResponse = ServiceUtils.convertObjToResponse(statusCode,statusMessage,menuConfig);
         return restResponse;
     }
 
@@ -366,5 +383,20 @@ public class MasterService implements IMasterService {
         }
         restResponse = ServiceUtils.convertObjToResponse(statusCode,statusMessage,menuConfig);
         return restResponse;
+    }
+
+    public RestResponse createPlots(InputStream inputStream)
+    {
+        PlotCreation plotCreation = new PlotCreation();
+        plotCreation.createPlot(inputStream);
+        return null;
+
+    }
+
+    public void createUserAndRole(String userid, String password, String role) {
+        String encodedPassword = new BCryptPasswordEncoder().encode(password);
+        String insertquery = "INSERT INTO user (username,password) VALUES ('" + userid + "','" + encodedPassword + "')";
+        String insertRole = "INSERT INTO user_roles(username,role) VALUES ('" + userid + "','" + role + "')";
+        masterDAO.insertDataBatch(new String[]{insertquery, insertRole});
     }
 }

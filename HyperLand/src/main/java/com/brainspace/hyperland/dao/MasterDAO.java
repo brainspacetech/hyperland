@@ -63,8 +63,11 @@ public class MasterDAO implements IMasterDAO {
 	}
 
     @Override
-    public void updateData(String query) {
+    public Object updateData(String query) {
         jdbcTemplate.update(query);
+        String selectQuery = "SELECT LAST_INSERT_ID() as bookingId";
+        Map<String, Object> idMap = jdbcTemplate.queryForMap(selectQuery);
+        return idMap.get("id");
     }
 
 	@Override
@@ -106,5 +109,7 @@ public class MasterDAO implements IMasterDAO {
             }
         });
     }
-
+    public void insertDataBatch(final String sql[]) {
+        this.jdbcTemplate.batchUpdate(sql);
+    }
 }
