@@ -6,13 +6,13 @@ import com.brainspace.hyperland.dao.ITransactionDAO;
 import com.brainspace.hyperland.utils.ConfigReader;
 import com.brainspace.hyperland.utils.PrintReceiptTemplate;
 import com.brainspace.hyperland.utils.ServiceUtils;
-import com.brainspace.hyperland.utils.TransactionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import javax.xml.bind.DatatypeConverter;
 import java.math.BigInteger;
+import java.sql.Blob;
 import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -118,6 +118,7 @@ public class TransactionService implements ITransactionService {
                     insertQuery = transactions.getTransaction()[i].getInsertQuery();
                     List<Map> customerList = new ArrayList<>();
                     customerDetails.put("customerId", bookingId + "_P_1");
+                    customerDetails.put("bookingId",bookingId);
                     Map customerMap = serviceUtils.customerMap(customerDetails, jsonColumnMap);
                     customerList.add(customerMap);
                     if (mainObject.get("coApplicantDetails") != null) {
@@ -335,6 +336,7 @@ public class TransactionService implements ITransactionService {
     }
 
 
+
     //used for Daily Expense / Farmer Payment / Agent Payment Approval / Property Cancellation Payment - > make and entry in Day book Entry table
     public RestResponse approvePayment(String id, String type, String approvedBy) {
         RestResponse restResponse = null;
@@ -368,9 +370,9 @@ public class TransactionService implements ITransactionService {
             }
             else  if(type.equalsIgnoreCase("dailyExpense")){
 
-                fethQuery = "SELECT PaymentMode as paymentMode,Amount as paymentAmount,PaidTo as paidTo,ExpenseCategory as expenseCategory,   from ExpenseDetails where id = ?";
+                fethQuery = "SELECT FirmId as firmId, FirmName as firmName, PaymentMode as paymentMode,Amount as paymentAmount,PaidTo as paidTo,ExpenseCategory as expenseCategory  from ExpenseDetails where id = ?";
                 Map data =  masterDAO.getDataById(fethQuery,Integer.parseInt(id));
-                dayBookEntry(null,null,data.get("paymentMode").toString(),Double.parseDouble(data.get("paymentAmount").toString()),"Debit",data.get("paidTo").toString(),data.get("expenseCategory").toString());
+                dayBookEntry(Integer.parseInt(data.get("firmId").toString()),data.get("firmName").toString(),data.get("paymentMode").toString(),Double.parseDouble(data.get("paymentAmount").toString()),"Debit",data.get("paidTo").toString(),data.get("expenseCategory").toString());
             }
 
                     statusCode = "1";
@@ -574,11 +576,11 @@ public class TransactionService implements ITransactionService {
         String selectChainAgents = "WITH RECURSIVE category_path (AgentId, AgentName, SponsorId,Designation,SelfBusiness,TotalCommission,Commission,MaxTarget) AS " +
                 "(" +
                 "   SELECT am.AgentId, am.AgentName, am.SponsorId,am.Designation,ab.SelfBusiness,ab.TotalCommission,mp.Commission,mp.MaxTarget " +
-                "    FROM  hyperland.AgentMaster am INNER JOIN hyperland.AgentBusinessDetails ab INNER JOIN hyperland.MatrixPlan mp ON mp.Level =am.Designation and am.AgentId = ab.AgentId " +
+                "    FROM  AgentMaster am INNER JOIN AgentBusinessDetails ab INNER JOIN MatrixPlan mp ON mp.Level =am.Designation and am.AgentId = ab.AgentId " +
                 "    WHERE am.AgentId = " + agentId +
                 "  UNION ALL" +
                 "  SELECT c.AgentId, c.AgentName, c.SponsorId,c.Designation, ab.SelfBusiness,ab.TotalCommission,mp.Commission,mp.MaxTarget " +
-                "    FROM category_path AS cp JOIN  hyperland.AgentMaster AS c INNER JOIN hyperland.AgentBusinessDetails  ab   INNER JOIN hyperland.MatrixPlan mp ON mp.Level = c.Designation and ab.AgentId = cp.SponsorId and cp.SponsorId = c.AgentId " +
+                "    FROM category_path AS cp JOIN  AgentMaster AS c INNER JOIN AgentBusinessDetails  ab   INNER JOIN MatrixPlan mp ON mp.Level = c.Designation and ab.AgentId = cp.SponsorId and cp.SponsorId = c.AgentId " +
                 ")" +
                 "" + "SELECT * FROM category_path cp ";
 
@@ -709,39 +711,51 @@ public class TransactionService implements ITransactionService {
         String statusMessage = "";
         RestResponse response = null;
         String paymentDetailsQuery = "";
-       if(paymnentId == null) {
-           paymentDetailsQuery = "select a.Amount as amount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate from PaymentDetails a INNER JOIN  BookingDetails b ON b.BookingId = a.BookingId WHERE b.BookingId = " + bookingId + " Order by PaymentDate asc";
-       }
-       else {
-           paymentDetailsQuery = "select a.Amount as amount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate from PaymentDetails a INNER JOIN  BookingDetails b ON b.BookingId = a.BookingId WHERE b.BookingId = " + bookingId + "  AND PaymentId = "+paymnentId+" Order by PaymentDate asc";
-       }
-           String receiptTemplate ="";
-           try {
-               receiptTemplate =  PrintReceiptTemplate.getReceiptTemplate();
-                             List paymentDeatils = null;
-               paymentDeatils = masterDAO.getAllData(paymentDetailsQuery);
-               if(paymentDeatils!=null && paymentDeatils.size()>0)
-               {
-                   Map paymentDetail  = (Map) paymentDeatils.get(0);
-                  // receiptTemplate =  receiptTemplate.replaceAll("","");
+        String firmId = "";
+        if(paymnentId == null) {
+            paymentDetailsQuery = "select a.Amount as paidAmount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,b.ProjectName as projectName, b.BlockId as block, b.PlotNumber as plotNumber,b.FirmName as firmName,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,\n" +
+                    "b.FirmId as firmId, DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate,c.CustomerId as customerId, c.CustomerName as customerName from PaymentDetails a INNER JOIN  BookingDetails b ON b.BookingId = a.BookingId INNER JOIN CustomerDetails c ON  b.BookingId = c.BookingId WHERE b.BookingId = " + bookingId + " Order by PaymentDate asc";
+        }
+        else {
+            paymentDetailsQuery = "select a.Amount as paidAmount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate from PaymentDetails a INNER JOIN  BookingDetails b ON b.BookingId = a.BookingId WHERE b.BookingId = " + bookingId + "  AND PaymentId = "+paymnentId+" Order by PaymentDate asc";
+        }
+
+        String receiptTemplate ="";
+        try {
+            receiptTemplate =  PrintReceiptTemplate.getReceiptTemplate();
+            List paymentDeatils = null;
+            paymentDeatils = masterDAO.getAllData(paymentDetailsQuery);
+            if(paymentDeatils!=null && paymentDeatils.size()>0)
+            {
+                Map paymentDetail  = (Map) paymentDeatils.get(0);
+                // receiptTemplate =  receiptTemplate.replaceAll("","");
 //                  / receiptTemplate =  receiptTemplate.replace("@irmName","");
-                   String replaceString[] = {"amount","receiptNo","paymentDate","paymentMode","transactionId","transactionDate"};
-                   for(int i = 0 ; i < replaceString.length;i++)
-                   {
-                       System.out.println(replaceString[i]+" -- "+paymentDetail.get(replaceString[i]));
-                       String replaceValue = replaceString[i]!=null?replaceString[i].toString():"";
-                       receiptTemplate =   receiptTemplate.replaceAll("@"+replaceString[i],replaceValue);
-                   }
-               }
-               statusCode = "1";
-               statusMessage = "Success";
-           } catch (Exception e) {
-               e.printStackTrace();
-               statusCode = "0";
-               statusMessage = "Failed";
-           }
-           return  response = ServiceUtils.convertObjToResponse(statusCode, statusMessage, receiptTemplate);
- }
+                String replaceString[] = {"firmName","paidAmount","receiptNo","paymentDate","paymentMode","transactionId","transactionDate","customerId","customerName","plotNumber","block","projectName"};
+                for(int i = 0 ; i < replaceString.length;i++)
+                {
+                    System.out.println(replaceString[i]+" -- "+paymentDetail.get(replaceString[i]));
+                    String replaceValue = paymentDetail.get(replaceString[i])!=null?paymentDetail.get(replaceString[i]).toString():"";
+                    String name = "@"+replaceString[i];
+                    System.out.println(name +" --- "+replaceValue);
+                    receiptTemplate =   receiptTemplate.replaceAll(name,replaceValue);
+                }
+                firmId = paymentDetail.get("firmId").toString();
+            }
+            Blob blob = masterDAO.getBlobData(firmId);
+            int myblobLength = (int) blob.length();
+            byte[] myblobAsBytes = blob.getBytes(1, myblobLength);
+            blob.free();
+            receiptTemplate =   receiptTemplate.replaceAll("@image", DatatypeConverter.printBase64Binary(myblobAsBytes));
+            System.out.println(receiptTemplate);
+            statusCode = "1";
+            statusMessage = "Success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        return  response = ServiceUtils.convertObjToResponse(statusCode, statusMessage, receiptTemplate);
+    }
 
 
     // for agent payment / farmer payment / booking/installment/ daily expense - make an entry in table
@@ -819,4 +833,94 @@ public class TransactionService implements ITransactionService {
         }
         return  restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
     }
+
+
+    public RestResponse createDailyExpense(Map paymentMap, String type, String createdBy) {
+        RestResponse restResponse = null;
+        String statusMessage = "";
+        String statusCode = "";
+        List expenseList = null;
+        Map commonMap = null;
+
+        try {
+            String firmId = paymentMap.get("firmId")!=null?paymentMap.get("firmId").toString():"-1";
+            expenseList = new ArrayList();
+            if(firmId.equalsIgnoreCase("-1"))
+            {
+                commonMap = null;
+                // get firm count.
+                List firmList = masterDAO.getAllData("SELECT Id, FirmName from FirmMaster");
+                Double amount = Double.parseDouble(paymentMap.get("amount").toString());
+                Double sharedAmount = amount/firmList.size();
+                for(int i = 0 ; i < firmList.size();i++)
+                {
+                    commonMap = new HashMap();
+                    commonMap.putAll(paymentMap);
+                    commonMap.put("amount",sharedAmount);
+                    commonMap.put("firmId",((Map)firmList.get(i)).get("Id"));
+                    commonMap.put("firmName",((Map)firmList.get(i)).get("FirmName"));
+                    commonMap.put("transactionDetail", "Common - "+paymentMap.get("transactionDetail"));
+                    expenseList.add(commonMap);
+                }
+            }
+            else{
+                expenseList.add(paymentMap);
+            }
+
+            ConfigBO configBO = ConfigReader.getConfig();
+            Transactions transactions = configBO.getTransactions();
+            ServiceUtils serviceUtils = new ServiceUtils();
+            for (int i = 0; i < transactions.getTransaction().length; i++) {
+                Transaction transaction = transactions.getTransaction()[i];
+                if (transaction.getId().equalsIgnoreCase(type)) {
+                    for(int count = 0 ;count < expenseList.size();count++) {
+                        Map expenseMap = (Map) expenseList.get(count);
+                        String sql = transaction.getInsertQuery();
+                        String params = sql.substring(sql.indexOf('(') + 1, sql.indexOf(')'));
+                        String paramsArr[] = params.split(",");
+                        PropertyMapping propertyMapping = transaction.getPropertyMapping();
+                        Property property[] = propertyMapping.getProperty();
+                        Map<String, List> jsonColumnMap = serviceUtils.propertyMapper(property);
+                        String value = "";
+                        Object arguments[] = new Object[paramsArr.length];
+                        int argumentTypes[] = new int[paramsArr.length];
+                        for (int j = 0; j < paramsArr.length; j++) {
+                            System.out.println("paramsArr[j].trim() -- " + paramsArr[j].trim());
+                            List jsonColTypeList = jsonColumnMap.get(paramsArr[j].trim());
+                            Object colValue = expenseMap.get(jsonColTypeList.get(0));
+                            arguments[j] = colValue;
+                            argumentTypes[j] = Integer.parseInt((String) jsonColTypeList.get(1));
+                            if (argumentTypes[j] == 93 && arguments[j] != null) {
+                                Instant instant = Instant.parse((String) arguments[j]);
+                                ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
+                                arguments[j] = new java.sql.Date(Date.from(zonedDateTime.toInstant()).getTime());
+                            }
+                            if (paramsArr[j].trim().equalsIgnoreCase("CreatedBy")) {
+                                arguments[j] = createdBy;
+                            } else if (paramsArr[j].trim().equalsIgnoreCase("CreatedOn")) {
+                                java.sql.Date currentDate = new java.sql.Date(new Date().getTime());
+                                arguments[j] = currentDate;
+                            }
+                        }
+                        transactionDAO.addData(sql, arguments, argumentTypes); // add entry in table
+                    }
+                }
+
+            }
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
+        return restResponse;
+
+    }
+
+
 }
+

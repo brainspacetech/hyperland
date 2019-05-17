@@ -1,7 +1,7 @@
 package com.brainspace.hyperland.utils;
 
 import com.brainspace.hyperland.dao.IMasterDAO;
-import com.brainspace.hyperland.dao.MasterDAO;
+
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -21,9 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 public class PlotCreation {
-     @Autowired
-    IMasterDAO masterDAO;
-    public boolean createPlot(InputStream inputStream)
+
+    public boolean createPlot(IMasterDAO masterDAO,InputStream inputStream)
     {
         boolean flag = false;
         try {
@@ -37,13 +36,7 @@ public class PlotCreation {
             Double sqftRate = 600.00;
 
             List<Map> valueList = readFile(inputStream);
-            SimpleDriverDataSource ds = new SimpleDriverDataSource();
-            ds.setDriver(new com.mysql.jdbc.Driver());
-            ds.setUrl("jdbc:mysql://db4free.net:3306/hyperland");
-            ds.setUsername("hyperland");
-            ds.setPassword("hyperland123");
-            JdbcTemplate jt = new JdbcTemplate(ds);
-            MasterDAO masterDAO = new MasterDAO(jt);
+
             for (int i = 0; i < valueList.size(); i++) {
                 //    Firm	Property	Block	Facing	Plot No	Area(in Sqr Ft.)	Rate/Sqr Ft.	Road	Description	PLC	PLC ChargingType
 
@@ -74,7 +67,7 @@ public class PlotCreation {
             return flag;
     }
 
-   private  String  getFirmId (MasterDAO masterDAO, String firmName) throws Exception
+   private  String  getFirmId (IMasterDAO masterDAO, String firmName) throws Exception
    {
        String firmQuery = "Select Id as id from FirmMaster where FirmName = '"+firmName+"'";
        String firmId = "";
@@ -86,7 +79,7 @@ public class PlotCreation {
        }
        return firmId;
    }
-    private  String  getProjectId (MasterDAO masterDAO, String projectName, String firmId) throws Exception
+    private  String  getProjectId (IMasterDAO masterDAO, String projectName, String firmId) throws Exception
     {
         String projectQuery = "Select Id as id from ProjectMaster where FirmId = "+firmId+" and ProjectName = '"+projectName+"'";
         String projectId = "";
@@ -97,7 +90,7 @@ public class PlotCreation {
         }
         return projectId;
     }
-    private  String  getPBlockId (MasterDAO masterDAO,String blockName ,String projectId, String firmId) throws Exception
+    private  String  getPBlockId (IMasterDAO masterDAO,String blockName ,String projectId, String firmId) throws Exception
     {
         String blockQuery = "Select Id as id from BlockMaster where FirmId = "+firmId+" and PropertyId = "+projectId+" and Block = '"+blockName+"'";
         String blockId = "";
@@ -109,7 +102,7 @@ public class PlotCreation {
         return blockId;
     }
 
-    private  void createPlot(MasterDAO masterDAO, String plotNo, String blockId , String firmId, String blockName , String projectId, String projectName, String firmName, Double plotSize, Double sqFtRate,String propertyType, String propertyTypeId)
+    private  void createPlot(IMasterDAO masterDAO, String plotNo, String blockId , String firmId, String blockName , String projectId, String projectName, String firmName, Double plotSize, Double sqFtRate,String propertyType, String propertyTypeId)
     {
         String query = "INSERT INTO PlotDetails (FirmId,FirmName,ProjectId, ProjectName,BlockId,Block,PlotNo, SqFtRate,PlotSize,Status)" +
                  " VALUES ("+firmId+",'"+firmName+"',"+projectId+",'"+projectName+"',"+blockId+",'"+blockName+"',"+plotNo+","+sqFtRate+","+plotSize+",'Available')";

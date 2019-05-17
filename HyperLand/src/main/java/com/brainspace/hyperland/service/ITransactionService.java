@@ -14,5 +14,6 @@ public interface ITransactionService {
     public RestResponse generatePrintReceipt(Integer bookingId, Integer paymentId) ;
     public RestResponse getAllChequeEntries();
     public RestResponse udpateChequeEntry(String id);
+    RestResponse createDailyExpense(Map paymentMap, String type, String createdBy) ;
 
 }

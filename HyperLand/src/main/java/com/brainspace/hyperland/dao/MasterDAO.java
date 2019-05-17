@@ -1,6 +1,8 @@
 package com.brainspace.hyperland.dao;
 
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.sql.Blob;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -9,10 +11,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -112,4 +111,33 @@ public class MasterDAO implements IMasterDAO {
     public void insertDataBatch(final String sql[]) {
         this.jdbcTemplate.batchUpdate(sql);
     }
+
+
+    public void insertBlobData(String sql, InputStream image, String firmName)
+    {
+        this.jdbcTemplate.update(sql, new PreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                //   preparedStatement.setString(1,"");
+                String params = sql.substring(sql.indexOf("(") + 1, sql.indexOf(")"));
+                preparedStatement.setString(1,firmName);
+                preparedStatement.setBlob(2,image);
+                System.out.println("preparedStatement  -- " + preparedStatement);
+            }
+        });
+      }
+
+      public Blob getBlobData(String firmId)
+      {
+          String selectQuery = "SELECT Logo FROM FirmMaster where Id = ?";
+
+          List<Blob>  blobList= jdbcTemplate.query(selectQuery,new Object[]{firmId}, (resultSet, i) -> {
+              return resultSet.getBlob("Logo");
+          });
+          if (blobList.size() == 1) {
+              return blobList.get(0);
+          }
+          return null;
+      }
+
 }

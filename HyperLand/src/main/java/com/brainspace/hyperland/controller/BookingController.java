@@ -81,7 +81,13 @@ public class BookingController {
         Object paymentId= ((Map)restRequest).get("paymentId");
 
         Integer paymentIdInt = paymentId!=null?Integer.parseInt(paymentId.toString()):null;
-        return new ResponseEntity<RestResponse>(transactionService.generatePrintReceipt(bookingIdInt,paymentIdInt), HttpStatus.OK);
+        RestResponse response = transactionService.generatePrintReceipt(bookingIdInt,paymentIdInt);
+        if(response.getStatusCode().equalsIgnoreCase("1")) {
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @RequestMapping(value = "/update/{id}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
@@ -98,11 +104,22 @@ public class BookingController {
     public ResponseEntity<RestResponse> getAllChequeEntry()
     {
         RestResponse response = transactionService.getAllChequeEntries();
-
         if(response.getStatusCode().equalsIgnoreCase("1"))
             return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
         else
             return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @RequestMapping(value = "/create/{type}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public ResponseEntity<RestResponse> createDailyExpense(@RequestBody Object restRequest,@PathVariable(name="type") String type) {
+        System.out.println(restRequest);
+        String createdBy = new ServiceUtils().getUserName();
+        RestResponse response = transactionService.createDailyExpense((Map)restRequest,type,createdBy);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return  new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+    }
+
 
 }

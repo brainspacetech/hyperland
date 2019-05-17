@@ -1,5 +1,7 @@
 package com.brainspace.hyperland.dao;
 
+import java.io.InputStream;
+import java.sql.Blob;
 import java.util.List;
 import java.util.Map;
 
@@ -14,5 +16,6 @@ public interface IMasterDAO {
     void deleteData(String sql,int id);
     void insertDataBatch(final String sql, List<Map> dataList);
     void insertDataBatch(final String sql[]);
-
+    void insertBlobData(String sql, InputStream image, String firmName);
+    Blob getBlobData(String firmId);
 }

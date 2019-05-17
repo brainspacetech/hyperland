@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -370,7 +371,7 @@ public class MasterService implements IMasterService {
         try
         {
             String userName = new ServiceUtils().getUserName();
-            String fetchMenuConfig = "select rm.MenuConfig as MenuConfig from  hyperland.RoleMenuConfig rm INNER JOIN hyperland.user_roles ur ON ur.role = rm.Role where username  = '"+userName+"'";
+            String fetchMenuConfig = "select rm.MenuConfig as MenuConfig from  RoleMenuConfig rm INNER JOIN user_roles ur ON ur.role = rm.Role where username  = '"+userName+"'";
             List<Map> menuConfigList = masterDAO.getAllData(fetchMenuConfig);
             menuConfig = menuConfigList.get(0);
             statusCode = "1";
@@ -387,16 +388,41 @@ public class MasterService implements IMasterService {
 
     public RestResponse createPlots(InputStream inputStream)
     {
-        PlotCreation plotCreation = new PlotCreation();
-        plotCreation.createPlot(inputStream);
-        return null;
+
+        String statusCode = "";
+        String statusMessage ="";
+        try {
+            PlotCreation plotCreation = new PlotCreation();
+            plotCreation.createPlot(masterDAO, inputStream);
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        return ServiceUtils.convertObjToResponse(statusCode,statusMessage,null);
 
     }
 
-    public void createUserAndRole(String userid, String password, String role) {
-        String encodedPassword = new BCryptPasswordEncoder().encode(password);
-        String insertquery = "INSERT INTO user (username,password) VALUES ('" + userid + "','" + encodedPassword + "')";
-        String insertRole = "INSERT INTO user_roles(username,role) VALUES ('" + userid + "','" + role + "')";
-        masterDAO.insertDataBatch(new String[]{insertquery, insertRole});
+
+    public RestResponse createFirm(InputStream logoFile, String firmName){
+        String statusCode = "";
+        String statusMessage ="";
+        try {
+            String insertQuery = "INSERT INTO FirmMaster (FirmName,Logo) VALUES (?,?)";
+            masterDAO.insertBlobData(insertQuery, logoFile, firmName);
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        return ServiceUtils.convertObjToResponse(statusCode,statusMessage,null);
     }
 }

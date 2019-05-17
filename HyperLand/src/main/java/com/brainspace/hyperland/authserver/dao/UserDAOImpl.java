@@ -42,7 +42,7 @@ public class UserDAOImpl implements  UserDAO{
 
         try {
             String query = "SELECT username ,role from user_roles where username = '"+username+"'";
-            System.out.println("this.jdbcTemplate -- " + this.jdbcTemplate);
+            System.out.println("findRoleByUsername -- query" + query);
             List roleList = this.jdbcTemplate.queryForList(query);
 
             return roleList;

@@ -76,12 +76,12 @@ public class SearchService implements ISearchService {
         String resultString = null;
         RestResponse restResponse = null;
         try {
-            String selectChainAgents = "select am.AgentId as AgentId, am.AgentName as AgentName, am.SponsorId as SponsorId,am.Designation as Designation,ab.SelfBusiness as SelfBusiness,ab.ChainBusiness as ChainBusiness from hyperland.AgentMaster am INNER JOIN hyperland.AgentBusinessDetails ab ON am.agentId = ab.agentId\n" +
+            String selectChainAgents = "select am.AgentId as AgentId, am.AgentName as AgentName, am.SponsorId as SponsorId,am.Designation as Designation,ab.SelfBusiness as SelfBusiness,ab.ChainBusiness as ChainBusiness from  AgentMaster am INNER JOIN  AgentBusinessDetails ab ON am.agentId = ab.agentId\n" +
                     "         where am.agentId = "+agentId+"\n" +
                     "UNION ALL\n" +
                     "(select  AgentId, AgentName, SponsorId,Designation,SelfBusiness,ChainBusiness\n" +
                     "from    (\n" +
-                    "         select am.AgentId, am.AgentName, am.SponsorId,am.Designation,ab.SelfBusiness,ab.ChainBusiness as ChainBusiness from hyperland.AgentMaster am INNER JOIN hyperland.AgentBusinessDetails ab ON am.agentId = ab.agentId\n" +
+                    "         select am.AgentId, am.AgentName, am.SponsorId,am.Designation,ab.SelfBusiness,ab.ChainBusiness as ChainBusiness from  AgentMaster am INNER JOIN  AgentBusinessDetails ab ON am.agentId = ab.agentId\n" +
                     "             order by sponsorId, agentId    \n" +
                     "         ) AgentMaster,\n" +
                     "        (select @pv := "+agentId+") initialisation\n" +

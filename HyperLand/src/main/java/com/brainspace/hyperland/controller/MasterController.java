@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import com.brainspace.hyperland.bo.RestResponse;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,79 +32,119 @@ public class MasterController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+       if(response.getStatusCode().equalsIgnoreCase("1"))
+          return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+       else
+           return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
     @PostMapping(value = "/add/{type}")
     public ResponseEntity<RestResponse> add(@PathVariable(name = "type") String type, @RequestBody Object request) {
         RestResponse response = masterService.addData(type, request, "");
-        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+        {
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
     @PostMapping(value = "/create/Firm")
-
-    public ResponseEntity<RestResponse> createFirm(@RequestParam("logoFile") MultipartFile logoFile) {
-        //   String firmName = (String) ((Map)requestBody).get("firmName");
-        System.out.println(logoFile);
-        // System.out.println(firmName);
-        //   RestResponse response = masterService.addData(type,request,"");
-        // return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
-        return null;
+    public ResponseEntity<RestResponse> createFirm(@RequestParam("logoFile") MultipartFile logoFile, @RequestParam("firmName") String firmName ) {
+        RestResponse response = null;
+        try {
+            response =  masterService.createFirm(logoFile.getInputStream(), firmName);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+        {
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping(value = "/addLand")
     public ResponseEntity<RestResponse> addLand(@RequestBody Object request) {
         RestResponse response = masterService.addLandData(request, "");
-        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping(value = "/add/menuConfig")
     public ResponseEntity<RestResponse> addMenuConfig(@RequestBody Object request) {
         RestResponse response = masterService.addMenuConfig((String) ((Map) request).get("menuConfig"));
-        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
     @GetMapping(value = "/get/{type}/{id}")
     public ResponseEntity<RestResponse> get(@PathVariable(name = "type") String type, @PathVariable("id") int id) {
         RestResponse response = masterService.getDataById(type, id);
-        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping(value = "/update/{type}/{id}")
     public ResponseEntity<RestResponse> update(@PathVariable(name = "type") String type, @PathVariable("id") int id, @RequestBody Object request) {
         RestResponse response = masterService.updateData(type, id, request);
-        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping(value = "/delete/{type}/{id}")
     public ResponseEntity<RestResponse> delete(@PathVariable(name = "type") String type, @PathVariable("id") int id) {
         RestResponse response = masterService.deleteData(type, id);
-        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @GetMapping(value = "/getLand/{id}")
     public ResponseEntity<RestResponse> getLand(@PathVariable("id") int id) {
         RestResponse response = masterService.getLandDataById("land", id);
-        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+          return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+           return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping(value = "/add/roleMenuConfig")
+
     public ResponseEntity<RestResponse> addRoleMenuConfig(@RequestBody Object request) {
         RestResponse response = masterService.addRoleMenuConfig((String) ((Map) request).get("roleMenuConfig"), (String) ((Map) request).get("role"));
-        return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @GetMapping("/downloadFile")
-    public ResponseEntity<Resource> downloadFile(HttpServletRequest request) {
+    @GetMapping("/downloadPlots")
+    public ResponseEntity<?> downloadFile(HttpServletRequest request) {
         // Load file as Resource
         Resource resource = null;
         String contentType = null;
+        byte content[] = null;
         try {
             resource = new FileStorageService().loadFileAsResource();
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+            content = FileCopyUtils.copyToByteArray(resource.getInputStream());
         } catch (IOException ex) {
 
         }
@@ -111,25 +152,29 @@ public class MasterController {
             contentType = "application/octet-stream";
         }
 
+
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
+                .body(content);
     }
 
 
     @PostMapping("/uploadPlots")
-    public ResponseEntity<Resource> uploadPlot(@RequestParam("file") MultipartFile file) {
-
+    public ResponseEntity<RestResponse> uploadPlot(@RequestParam("file") MultipartFile file) {
+        RestResponse response = null;
         System.out.println(file);
         try {
-            masterService.createPlots(file.getInputStream());
+            response  = masterService.createPlots(file.getInputStream());
         }
         catch(Exception e)
         {
             e.printStackTrace();
         }
-        return null;
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

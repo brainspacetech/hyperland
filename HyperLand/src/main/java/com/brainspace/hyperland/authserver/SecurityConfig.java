@@ -43,15 +43,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userDetailsService). passwordEncoder(encoder());
     }
 
-    @Override
+   /* @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
                 .anonymous().disable()
                 .authorizeRequests()
-                .antMatchers("/master/**").hasRole("USER")
+                .antMatchers("/master/**").hasAnyRole("ADMIN","USER")
                 .anyRequest().authenticated();
-    }
+    }*/
 
 
     @Bean
