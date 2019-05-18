@@ -199,6 +199,12 @@ public class MasterService implements IMasterService {
                         Object colValue = propertyMap.get(jsonColTypeList.get(0));
                         arguments[j] = colValue;
                         argumentTypes[j] = Integer.parseInt((String) jsonColTypeList.get(1));
+                        if(argumentTypes[j] == 93 && arguments[j] !=null ){
+                            Instant instant = Instant.parse((String) arguments[j]);
+                            ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
+                            arguments[j] = new java.sql.Date(Date.from(zonedDateTime.toInstant()).getTime());
+                        }
+
                     }
                     arguments[count] = id;
                     argumentTypes[count] = 4;
@@ -298,7 +304,7 @@ public class MasterService implements IMasterService {
         RestResponse restResponse = null;
         Map landData = null;
         try {
-            String landQuery = "SELECT KhasraNumber as khasraNumber, LandAmount as landAmount FROM LandMaster Where Id = ?";
+            String landQuery = "SELECT Id as id, KhasraNumber as khasraNumber, LandAmount as landAmount FROM LandMaster Where Id = ?";
             landData = masterDAO.getDataById(landQuery, id);
             String farmerQuery = "SELECT FarmerName as farmerName, panNumber as panNumber FROM FarmerMaster Where LandId = " + id;
             List<Map> farmerData = masterDAO.getAllData(farmerQuery);

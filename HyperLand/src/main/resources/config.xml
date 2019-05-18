@@ -167,14 +167,14 @@
             sponsorId ,sponsorName as sponsorName ,Bank as bank ,Branch as branch ,AccountNumber as accountNumber
             ,IFSCCode as ifscCode ,Status as status ,LoginId as loginId ,Designation as designation, TotalAmount as totalAmount,
             AmountPaidTillNow as paidAmount from AgentMaster
-            where AgentId = ?
+            WHERE AgentId = ?
         </SelectQueryById>
         <InsertQuery>INSERT INTO AgentMaster (AgentName ,PanNumber ,AdhaarNo ,Address ,City ,State ,PinCode ,emailId
             ,PhoneNo ,DateOfJoining ,DateOfBirth ,Occupation ,sponsorId ,sponsorName ,Bank ,Branch ,AccountNumber
             ,IFSCCode ,Status ,LoginId ,Designation) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         </InsertQuery>
         <UpdateQuery>UPDATE AgentMaster SET AgentName = ?,PanNumber = ?,AdhaarNo = ?,Address = ?,City = ?,State =
-            ?,PinCode nj= ?,emailId = ?,PhoneNo = ?,DateOfJoining = ?,DateOfBirth = ?,Occupation = ?,sponsorId =
+            ?,PinCode = ?,emailId = ?,PhoneNo = ?,DateOfJoining = ?,DateOfBirth = ?,Occupation = ?,sponsorId =
             ?,sponsorName = ?,Bank = ?,Branch = ?,AccountNumber = ?,IFSCCode = ?,Status = ?,LoginId = ?,Designation = ?
             WHERE AgentId = ?
         </UpdateQuery>
@@ -246,7 +246,7 @@
         <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,Block as block,BlockId as blockId from BlockMaster</SelectQuery>
         <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,Block as block,BlockId as blockId from BlockMaster where Id = ?</SelectQueryById>
         <InsertQuery>INSERT INTO BlockMaster (FirmId,FirmName,PropertyId,PropertyName, BlockId,Block ) VALUES (?,?,?,?,?,?)</InsertQuery>
-        <UpdateQuery>UPDATE BlockMaster SET FirmId=?,  FirmName = ?,PropertyId = ?, PropertyName = ? , BlockId = ?, Block = ? WHERE Id = ?</UpdateQuery>
+        <UpdateQuery>UPDATE BlockMaster SET FirmId = ?,  FirmName = ?,PropertyId = ?, PropertyName = ? , BlockId = ?, Block = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM BlockMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType='4'/>

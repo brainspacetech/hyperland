@@ -118,6 +118,7 @@ public class TransactionService implements ITransactionService {
                     insertQuery = transactions.getTransaction()[i].getInsertQuery();
                     List<Map> customerList = new ArrayList<>();
                     customerDetails.put("customerId", bookingId + "_P_1");
+                    customerDetails.put("customerType", "Primary");
                     customerDetails.put("bookingId",bookingId);
                     Map customerMap = serviceUtils.customerMap(customerDetails, jsonColumnMap);
                     customerList.add(customerMap);
@@ -129,6 +130,7 @@ public class TransactionService implements ITransactionService {
                             coAppMap.put("customerId", bookingId + "_C_" + (count + 1));
                             customerMap = serviceUtils.customerMap(coAppMap, jsonColumnMap);
                             customerMap.put("customerId", bookingId + "_C_" + (count + 1));
+                            customerDetails.put("customerType", "CoApplicant");
                             customerList.add(customerMap);
                         }
                     }
