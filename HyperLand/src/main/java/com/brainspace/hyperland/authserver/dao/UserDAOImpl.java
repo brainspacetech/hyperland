@@ -29,7 +29,7 @@ public class UserDAOImpl implements  UserDAO{
                user = new User ();
                user.setUsername((String)userMap.get("username"));
                user.setPassword((String)userMap.get("password"));
-               user.setRoles(new String[]{"USER","ADMIN"});
+               user.setRoles(new String[]{"ROLE_ADMIN"});
            }
            return user;
         } catch (Exception e) {

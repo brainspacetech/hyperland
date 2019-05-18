@@ -191,7 +191,7 @@
             <Property name="emailId" columnName="emailId" dataType="12"/>
             <Property name="phoneNo" columnName="PhoneNo" dataType="12"/>
             <Property name="dateOfJoining" columnName="DateOfJoining" dataType="93"/>
-            <Property name="dateOfBirth " columnName="DateOfBirth" dataType="93"/>
+            <Property name="dateOfBirth" columnName="DateOfBirth" dataType="93"/>
             <Property name="occupation" columnName="Occupation" dataType="12"/>
             <Property name="sponsorId" columnName="sponsorId" dataType="12"/>
             <Property name="sponsorName" columnName="sponsorName" dataType="12"/>
@@ -327,7 +327,7 @@
             <Property name="id" columnName="Id" dataType="4"/>
             <Property name="name" columnName="Name" dataType="12"/>
             <Property name="panNumber" columnName="PanNumber" dataType="12"/>
-            <Property name="dateOfBirth " columnName="DateOfBirth" dataType="93"/>
+            <Property name="dateOfBirth" columnName="DateOfBirth" dataType="93"/>
             <Property name="role " columnName="Role" dataType="12"/>
             <Property name="userId " columnName="UserId" dataType="12"/>
         </PropertyMapping>
@@ -655,6 +655,7 @@
                 <Property columnName="b.FirmId" name="firmId" dataType="4"/>
                 <Property columnName="b.ProjectId" name="projectId" dataType="4"/>
                 <Property columnName="b.BlockId" name="blockId" dataType="4"/>
+                <Property columnName="b.PlotNumber" name="plotNumber" dataType="12"/>
                 <Property columnName="b.PlotNumber" name="plotId" dataType="12"/>
                 <Property columnName="BookingDate" name="bookingDateFrom" dataType="-101"/>
                 <Property columnName="BookingDate" name="bookingDateTo" dataType="-102"/>
