@@ -643,7 +643,7 @@
                 agentName,DATE_FORMAT(b.BookingDate,'%d/%m/%Y') as bookingDate,b.ProjectName as projectName,b.FirmName as firmName,b.Block as
                 block,b.PlotNumber as plotNumber,b.TotalAmount as totalAmount,
                 b.BookingType as bookingType,DATE_FORMAT(b.LastPaymentDate,'%d/%m/%Y') as paymentDate,e.PlotSize as plotSize,e.SqFtRate as
-                sqftRate FROM CustomerDetails a INNER JOIN BookingDetails b on b.BookingId = a.BookingId INNER JOIN
+                sqftRate FROM CustomerDetails a INNER JOIN BookingDetails b on b.BookingId = a.BookingId LEFT OUTER JOIN
                 AgentMaster c on b.AgentId = c.AgentId INNER JOIN PlotTransaction d
                 ON d.BookingId = b.BookingId INNER JOIN PlotDetails e ON e.Id = d.PlotId WHERE a.CustomerType =
                 'Primary' AND  IsCancelled is null  AND {MACRO}
@@ -669,7 +669,7 @@
                 transactionDate, CASE WHEN d.PaymentMode = 'Cheque' THEN d.ChequeNo ELSE d.TransactionId END as
                 transactionId,d.BankName as bankName,d.InstallmentAmount as installmentAmount, d.PaidInstallment as
                 paidInstallment FROM CustomerDetails a INNER JOIN
-                BookingDetails b ON a.CustomerId = b.CustomerId INNER JOIN AgentMaster c ON c.AgentId = b.AgentId INNER
+                BookingDetails b ON a.CustomerId = b.CustomerId LEFT OUTER JOIN AgentMaster c ON c.AgentId = b.AgentId INNER
                 JOIN PaymentDetails d ON d.BookingId = b.BookingId where d.PaymentDate is not null AND d.IsCancelled is null AND {MACRO}
             </SearchQuery>
             <PropertyMapping>
@@ -689,7 +689,7 @@
                 sum(d.InstallmentAmount) as pendingInstallment,DATE_FORMAT(b.BookingDate,'%d/%m/%Y')  as bookingDate, b.FirmName as
                 firmName,b.ProjectName as projectName,b.block as block,b.PlotNumber as plotNumber FROM CustomerDetails a
                 INNER JOIN
-                BookingDetails b ON a.CustomerId = b.CustomerId INNER JOIN AgentMaster c ON c.AgentId = b.AgentId INNER
+                BookingDetails b ON a.CustomerId = b.CustomerId LEFT OUTER JOIN AgentMaster c ON c.AgentId = b.AgentId INNER
                 JOIN PaymentDetails d ON d.BookingId = b.BookingId where d.Status ='Pending' and d.DueDate &lt;
                 SYSDATE() and d.BookingId = '15' AND d.IsCancelled is null AND {MACRO} group by a.CustomerName,a.PhoneNo
             </SearchQuery>
