@@ -243,9 +243,9 @@
         </PropertyMapping>
 -->    </Service>
     <Service id="block">
-        <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,Block as block,BlockId as blockId from BlockMaster</SelectQuery>
-        <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,Block as block,BlockId as blockId from BlockMaster where Id = ?</SelectQueryById>
-        <InsertQuery>INSERT INTO BlockMaster (FirmId,FirmName,PropertyId,PropertyName, BlockId,Block ) VALUES (?,?,?,?,?,?)</InsertQuery>
+        <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,Block as block from BlockMaster</SelectQuery>
+        <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,Block as block from BlockMaster where Id = ?</SelectQueryById>
+        <InsertQuery>INSERT INTO BlockMaster (FirmId,FirmName,PropertyId,PropertyName, Block ) VALUES (?,?,?,?,?)</InsertQuery>
         <UpdateQuery>UPDATE BlockMaster SET FirmId = ?,  FirmName = ?,PropertyId = ?, PropertyName = ? , BlockId = ?, Block = ? WHERE Id = ?</UpdateQuery>
         <DeleteQuery>DELETE FROM BlockMaster WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
