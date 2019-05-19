@@ -640,7 +640,7 @@
         </Search>
         <Search id="booking"> <!-- Booking report-->
             <SearchQuery>SELECT a.Id as id, a.CustomerId as customerId, a.CustomerName as customerName,c.AgentName as
-                agentName,DATE_FORMAT(b.BookingDate,'%d/%m/%Y') as bookingDate,b.ProjectName as projectName,b.FirmName as firmName,b.Block as
+                agentName,DATE_FORMAT(b.BookingDate,'%d/%m/%Y') as bookingDate,b.BookingId as bookingId, b.ProjectName as projectName,b.FirmName as firmName,b.Block as
                 block,b.PlotNumber as plotNumber,b.TotalAmount as totalAmount,b.TotalPaidAmount as totalPaidAmount,
                 b.BookingType as bookingType,DATE_FORMAT(b.LastPaymentDate,'%d/%m/%Y') as paymentDate,e.PlotSize as plotSize,e.SqFtRate as
                 sqftRate FROM CustomerDetails a INNER JOIN BookingDetails b on b.BookingId = a.BookingId LEFT OUTER JOIN
