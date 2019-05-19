@@ -15,5 +15,6 @@ public interface ITransactionService {
     public RestResponse getAllChequeEntries();
     public RestResponse udpateChequeEntry(String id);
     RestResponse createDailyExpense(Map paymentMap, String type, String createdBy) ;
+    RestResponse  cancelProperty(int firmId,String firmName, int bookingId,String paymentMode, String customerName,Double paidAmount,int projectId, int blockId, int plotNumber) ;
 
 }

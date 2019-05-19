@@ -391,8 +391,29 @@ public class TransactionService implements ITransactionService {
     }
 
     // cancel property, update IsCancelled = 'Y' in BookingDetails table
-    public void cancelProperty(String bookingId) {
+    public RestResponse cancelProperty(int firmId,String firmName, int bookingId,String paymentMode, String customerName,Double paidAmount,int projectId, int blockId, int plotNumber) {
+        // in case of installment update, update booking details table with total amount.
+        RestResponse restResponse = null;
+        String statusMessage = "";
+        String statusCode = "";
+        try {
+            String updateBookingQuery = "UPDATE BookingDetails SET IsCancelled = 'Y' WHERE BookingId = " + bookingId;
+            String updatePlotQuery = "UPDATE PlotDetails SET Status = 'Available' WHERE FirmId = " + firmId + " and ProjectId = " + projectId + " and BlockId = " + blockId + " and PlotNo =" + plotNumber;
 
+            transactionDAO.insertDataBatch(new String[]{updateBookingQuery, updatePlotQuery});
+            dayBookEntry(firmId, firmName, paymentMode, paidAmount, "Debit", customerName, "Property Cancellation");
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        //make entry in day book entry
+        restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
+        return restResponse;
     }
 
     public RestResponse updateTransaction(Map restRequest, String type, String id, String createdBy) {

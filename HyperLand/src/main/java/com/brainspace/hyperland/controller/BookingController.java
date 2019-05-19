@@ -111,7 +111,7 @@ public class BookingController {
     }
     @RequestMapping(value = "/create/{type}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<RestResponse> createDailyExpense(@RequestBody Object restRequest,@PathVariable(name="type") String type) {
-        System.out.println(restRequest);
+
         String createdBy = new ServiceUtils().getUserName();
         RestResponse response = transactionService.createDailyExpense((Map)restRequest,type,createdBy);
         if(response.getStatusCode().equalsIgnoreCase("1"))
@@ -121,5 +121,22 @@ public class BookingController {
 
     }
 
-
+    @RequestMapping(value = "/cancelProperty", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public ResponseEntity<RestResponse> cancelProperty(@RequestBody Object restRequest) {
+        Map requestParams = (Map) restRequest;
+        int firmId = Integer.parseInt(requestParams.get("firmId").toString());
+        String firmName = requestParams.get("firmName").toString();
+        String customerName = requestParams.get("customerName").toString();
+        int bookingId = Integer.parseInt(requestParams.get("bookingId").toString());
+        String paymentMode = requestParams.get("paymentMode").toString();
+        Double paidAmount = Double.parseDouble(requestParams.get("paidAmount").toString());
+        int projectId = Integer.parseInt(requestParams.get("projectId").toString());
+        int blockId = Integer.parseInt(requestParams.get("blockId").toString());
+        int plotNumber = Integer.parseInt(requestParams.get("plotNumber").toString());
+         RestResponse response = transactionService.cancelProperty(firmId, firmName, bookingId, paymentMode, customerName, paidAmount, projectId, blockId, plotNumber);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return  new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
