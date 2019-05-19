@@ -90,7 +90,7 @@ public class BookingController {
         }
     }
 
-    @RequestMapping(value = "/update/{id}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = "/update/cheque/{id}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<RestResponse> udpateChequeEntry(@PathVariable(name="id") String id)
     {
         RestResponse response = transactionService.udpateChequeEntry(id);
