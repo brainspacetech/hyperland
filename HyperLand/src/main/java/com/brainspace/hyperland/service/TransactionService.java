@@ -845,7 +845,7 @@ public class TransactionService implements ITransactionService {
         String statusCode = "";
         String fetchChequeQuery = "SELECT Id as id, BookingId as bookingId, ChequeNumber as chequeNumber, ChequeDate as chequeDate FROM ChequeEntry where Status = 'Pending'";
         try {
-            masterDAO.getAllData(fetchChequeQuery);
+             chequeList = masterDAO.getAllData(fetchChequeQuery);
             statusCode = "1";
             statusMessage = "Success";
         }
@@ -854,7 +854,7 @@ public class TransactionService implements ITransactionService {
             statusCode = "0";
             statusMessage = "Failed";
         }
-        return  restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
+        return  restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, chequeList);
     }
 
 
