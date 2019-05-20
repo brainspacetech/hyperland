@@ -46,16 +46,18 @@ public class PlotCreation {
                 projectName = valueMap.get("Property") != null ? valueMap.get("Property").toString() : "";
                 blockName = valueMap.get("Block") != null ? valueMap.get("Block").toString() : "";
                 plotNo = valueMap.get("Plot No") != null ? valueMap.get("Plot No").toString() : "";
+                System.out.println("plotsize -- "+valueMap.get("Area(in Sqr Ft.)") );
                 plotSize = valueMap.get("Area(in Sqr Ft.)") != null ? Double.parseDouble(valueMap.get("Area(in Sqr Ft.)").toString()) : 0.00;
                 sqftRate = valueMap.get("Rate/Sqr Ft") != null ? Double.parseDouble(valueMap.get("Rate/Sqr Ft").toString()) : 0.00;
-
-                String firmId = getFirmId(masterDAO, firmName);
-                String projectId = getProjectId(masterDAO, projectName, firmId);
-                String blockId = getPBlockId(masterDAO, blockName, projectId, firmId);
-                try {
-                    createPlot(masterDAO, plotNo, blockId, firmId, blockName, projectId, projectName, firmName, sqftRate, plotSize, propertyName, propertyTypeId);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if(firmName != null && !firmName.equalsIgnoreCase("")) {
+                    String firmId = getFirmId(masterDAO, firmName);
+                    String projectId = getProjectId(masterDAO, projectName, firmId);
+                    String blockId = getPBlockId(masterDAO, blockName, projectId, firmId);
+                    try {
+                        createPlot(masterDAO, plotNo, blockId, firmId, blockName, projectId, projectName, firmName, sqftRate, plotSize, propertyName, propertyTypeId);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             flag = true;
@@ -70,6 +72,7 @@ public class PlotCreation {
    private  String  getFirmId (IMasterDAO masterDAO, String firmName) throws Exception
    {
        String firmQuery = "Select Id as id from FirmMaster where FirmName = '"+firmName+"'";
+       System.out.println("firmQuery -- "+firmQuery);
        String firmId = "";
        List firmList = masterDAO.getAllData(firmQuery);
        if(firmList.size()>0)
@@ -102,7 +105,7 @@ public class PlotCreation {
         return blockId;
     }
 
-    private  void createPlot(IMasterDAO masterDAO, String plotNo, String blockId , String firmId, String blockName , String projectId, String projectName, String firmName, Double plotSize, Double sqFtRate,String propertyType, String propertyTypeId)
+    private  void createPlot(IMasterDAO masterDAO, String plotNo, String blockId , String firmId, String blockName , String projectId, String projectName, String firmName, Double sqFtRate,Double plotSize, String propertyType, String propertyTypeId)
     {
         String query = "INSERT INTO PlotDetails (FirmId,FirmName,ProjectId, ProjectName,BlockId,Block,PlotNo, SqFtRate,PlotSize,Status)" +
                  " VALUES ("+firmId+",'"+firmName+"',"+projectId+",'"+projectName+"',"+blockId+",'"+blockName+"',"+plotNo+","+sqFtRate+","+plotSize+",'Available')";
@@ -137,10 +140,14 @@ public class PlotCreation {
                     cell = row.getCell((short)c);
                     if(cell != null) {
                         CellType type = cell.getCellType();
-                        if(type == CellType.NUMERIC)
-                            valueMap.put( tempRow.getCell((short)c).getStringCellValue(),cell.getNumericCellValue());
-                        else
-                            valueMap.put( tempRow.getCell((short)c).getStringCellValue(),cell.getStringCellValue().toString());
+                        if(type == CellType.NUMERIC) {
+                            System.out.println(tempRow.getCell((short) c).getStringCellValue() +" -===== "+cell.getNumericCellValue());
+                            valueMap.put(tempRow.getCell((short) c).getStringCellValue(), cell.getNumericCellValue());
+                        }
+                        else {
+                            System.out.println(tempRow.getCell((short) c).getStringCellValue() +" -===== "+cell.getStringCellValue());
+                            valueMap.put(tempRow.getCell((short) c).getStringCellValue(), cell.getStringCellValue());
+                        }
                     }
                 }
             }

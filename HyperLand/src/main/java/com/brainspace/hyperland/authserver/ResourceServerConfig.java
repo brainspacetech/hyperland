@@ -31,7 +31,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         http.
 
                 authorizeRequests()
-                .antMatchers("/index.html","/*.js","/*.png", "/*.woff*","/*.ttf","/*.ico","/home", "/about").anonymous()
+                .antMatchers("/","/*.css","/index.html","/*.js","/*.png", "/*.woff*","/*.ttf","/*.ico","/home", "/about").anonymous()
                 .antMatchers("/master/getAll/**").hasAnyRole("ADMIN","OFFICE_USER","AGENT")
                 .antMatchers("/search/**").hasAnyRole("CHECKER","ADMIN","OFFICE_USER","CUSTOMER","AGENT")
                 .antMatchers("/transaction/**").hasAnyRole("CHECKER","ADMIN","OFFICE_USER")
