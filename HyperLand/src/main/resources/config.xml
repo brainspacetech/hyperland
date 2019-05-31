@@ -845,6 +845,20 @@
                 <Property columnName="CustomerId" name="customerId" dataType="12"/>
             </PropertyMapping>
         </Search>
+
+        <Search id="plotDetails"><!-- Property Availability Report-->
+            <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize,Status as status FROM PlotDetails
+                WHERE {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="BlockId" name="blockId" dataType="4"/>
+                <Property columnName="PlotId" name="plotId" dataType="12"/>
+                <Property columnName="Status" name="status" dataType="12"/>
+            </PropertyMapping>
+        </Search>
     </Searches>
 </Configuration>
 

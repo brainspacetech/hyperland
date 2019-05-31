@@ -7,7 +7,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 
 
-//@EnableResourceServer
+@EnableResourceServer
 @SpringBootApplication
 public class HyperlandApplication extends SpringBootServletInitializer {
 	public static void main(String[] args) {

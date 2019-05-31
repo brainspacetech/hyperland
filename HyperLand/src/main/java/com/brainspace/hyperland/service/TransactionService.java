@@ -94,22 +94,50 @@ public class TransactionService implements ITransactionService {
                     System.out.println("insertPlotTransaction  -- " + insertPlotTransaction);
                     transactionDAO.insertDataBatch(new String[]{updatePlotDetails, insertPlotTransaction});
                     //if token amount paid and booking amount is pending then insert into installment details along with installment details
-                    if (((String) mainObject.get("amountType")).equalsIgnoreCase("Token")) {
+                    if(((String) bookingDetails.get("paymentType")).equalsIgnoreCase("installment")  && ((String) mainObject.get("amountType")).equalsIgnoreCase("Token") )
+                    {
                         Double totalAmount = Double.parseDouble(mainObject.get("totalAmount").toString());
                         Double bookingAmount = totalAmount * 25 / 100;
-                        Double remainingBookingAmount = bookingAmount - Double.parseDouble(mainObject.get("tokenAmount").toString());
-                        if (remainingBookingAmount > 0) {
-                            Map installmentMap = new HashMap();
-                            installmentMap.put("customerId", bookingId + "_P_1");
-                            installmentMap.put("bookingId", bookingId);
-                            installmentMap.put("installmentAmount", remainingBookingAmount);
-                            installmentMap.put("dueDate", mainObject.get("installmentStartDate"));
-                            installmentMap.put("status", "Pending");
-                            installmentMap.put("paymentType", "Booking");
-                            installmentList.add(installmentMap);
-                            // add this entry in installment details
-                            //transactionDAO.insertDataBatch("");
+                        Double remainingBookingAmount = 0.00;
+                        if (((String) mainObject.get("amountType")).equalsIgnoreCase("Token") ) {
+                            remainingBookingAmount = bookingAmount - Double.parseDouble(mainObject.get("tokenAmount").toString());
+                            if (remainingBookingAmount > 0) {
+                                Map installmentMap = new HashMap();
+                                installmentMap.put("customerId", bookingId + "_P_1");
+                                installmentMap.put("bookingId", bookingId);
+                                installmentMap.put("installmentAmount", remainingBookingAmount);
+                                installmentMap.put("dueDate", mainObject.get("installmentStartDate"));
+                                installmentMap.put("status", "Pending");
+                                installmentMap.put("paymentType", "Booking");
+                                installmentList.add(installmentMap);
+                                // add this entry in installment details
+                                //transactionDAO.insertDataBatch("");
+                            }
                         }
+                    }
+                    else  if(!((String) bookingDetails.get("paymentType")).equalsIgnoreCase("installment"))
+                    {
+                        Double totalAmount = Double.parseDouble(mainObject.get("totalAmount").toString());
+                        Double bookingAmount = totalAmount * 25 / 100;
+                        Double remainingBookingAmount = 0.00;
+                        if (((String) mainObject.get("amountType")).equalsIgnoreCase("Token") ) {
+                            remainingBookingAmount = totalAmount - Double.parseDouble(mainObject.get("tokenAmount").toString());
+                        }
+                        else{
+                            remainingBookingAmount = totalAmount - bookingAmount;
+                        }
+
+                            if (remainingBookingAmount > 0) {
+                                Map installmentMap = new HashMap();
+                                installmentMap.put("customerId", bookingId + "_P_1");
+                                installmentMap.put("bookingId", bookingId);
+                                installmentMap.put("installmentAmount", remainingBookingAmount);
+                                installmentMap.put("dueDate", mainObject.get("installmentStartDate"));
+                                installmentMap.put("status", "Pending");
+                                installmentMap.put("paymentType", "Booking");
+                                installmentList.add(installmentMap);
+                            }
+
                     }
 
 
