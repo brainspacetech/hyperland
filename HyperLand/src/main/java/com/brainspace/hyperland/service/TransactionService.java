@@ -344,8 +344,9 @@ public class TransactionService implements ITransactionService {
                         transactionDAO.insertDataBatch(new String[]{updateQuery, updateFarmerMasterQuery});
                     } else if (type.equalsIgnoreCase("agentPayment")) {
                         Double paidAmount = Double.valueOf(paymentMap.get("paymentAmount").toString());
-                        String updateQuery = " UPDATE AgentBusinessDetails SET AmountPaidTillNow = CASE WHEN AmountPaidTillNow = 0.00 || AmountPaidTillNow is null THEN " + paidAmount + "  ELSE AmountPaidTillNow " + paidAmount + " END WHERE Id = " + paymentMap.get("agentId");
-                        transactionDAO.updateData(updateQuery);
+                        String updateQuery = "UPDATE AgentBusinessDetails SET AmountPaidTillNow = CASE WHEN AmountPaidTillNow = 0.00 || AmountPaidTillNow is null THEN " + paidAmount + "  ELSE AmountPaidTillNow +" + paidAmount + " END WHERE AgentId = " + paymentMap.get("agentId");
+                        String udpateAgentMasterPaidTillNow = "UPDATE AgentMaster SET AmountPaidTillNow = CASE WHEN AmountPaidTillNow = 0.00 || AmountPaidTillNow is null THEN " + paidAmount + "  ELSE AmountPaidTillNow +" + paidAmount + " END WHERE AgentId = " + paymentMap.get("agentId");
+                        transactionDAO.insertDataBatch(new String[]{udpateAgentMasterPaidTillNow,updateQuery});
                     }
 
                 }
@@ -368,7 +369,7 @@ public class TransactionService implements ITransactionService {
 
 
     //used for Daily Expense / Farmer Payment / Agent Payment Approval / Property Cancellation Payment - > make and entry in Day book Entry table
-    public RestResponse approvePayment(String id, String type, String approvedBy) {
+    public RestResponse approvePayment(String id, String type, String approvedBy,String isApproved) {
         RestResponse restResponse = null;
         String statusMessage = "";
         String statusCode = "";
@@ -381,30 +382,33 @@ public class TransactionService implements ITransactionService {
                     updateQuery = transaction.getUpdateQuery();
                     updateQuery = updateQuery.replace("{1}", "'" + approvedBy + "'");
                     updateQuery = updateQuery.replace("{2}", id);
+                    updateQuery = updateQuery.replace("{3}", "'"+isApproved+"'");
+                    if(isApproved.equalsIgnoreCase("Y"))
+                        updateQuery = updateQuery.replace("{4}", "'"+"Approved"+"'");
+                    else
+                        updateQuery = updateQuery.replace("{4}", "'"+"Rejected"+"'");
+
                     transactionDAO.updateData(updateQuery);
                     // after payment make an entry in DaybookEntry table
                  }
             }
-            String fethQuery = "";
-            if(type.equalsIgnoreCase("agentPayment"))
-            {
-                fethQuery = "SELECT PaymentMode as paymentMode,PaymentAmount as paymentAmount,AgentName as agentName   from AgentPayment where id = ?";
-                Map data =  masterDAO.getDataById(fethQuery,Integer.parseInt(id));
-                dayBookEntry(null,null,data.get("paymentMode").toString(),Double.parseDouble(data.get("paymentAmount").toString()),"Debit",data.get("agentName").toString(),"Agent Payment");
-            }
-            else if(type.equalsIgnoreCase("farmerPayment"))
-            {
-                fethQuery = "SELECT PaymentMode as paymentMode,PaymentAmount as paymentAmount,FarmerName as farmerName   from FarmerPayment where id = ?";
-                Map data =  masterDAO.getDataById(fethQuery,Integer.parseInt(id));
-                dayBookEntry(null,null,data.get("paymentMode").toString(),Double.parseDouble(data.get("paymentAmount").toString()),"Debit",data.get("farmerName").toString(),"Farmer Payment");
-            }
-            else  if(type.equalsIgnoreCase("dailyExpense")){
+            if(isApproved.equalsIgnoreCase("Y")) {
+                String fethQuery = "";
+                if (type.equalsIgnoreCase("agentPayment")) {
+                    fethQuery = "SELECT PaymentMode as paymentMode,PaymentAmount as paymentAmount,AgentName as agentName   from AgentPayment where id = ?";
+                    Map data = masterDAO.getDataById(fethQuery, Integer.parseInt(id));
+                    dayBookEntry(null, null, data.get("paymentMode").toString(), Double.parseDouble(data.get("paymentAmount").toString()), "Debit", data.get("agentName").toString(), "Agent Payment");
+                } else if (type.equalsIgnoreCase("farmerPayment")) {
+                    fethQuery = "SELECT PaymentMode as paymentMode,PaymentAmount as paymentAmount,FarmerName as farmerName   from FarmerPayment where id = ?";
+                    Map data = masterDAO.getDataById(fethQuery, Integer.parseInt(id));
+                    dayBookEntry(null, null, data.get("paymentMode").toString(), Double.parseDouble(data.get("paymentAmount").toString()), "Debit", data.get("farmerName").toString(), "Farmer Payment");
+                } else if (type.equalsIgnoreCase("dailyExpense")) {
 
-                fethQuery = "SELECT FirmId as firmId, FirmName as firmName, PaymentMode as paymentMode,Amount as paymentAmount,PaidTo as paidTo,ExpenseCategory as expenseCategory  from ExpenseDetails where id = ?";
-                Map data =  masterDAO.getDataById(fethQuery,Integer.parseInt(id));
-                dayBookEntry(Integer.parseInt(data.get("firmId").toString()),data.get("firmName").toString(),data.get("paymentMode").toString(),Double.parseDouble(data.get("paymentAmount").toString()),"Debit",data.get("paidTo").toString(),data.get("expenseCategory").toString());
+                    fethQuery = "SELECT FirmId as firmId, FirmName as firmName, PaymentMode as paymentMode,Amount as paymentAmount,PaidTo as paidTo,ExpenseCategory as expenseCategory  from ExpenseDetails where id = ?";
+                    Map data = masterDAO.getDataById(fethQuery, Integer.parseInt(id));
+                    dayBookEntry(Integer.parseInt(data.get("firmId").toString()), data.get("firmName").toString(), data.get("paymentMode").toString(), Double.parseDouble(data.get("paymentAmount").toString()), "Debit", data.get("paidTo").toString(), data.get("expenseCategory").toString());
+                }
             }
-
                     statusCode = "1";
                    statusMessage = "Success";
         }
@@ -505,7 +509,6 @@ public class TransactionService implements ITransactionService {
                     installmentAmount = Double.parseDouble(restRequest.get("installmentAmount").toString());
                     totalEmi = (int) ((totalAmountPaid - totalAmount) / installmentAmount);
                     remainder = (totalAmountPaid - totalAmount) % installmentAmount;
-
                 }
                 if (restRequest.get("paymentDate") != null) {
                     Instant instant = Instant.parse((String) restRequest.get("paymentDate"));
@@ -524,7 +527,7 @@ public class TransactionService implements ITransactionService {
                             restRequest.put("paymentDate", restRequest.get("paymentDate"));
                             if (restRequest.get("pendingAmount") != null) {
                                 Double pendingAmount = Double.parseDouble(restRequest.get("pendingAmount").toString());
-                                if (pendingAmount < 0.00) {
+                                if (pendingAmount <=0.00) {
                                     restRequest.put("pendingAmount", pendingAmount);
                                 }
                             }
@@ -616,7 +619,7 @@ public class TransactionService implements ITransactionService {
 
         String selectProjectMaster = "SELECT BusinessValue as businessValue from ProjectMaster WHERE FirmId = " + firmId + " and ProjectId =" + projectId;
         List projectList = masterDAO.getAllData(selectProjectMaster);
-        Integer busnessValuePercentage = Integer.parseInt(((Map) projectList.get(0)).get("businessValue").toString());
+        Double busnessValuePercentage = Double.parseDouble(((Map) projectList.get(0)).get("businessValue").toString());
         Double businessValue = amount * busnessValuePercentage / 100;
         String queries[] = null;
         int count = 0;
@@ -640,18 +643,22 @@ public class TransactionService implements ITransactionService {
         for (Object agentObject : allAgentList) {
             Map agentMap = (Map) agentObject;
             Double commissionAmount = 0.00;
+            String sponsorId = null;
             if (Integer.parseInt(agentMap.get("agentId").toString()) == agentId) {
                 Double commissionPerc = Double.parseDouble(agentMap.get("Commission").toString());
-                Double existingSelfBusiness = Double.parseDouble(agentMap.get("SelfBusiness").toString());
-                Double totalSelfBusiness = businessValue;
+                Double existingSelfBusiness = 0.00;
+                if(agentMap.get("SelfBusiness")!=null)
+                    existingSelfBusiness = Double.parseDouble(agentMap.get("SelfBusiness").toString());
+                Double totalSelfBusiness = existingSelfBusiness + businessValue;
                 Double maxTarget = Double.parseDouble(agentMap.get("MaxTarget").toString());
                 sellerAgentLevel = Integer.parseInt(agentMap.get("Designation").toString());
-
+                sponsorId = agentMap.get("SponsorId")!=null ? agentMap.get("SponsorId").toString():null;
                 sellerAgentCommission = commissionPerc;
                 //get rank from Matrix plan
                 if (totalSelfBusiness > maxTarget) {
                     String selectNewLevel = "SELECT Level,Commission,MinTarget,MaxTarget from MatrixPlan WHERE " + totalSelfBusiness + " BETWEEN MinTarget and MaxTarget";
                     List newLevelList = masterDAO.getAllData(selectNewLevel);
+
                     int newLevel = 0;
                     Double newMinTarget = 0.00;
                     Double newMaxTarget = 0.00;
@@ -660,6 +667,10 @@ public class TransactionService implements ITransactionService {
                         newLevel = Integer.parseInt(((Map) newLevelList.get(0)).get("Level").toString());
                         newMinTarget = Double.parseDouble(((Map) newLevelList.get(0)).get("MinTarget").toString());
                         newCommissionPerc = Double.parseDouble(((Map) newLevelList.get(0)).get("Commission").toString());
+                        //update agent details with new agent level;
+                        String agentNewLevel = "UPDATE AgentMaster SET Designation = '"+newLevel+"' WHERE AgentId = " + agentMap.get("agentId");
+                        queries[count] = agentNewLevel;
+                        count++;
                     }
 
                     if (newLevel > sellerAgentLevel + 1) {
@@ -674,8 +685,13 @@ public class TransactionService implements ITransactionService {
                     commissionAmount = businessValue * commissionPerc / 100;
                     //update in agent business details
                 }
+
+                // update total amount in Agent master
+                String agentTotalAmount =  "UPDATE AgentMaster TotalAmount = CASE WHEN TotalAmount = 0.00 || TotalAmount is null  THEN " + businessValue + "  ELSE TotalAmount + " + businessValue + " END WHERE AgentId = " + agentMap.get("agentId");
                 //update chain business value
-                String updateABQuery = "UPDATE AgentBusinessDetails SET  TotalBusiness = CASE WHEN TotalBusiness = 0.00 || TotalBusiness is null  THEN " + businessValue + "  ELSE TotalBusiness + " + businessValue + " END, SelfBusiness = CASE WHEN SelfBusiness = 0.00  THEN " + businessValue + "  ELSE SelfBusiness + " + businessValue + " END,  TotalCommission = CASE WHEN TotalCommission = 0.00  THEN " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END WHERE AgentId = " + agentMap.get("agentId");
+                queries[count] = agentTotalAmount;
+                count++;
+                String updateABQuery = "UPDATE AgentBusinessDetails SET  TotalBusiness = CASE WHEN TotalBusiness = 0.00 || TotalBusiness is null  THEN " + businessValue + "  ELSE TotalBusiness + " + businessValue + " END, SelfBusiness = CASE WHEN SelfBusiness = 0.00 || SelfBusiness is null THEN " + businessValue + "  ELSE SelfBusiness + " + businessValue + " END,  TotalCommission = CASE WHEN TotalCommission = 0.00 || TotalCommission is null THEN " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END WHERE AgentId = " + agentMap.get("agentId");
                 queries[count] = updateABQuery;
             } else {
                 Double chainAgentCommission = Double.parseDouble(agentMap.get("Commission").toString());
@@ -686,8 +702,20 @@ public class TransactionService implements ITransactionService {
 
                 }
                 sellerAgentCommission = chainAgentCommission;
+                String agentTotalAmount =  "UPDATE AgentMaster TotalAmount = CASE WHEN TotalAmount = 0.00 || TotalAmount is null  THEN " + businessValue + "  ELSE TotalAmount + " + businessValue + " END WHERE AgentId = " + agentMap.get("agentId");
                 //update chain business value
-                String updateABQuery = "UPDATE AgentBusinessDetails SET TotalCommission = CASE WHEN TotalCommission = 0.00  || TotalCommission is null THEN  " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END , ChainBusiness = CASE WHEN ChainBusiness = 0.00  || ChainBusiness is null THEN " + businessValue + "  ELSE ChainBusiness + "+ businessValue  +" END WHERE AgentId = " + agentMap.get("agentId");
+                queries[count] = agentTotalAmount;
+                count++;
+                //update chain business value
+                String updateABQuery = null;
+
+                if (Integer.parseInt(agentMap.get("sponsorId").toString()) == agentId) {
+                    updateABQuery = "UPDATE AgentBusinessDetails SET TotalCommission = CASE WHEN TotalCommission = 0.00  || TotalCommission is null THEN  " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END , ChainBusiness = CASE WHEN ChainBusiness = 0.00  || ChainBusiness is null THEN " + businessValue + "  ELSE ChainBusiness + " + businessValue + " END WHERE AgentId = " + agentMap.get("agentId");
+                 }
+                else{
+                    updateABQuery = "UPDATE AgentBusinessDetails SET TotalCommission = CASE WHEN TotalCommission = 0.00  || TotalCommission is null THEN  " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END  WHERE AgentId = " + agentMap.get("agentId");
+                }
+
                 queries[count] = updateABQuery;
             }
             count++;
@@ -764,11 +792,12 @@ public class TransactionService implements ITransactionService {
         String paymentDetailsQuery = "";
         String firmId = "";
         if(paymnentId == null) {
-            paymentDetailsQuery = "select a.Amount as paidAmount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,b.ProjectName as projectName, b.BlockId as block, b.PlotNumber as plotNumber,b.FirmName as firmName,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,\n" +
-                    "b.FirmId as firmId, DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate,c.CustomerId as customerId, c.CustomerName as customerName from PaymentDetails a INNER JOIN  BookingDetails b ON b.BookingId = a.BookingId INNER JOIN CustomerDetails c ON  b.BookingId = c.BookingId WHERE b.BookingId = " + bookingId + " Order by PaymentDate asc";
+            paymentDetailsQuery = "select a.Amount as paidAmount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,b.ProjectName as projectName, d.Block as block, b.PlotNumber as plotNumber,b.FirmName as firmName,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,\n" +
+                    "b.FirmId as firmId, DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate,c.CustomerId as customerId, c.CustomerName as customerName from PaymentDetails a INNER JOIN  BookingDetails b ON b.BookingId = a.BookingId INNER JOIN CustomerDetails c ON  b.BookingId = c.BookingId  INNER JOIN BlockMaster d ON d.Id = b.BlockId WHERE b.BookingId = " + bookingId + " Order by PaymentDate asc";
         }
         else {
-            paymentDetailsQuery = "select a.Amount as paidAmount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate from PaymentDetails a INNER JOIN  BookingDetails b ON b.BookingId = a.BookingId WHERE b.BookingId = " + bookingId + "  AND PaymentId = "+paymnentId+" Order by PaymentDate asc";
+            paymentDetailsQuery = "select a.Amount as paidAmount, a.PaymentType as paymentType , a.PaymentMode as paymentMode, a.TransactionId as transactionId,a.ReceiptNo as receiptNo, a.BankName as bank,b.ProjectName as projectName, d.Block as block, b.PlotNumber as plotNumber,b.FirmName as firmName,DATE_FORMAT(a.PaymentDate,'%d/%m/%Y') as paymentDate,\n" +
+                    "b.FirmId as firmId, DATE_FORMAT(a.TransactionDate,'%d/%m/%Y') as transactionDate,c.CustomerId as customerId, c.CustomerName as customerName from PaymentDetails a INNER JOIN  BookingDetails b ON b.BookingId = a.BookingId INNER JOIN CustomerDetails c ON  b.BookingId = c.BookingId INNER JOIN BlockMaster d ON d.Id = b.blockId WHERE b.BookingId = " + bookingId + "  AND PaymentId = "+paymnentId+" Order by PaymentDate asc";
         }
 
         String receiptTemplate ="";
@@ -788,6 +817,9 @@ public class TransactionService implements ITransactionService {
                     String replaceValue = paymentDetail.get(replaceString[i])!=null?paymentDetail.get(replaceString[i]).toString():"";
                     String name = "@"+replaceString[i];
                     System.out.println(name +" --- "+replaceValue);
+                    if(replaceString[i].equalsIgnoreCase("customerId")){
+                        replaceValue = replaceValue.substring(0,replaceValue.indexOf("_")-1);
+                    }
                     receiptTemplate =   receiptTemplate.replaceAll(name,replaceValue);
                 }
                 firmId = paymentDetail.get("firmId").toString();

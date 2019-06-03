@@ -84,7 +84,7 @@ public class PlotCreation {
    }
     private  String  getProjectId (IMasterDAO masterDAO, String projectName, String firmId) throws Exception
     {
-        String projectQuery = "Select Id as id from ProjectMaster where FirmId = "+firmId+" and ProjectName = '"+projectName+"'";
+        String projectQuery = "Select ProjectId as id from ProjectMaster where FirmId = "+firmId+" and ProjectName = '"+projectName+"'";
         String projectId = "";
         List projectList = masterDAO.getAllData(projectQuery);
         if(projectList.size()>0){

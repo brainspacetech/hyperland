@@ -36,11 +36,11 @@
     </Service>
     <Service id="project">
         <SelectQuery>SELECT FirmId as firmId, FirmName as firmName,ProjectName as projectName,CityId as cityId, CityName as cityName,LocationId as
-            locationId,Location as location,Address as address,BusinessValue as businessValue FROM ProjectMaster
+            locationId,Location as location,Address as address,ProjectId as projectId,BusinessValue as businessValue FROM ProjectMaster
         </SelectQuery>
         <SelectQueryById>SELECT FirmId as firmId, FirmName as firmName,ProjectName as projectName,CityId as cityId, CityName as cityName,LocationId as
-            locationId,Location as location,Address as address,BusinessValue as businessValue FROM ProjectMaster WHERE
-            Id = ?
+            locationId,Location as location,Address as address,BusinessValue as businessValue,ProjectId as projectId FROM ProjectMaster WHERE
+            ProjectId = ?
         </SelectQueryById>
         <InsertQuery>INSERT INTO ProjectMaster
             (FirmId,FirmName,ProjectName,CityId,CityName,LocationId,Location,Address,BusinessValue)
@@ -48,11 +48,11 @@
         </InsertQuery>
         <UpdateQuery>UPDATE ProjectMaster SET FirmId = ? ,FirmName = ? ,ProjectName = ?
             ,CityId = ? ,CityName = ? ,LocationId = ? ,Location= ? ,Address= ? ,BusinessValue= ? )
-            WHERE Id = ?
+            WHERE ProjectId = ?
         </UpdateQuery>
-        <DeleteQuery>DELETE FROM ProjectMaster WHERE Id = ?</DeleteQuery>
+        <DeleteQuery>DELETE FROM ProjectMaster WHERE ProjectId = ?</DeleteQuery>
         <PropertyMapping>
-            <Property name="id" columnName="Id" dataType='4'/>
+            <Property name="id" columnName="ProjectId" dataType='4'/>
             <Property name="firmId" columnName="FirmId" dataType="4"/>
             <Property name="firmName" columnName="FirmName" dataType="12"/>
             <Property name="projectName" columnName="ProjectName" dataType="12"/>
@@ -228,20 +228,24 @@
     <Service id="plot">
         <SelectQuery>select Id as id, PlotSize as plotSize, SqFtRate as sqftRate, PLCType as PLCType, PLCTypeId as plcTypeId,Status as status from PlotDetails</SelectQuery>
         <SelectQueryById>select Id as id, PlotSize as plotSize, SqFtRate as sqftRate, PLCType as plcType, PLCTypeId as plcTypeId,Status as status from PlotDetails where Id = ?</SelectQueryById>
-     <!--   <InsertQuery>INSERT INTO PLCMaster (FirmId,FirmName,PropertyId,PropertyName,PLCName,PLCCharge, ChargeType ) VALUES (?,?,?,?,?,?,?)</InsertQuery>
-        <UpdateQuery>UPDATE PLCMaster SET FirmId=?,  FirmName = ?,PropertyId = ?, PropertyName = ?,PLCName =?,PLCCharge =?, ChargeType = ? WHERE Id = ?</UpdateQuery>
-        <DeleteQuery>DELETE FROM PLCMaster WHERE Id = ?</DeleteQuery>
+     <InsertQuery>INSERT INTO PlotDetails (Status,FirmId,FirmName,ProjectId,ProjectName,BlockId,Block, PlotNo,Facing ,PlotSize,SqFtRate) VALUES (?,?,?,?,?,?,?,?,?,?,?)</InsertQuery>
+        <UpdateQuery>UPDATE PlotDetails SET FirmId=?,  FirmName = ?,ProjectId = ?, ProjectName = ?,BlockId =?,Block =?, PlotNo = ?,Facing = ?, PlotSize = ?, SqFtRate = ? WHERE Id = ?</UpdateQuery>
+        <DeleteQuery>DELETE FROM PlotDetails WHERE Id = ?</DeleteQuery>
         <PropertyMapping>
             <Property name="id" columnName="Id" dataType='4'/>
             <Property name="firmId" columnName="FirmId" dataType='4'/>
             <Property name="firmName" columnName="FirmName" dataType='12'/>
-            <Property name="propertyId" columnName="PropertyId" dataType='4'/>
-            <Property name="propertyName" columnName="PropertyName" dataType='12'/>
-            <Property name="plcName" columnName="PLCName" dataType='12'/>
-            <Property name="plcCharge" columnName="PLCCharge" dataType='3'/>
-            <Property name="chargeType" columnName="ChargesType" dataType='12'/>
+            <Property name="propertyId" columnName="ProjectId" dataType='4'/>
+            <Property name="propertyName" columnName="ProjectName" dataType='12'/>
+            <Property name="blockId" columnName="BlockId" dataType='4'/>
+            <Property name="block" columnName="Block" dataType='12'/>
+            <Property name="plotNumber" columnName="PlotNo" dataType='4'/>
+            <Property name="facing" columnName="Facing" dataType='12'/>
+            <Property name="size" columnName="PlotSize" dataType='3'/>
+            <Property name="rate" columnName="SqFtRate" dataType='3'/>
+            <Property name="status" columnName="Status" dataType='12'/>
         </PropertyMapping>
--->    </Service>
+ </Service>
     <Service id="block">
         <SelectQuery>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,Block as block from BlockMaster</SelectQuery>
         <SelectQueryById>select Id as id, FirmId as firmId,FirmName as firmName, PropertyId as propertyId,PropertyName as propertyName,Block as block from BlockMaster where Id = ?</SelectQueryById>
@@ -455,13 +459,14 @@
                 <Property columnName="Interest" name="interest" dataType="3"/>
                 <Property columnName="WaiveOff" name="interestWaiveOff" dataType="3"/>
                 <Property columnName="InterestPaid" name="interestPaid" dataType="3"/>
-                <Property columnName="TotalAmountPaid" name="amount" dataType="3"/>
-                <Property columnName="TotalAmount" name="totalAmount" dataType="3"/>
+                <Property columnName="TotalAmountPaid" name="totalAmountPaid" dataType="3"/>
+                <Property columnName="TotalAmount" name="amount" dataType="3"/>
                 <Property columnName="PendingAmount" name="pendingAmount" dataType="3"/>
                 <Property columnName="CollectedBy" name="collectedBy" dataType="12"/>
                 <Property columnName="CollectedOn" name="collectedOn" dataType="93"/>
                 <Property columnName="ChequeDate" name="chequeDate" dataType="93"/>
                 <Property columnName="TransactionDate" name="transactionDate" dataType="93"/>
+                <Property columnName="TotalAmount1" name="totalAmount" dataType="3"/> <!--dummy-->
             </PropertyMapping>
         </Transaction>
         <Transaction id="farmerPayment">
@@ -469,7 +474,7 @@
                 PaymentAmount, TransactionId, TransactionDate,
                 CreatedBy,CreatedOn,ApprovedOn,ApprovedBy,ReceiptNo) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
-            <UpdateQuery>UPDATE FarmerPayment SET ApprovedBy = {1} , ApprovedOn = SYSDATE(),IsApproved = 'Y' WHERE Id = {2} AND ApprovedOn is null</UpdateQuery>
+            <UpdateQuery>UPDATE FarmerPayment SET ApprovedBy = {1} , ApprovedOn = SYSDATE(),IsApproved = {3}, Status = {4} WHERE Id = {2} AND ApprovedOn is null</UpdateQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
                 <Property columnName="FarmerId" name="farmerId" dataType="4"/>
@@ -496,7 +501,7 @@
                 TransactionId, TransactionDate, CreatedBy,CreatedOn) VALUES
                 (?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
-            <UpdateQuery>UPDATE AgentPayment SET ApprovedBy = {1} , ApprovedOn = SYSDATE(),IsApproved = 'Y' WHERE Id = {2} AND ApprovedOn is null</UpdateQuery>
+            <UpdateQuery>UPDATE AgentPayment SET ApprovedBy = {1} , ApprovedOn = SYSDATE(),IsApproved = {3}, Status = {4}' WHERE Id = {2} AND ApprovedOn is null</UpdateQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
                 <Property columnName="AgentId" name="agentId" dataType="4"/>
@@ -521,7 +526,7 @@
             <InsertQuery>INSERT INTO ExpenseDetails (ExpenseCategory,Amount,CreatedBy,CreatedOn,TransactionId,FirmId,FirmName,PropertyId,PropertyName,InvoiceNo,PaidTo,PaymentMode,BankName,TransactionDate,ExpenseDate,TransactionDetail) VALUES
                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
-            <UpdateQuery>UPDATE ExpenseDetails SET ApprovedBy = {1} , ApprovedOn = SYSDATE(),IsApproved = 'Y' WHERE Id = {2} AND ApprovedOn is null</UpdateQuery>
+            <UpdateQuery>UPDATE ExpenseDetails SET ApprovedBy = {1} , ApprovedOn = SYSDATE(),IsApproved = {3}, Status = {4} WHERE Id = {2} AND ApprovedOn is null</UpdateQuery>
             <PropertyMapping>
                 <Property name="id" columnName="Id" dataType="4"/>
                 <Property name="expenseCategory" columnName="ExpenseCategory" dataType="12"/>,
@@ -547,12 +552,12 @@
             </PropertyMapping>
         </Transaction>
 
-        <Transaction id="agentPayment">
+        <!--<Transaction id="agentPayment">
             <InsertQuery>INSERT INTO AgentPayment (AgentId,AgentName,PaymentDate, PaymentMode,BankName, PaymentAmount,
                 TransactionId, TransactionDate, CreatedBy,CreatedOn,ReceiptNo) VALUES
                 (?,?,?,?,?,?,?,?,?,?,?)
             </InsertQuery>
-            <UpdateQuery>UPDATE AgentPayment SET ApprovedBy = {1} , ApprovedOn = SYSDATE(),IsApproved = 'Y' WHERE Id = {2} AND ApprovedOn is null</UpdateQuery>
+            <UpdateQuery>UPDATE AgentPayment SET ApprovedBy = {1} , ApprovedOn = SYSDATE(),IsApproved = {3}, Status = {4} WHERE Id = {2} AND ApprovedOn is null</UpdateQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
                 <Property columnName="AgentId" name="agentId" dataType="4"/>
@@ -572,12 +577,12 @@
                 <Property columnName="IsApproved" name="isApproved" dataType="1"/>
                 <Property columnName="ReceiptNo" name="receiptNo" dataType="4"/>
             </PropertyMapping>
-        </Transaction>
+        </Transaction> -->
     </Transactions>
     <Searches>
         <Search id="expense">
             <SearchQuery>SELECT Id as id, FirmName as firmName,ExpenseCategory as category, DATE_FORMAT(ExpenseDate,'%d/%m/%Y') as expenseDate,
-                PaidTo as paidTo, Amount as amount, PaymentMode as paymentMode,IsApproved as isApproved FROM
+                PaidTo as paidTo, Amount as amount, PaymentMode as paymentMode,IsApproved as isApproved, Status as status FROM
                 ExpenseDetails WHERE {MACRO}
             </SearchQuery>
             <PropertyMapping>
@@ -788,11 +793,11 @@
 
 
         <Search id="agentPaymentDetails">
-            <SearchQuery>SELECT Id as id, AgentId as agentId, AgentName as agentName,ReceiptNo as receiptNo, PaymentMode as paymentMode, PaymentAmount as paymentAmount,BankName as bank, DATE_FORMAT(TransactionDate,'%d/%m/%Y')  as transactionDate, TransactionId as transactionId, CreatedBy as createdBy, DATE_FORMAT(CreatedOn,'%d/%m/%Y')  as createdOn from AgentPayment WHERE {MACRO}
+            <SearchQuery>SELECT a.Id as id, a.AgentId as agentId, b.AgentName as agentName,b.ReceiptNo as receiptNo, b.PaymentMode as paymentMode, b.PaymentAmount as paymentAmount,BankName as bank, DATE_FORMAT(TransactionDate,'%d/%m/%Y')  as transactionDate, TransactionId as transactionId, CreatedBy as createdBy, DATE_FORMAT(CreatedOn,'%d/%m/%Y')  as createdOn,  a.TotalCommission as totalAmount,a.AmountPaidTillNow from AgentPayment b INNER JOIN AgentBusinessDetails a ON a.AgentId = b.AgentId  WHERE {MACRO}
             </SearchQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
-                <Property columnName="AgentId" name="agentId" dataType="4"/>
+                <Property columnName="b.AgentId" name="agentId" dataType="4"/>
                 <Property columnName="IsApproved" name="isApproved" dataType="1"/>
             </PropertyMapping>
         </Search>
@@ -848,6 +853,20 @@
 
         <Search id="plotDetails"><!-- Property Availability Report-->
             <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize,Status as status FROM PlotDetails
+                WHERE {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="FirmId" name="firmId" dataType="4"/>
+                <Property columnName="ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="BlockId" name="blockId" dataType="4"/>
+                <Property columnName="PlotId" name="plotId" dataType="12"/>
+                <Property columnName="Status" name="status" dataType="12"/>
+            </PropertyMapping>
+        </Search>
+
+        <Search id="agentPaymentData">
+            <SearchQuery>SELECT  FROM PlotDetails
                 WHERE {MACRO}
             </SearchQuery>
             <PropertyMapping>

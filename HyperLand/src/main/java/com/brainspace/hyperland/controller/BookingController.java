@@ -33,9 +33,11 @@ public class BookingController {
     }
 
     @RequestMapping(value = "/approve/{type}/{id}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
-    public ResponseEntity<RestResponse> approvePayment(@PathVariable(name="id") String id,@PathVariable(name="type") String type) {
+    public ResponseEntity<RestResponse> approvePayment(@PathVariable(name="id") String id,@PathVariable(name="type") String type,@RequestBody Object restRequest) {
+        Map<String,Object> params = (Map<String,Object>)restRequest;
+        String isApprovedOn = (String)params.get("isApproved");
         String approvedBy = new ServiceUtils().getUserName();
-        RestResponse response = transactionService.approvePayment(id,type,approvedBy);
+        RestResponse response = transactionService.approvePayment(id,type,approvedBy,isApprovedOn);
         if(response.getStatusCode().equalsIgnoreCase("1"))
             return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
         else
