@@ -141,4 +141,40 @@ public class BookingController {
         else
             return  new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @RequestMapping(value = "/get/reward", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public ResponseEntity<RestResponse> getRewards(@RequestBody Object restRequest)
+    {
+        String agentId = null;
+        if(restRequest!=null){
+           Map requestMap = (Map) restRequest;
+            agentId = requestMap.get("AgentId")!=null ? (String)requestMap.get("AgentId"):null;
+        }
+        RestResponse response = transactionService.getRewards(agentId);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @RequestMapping(value = "/update/reward", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public ResponseEntity<RestResponse> updateRewards(@RequestBody Object restRequest)
+    {
+        String agentId = null;
+        String rewardId = null;
+        Map requestMap = (Map) restRequest;
+        String issuedBy = new ServiceUtils().getUserName();
+
+        agentId = requestMap.get("AgentId")!=null ? (String)requestMap.get("AgentId"):null;
+        rewardId = requestMap.get("RewardId")!=null ? (String)requestMap.get("RewardId"):null;
+       String rewardOpted = requestMap.get("RewardOpted")!=null ? (String)requestMap.get("RewardOpted"):null;
+
+        RestResponse response = transactionService.updateRewards(agentId,rewardId,issuedBy,rewardOpted);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+    }
+
 }

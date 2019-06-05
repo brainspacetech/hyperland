@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.xml.bind.DatatypeConverter;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Blob;
 import java.sql.Types;
@@ -626,6 +627,7 @@ public class TransactionService implements ITransactionService {
         Double chainBusiness = 0.00;
         int sellerAgentLevel = 0;
         Double sellerAgentCommission = 0.00;
+        String sponsorId = null;
         // fetch all parent agents.
         String selectChainAgents = "WITH RECURSIVE category_path (AgentId, AgentName, SponsorId,Designation,SelfBusiness,TotalCommission,Commission,MaxTarget) AS " +
                 "(" +
@@ -643,7 +645,7 @@ public class TransactionService implements ITransactionService {
         for (Object agentObject : allAgentList) {
             Map agentMap = (Map) agentObject;
             Double commissionAmount = 0.00;
-            String sponsorId = null;
+
             if (Integer.parseInt(agentMap.get("agentId").toString()) == agentId) {
                 Double commissionPerc = Double.parseDouble(agentMap.get("Commission").toString());
                 Double existingSelfBusiness = 0.00;
@@ -708,13 +710,7 @@ public class TransactionService implements ITransactionService {
                 count++;
                 //update chain business value
                 String updateABQuery = null;
-
-                if (Integer.parseInt(agentMap.get("sponsorId").toString()) == agentId) {
-                    updateABQuery = "UPDATE AgentBusinessDetails SET TotalCommission = CASE WHEN TotalCommission = 0.00  || TotalCommission is null THEN  " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END , ChainBusiness = CASE WHEN ChainBusiness = 0.00  || ChainBusiness is null THEN " + businessValue + "  ELSE ChainBusiness + " + businessValue + " END WHERE AgentId = " + agentMap.get("agentId");
-                 }
-                else{
-                    updateABQuery = "UPDATE AgentBusinessDetails SET TotalCommission = CASE WHEN TotalCommission = 0.00  || TotalCommission is null THEN  " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END  WHERE AgentId = " + agentMap.get("agentId");
-                }
+                updateABQuery = "UPDATE AgentBusinessDetails SET TotalCommission = CASE WHEN TotalCommission = 0.00  || TotalCommission is null THEN  " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END , ChainBusiness = CASE WHEN ChainBusiness = 0.00  || ChainBusiness is null THEN " + businessValue + "  ELSE ChainBusiness + " + businessValue + " END WHERE AgentId = " + agentMap.get("agentId");
 
                 queries[count] = updateABQuery;
             }
@@ -722,6 +718,7 @@ public class TransactionService implements ITransactionService {
         }
         //update commissionAmount and chain business in agent business details
         transactionDAO.insertDataBatch(queries);
+        calculateReward(sponsorId);
     }
 
     private Double calculateCommision(int newLevel, int oldLevel, Double oldCommissionPerc, Double existingSelfBusiness, Double totalSelfBusiness) throws Exception {
@@ -1004,6 +1001,133 @@ public class TransactionService implements ITransactionService {
 
     }
 
+    public void calculateReward(String parentId) throws Exception {
+        Double parentChainBusiness = 0.00;
+        String giftItem = "";
+        Double giftAmount = 0.00;
+        Double rewardCategoryAmount = 0.00;
+        Integer rewardId = 0;
+        // if parentChainBusiness >= defined reward limit
+        // fetch reward category by parentchainbusiness value.
+        //String selectChild = "Select b.ChainBusiness as ChainBusiness,a.AgentId as AgentId,a.AgentName as AgentName FROM AgentBusinessDetails a INNER JOIN AgentMaster b ON  a.Id = b.AgentId where b.SponsorId = parentId";
+        String parentNode = "SELECT am.AgentId as AgentId, am.AgentName as AgentName,am.SponsorId as SponsorId,ab.ChainBusiness as ChainBusiness from hyperland.AgentMaster am INNER JOIN hyperland.AgentBusinessDetails ab ON ab.AgentId = am.AgentId  where am.AgentId =" + parentId + "\n";
+        List resultDataList = masterDAO.getAllData(parentNode);
+        if (resultDataList != null && resultDataList.size() > 0) {
+            parentChainBusiness = ((BigDecimal) ((Map) resultDataList.get(0)).get("ChainBusiness")).doubleValue();
+            String parentName = (String) ((Map) resultDataList.get(0)).get("AgentName");
+            Map parentResult = (Map) resultDataList.get(0);
+            String selectParentReward = "SELECT Id,MinRewardBaseAmount,GiftAmount, GiftItem from hyperland.MatrixReward WHERE " + parentChainBusiness + " BETWEEN MinRewardBaseAmount AND MaxRewardBaseAmount";
+            List rewardList = masterDAO.getAllData(selectParentReward);
+            if (rewardList != null && rewardList.size() > 0) {
+                Map rewardMap = (Map) rewardList.get(0);
+                giftAmount = (Double) rewardMap.get("GiftAmount");
+                giftItem = (String) rewardMap.get("GiftItem");
+                rewardCategoryAmount = ((Double) rewardMap.get("MinRewardBaseAmount"));
+                rewardId = (Integer) rewardMap.get("Id");
 
+                String childParentNode = "SELECT am.AgentId as AgentId, am.AgentName as AgentName,am.SponsorId as SponsorId,ab.ChainBusiness as ChainBusiness from hyperland.AgentMaster am INNER JOIN hyperland.AgentBusinessDetails ab ON ab.AgentId = am.AgentId  where am.SponsorId =" + parentId + "\n";
+                List childDataList = masterDAO.getAllData(childParentNode);
+                if (childDataList != null && childDataList.size() > 1) {
+                    if (childDataList.size() == 2) {
+                        Map result1 = (Map) childDataList.get(0);
+                        Map result2 = (Map) childDataList.get(1);
+                        Double chainBusiness1 = ((BigDecimal) result1.get("ChainBusiness")).doubleValue();
+                        Double chainBusiness2 = ((BigDecimal) result2.get("ChainBusiness")).doubleValue();
+                        boolean updateReward = false;
+                        if (chainBusiness1 >= chainBusiness2) {
+                            if (chainBusiness1 >= rewardCategoryAmount * .6 && chainBusiness2 >= rewardCategoryAmount * .4) {
+                                //update entry in rewards
+                                updateReward = true;
+                            }
+                        } else if (chainBusiness2 > chainBusiness1) {
+                            if (chainBusiness2 >= rewardCategoryAmount * .6 && chainBusiness1 >= rewardCategoryAmount * .4) {
+                                //update entry in rewards
+                                updateReward = true;
+                            }
+                        }
+                        if (updateReward) {
+                            String checkRewardQuery = "Select AgentId from UserReward Where AgentId = " + parentId + " AND RewardId = " + rewardId;
+                            List rewardDataList = masterDAO.getAllData(checkRewardQuery);
+                            if (rewardDataList == null || rewardDataList.size() == 0) {
+                                //insert entry in user reward table;
+                                String rewardCategory = giftItem + " / " + giftAmount;
+                                String insertReward = "INSERT INTO UserReward (RewardId,AgentId,AgentName,Status,RewardCategory) VALUES (" + rewardId + "," + parentId + ",'" + parentName + "', 'Pending', '" + rewardCategory + "')";
+                                transactionDAO.insertDataBatch(new String[]{insertReward});
+                            }
+                        }
+
+                    } else if (childDataList.size() == 3) {
+                        Map result1 = (Map) childDataList.get(0);
+                        Map result2 = (Map) childDataList.get(1);
+                        Map result3 = (Map) childDataList.get(2);
+                        Double chainBusiness1 = ((BigDecimal) result1.get("ChainBusiness")).doubleValue();
+                        Double chainBusiness2 = ((BigDecimal) result2.get("ChainBusiness")).doubleValue();
+                        Double chainBusiness3 = ((BigDecimal) result3.get("ChainBusiness")).doubleValue();
+                        List<Double> chainBusinessList = new ArrayList<>();
+
+                        chainBusinessList.add(chainBusiness1);
+                        chainBusinessList.add(chainBusiness2);
+                        chainBusinessList.add(chainBusiness3);
+                        Collections.sort(chainBusinessList);
+                        if (chainBusinessList.get(0) >= rewardCategoryAmount * .6 && (chainBusinessList.get(1) + chainBusinessList.get(2)) >= rewardCategoryAmount * .4) {
+                            // before making and entry , first check the existense of same reward in
+                            String checkRewardQuery = "Select count(*) from UserReward Where AgentId = " + parentId + " AND RewardId = " + rewardId;
+                            List rewardDataList = masterDAO.getAllData(checkRewardQuery);
+                            if (rewardDataList == null || rewardDataList.size() == 0) {
+                                //insert entry in user reward table;
+                                String rewardCategory = giftItem + " / " + giftAmount;
+                                String insertReward = "INSERT INTO UserReward (RewardId,AgentId,AgentName,Status,RewardCategory) VALUES (" + rewardId + "," + parentId + ",'" + parentName + "', 'Pending', '" + rewardCategory + "')";
+                                transactionDAO.insertDataBatch(new String[]{insertReward});
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if(resultDataList!=null && resultDataList.size()>0){
+            Map result1 = (Map) resultDataList.get(0);
+            String sponsorId = (String)result1.get("SponsorId");
+            String agentName = (String)result1.get("AgentName");
+            calculateReward(sponsorId);
+        }
+    }
+
+    public RestResponse getRewards(String agentId){
+        String rewardQuery = "SELECT AgentId,AgentName,RewardId,RewardCategory,Status from UserReward";
+        String whereClause = "";
+        String statusCode = "";
+        String statusMessage = "";
+        List result = null;
+        RestResponse restResponse = null;
+        if(agentId!=null){
+            whereClause = "AgentId = "+agentId;
+            rewardQuery = " WHERE "+whereClause;
+        }
+        try{
+            result = masterDAO.getAllData(rewardQuery);
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, result);
+        return restResponse;
+    }
+
+    public RestResponse updateRewards(String agentId, String rewardId, String issuedBy,String rewardOpted){
+        String statusCode = "";
+        String statusMessage = "";
+        String updateReward = "UPDATE UserReward SET RewardOpted = '"+rewardOpted+"', STATUS = 'Done',IssuedBy = '"+issuedBy+"', IssuedOn = Now() WHERE RewardId = "+rewardId+" AND AgentId ="+agentId;
+
+        transactionDAO.updateData(updateReward);
+        statusCode = "1";
+        statusMessage = "Success";
+        return null;
+    }
 }
 

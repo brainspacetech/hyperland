@@ -46,8 +46,7 @@
             (FirmId,FirmName,ProjectName,CityId,CityName,LocationId,Location,Address,BusinessValue)
             VALUES (?,?,?,?,?,?,?,?,?)
         </InsertQuery>
-        <UpdateQuery>UPDATE ProjectMaster SET FirmId = ? ,FirmName = ? ,ProjectName = ?
-            ,CityId = ? ,CityName = ? ,LocationId = ? ,Location= ? ,Address= ? ,BusinessValue= ? )
+        <UpdateQuery>UPDATE ProjectMaster SET FirmId = ? ,FirmName = ? ,ProjectName = ?,CityId = ? ,CityName = ? ,LocationId = ? ,Location= ? ,Address= ? ,BusinessValue= ? )
             WHERE ProjectId = ?
         </UpdateQuery>
         <DeleteQuery>DELETE FROM ProjectMaster WHERE ProjectId = ?</DeleteQuery>
