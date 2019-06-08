@@ -277,7 +277,7 @@ public class TransactionService implements ITransactionService {
             }
             if(mainObject.get("paymentMode").toString().equalsIgnoreCase("Cheque")){
                 String  transactionId = mainObject.get("transactionId")!=null?mainObject.get("transactionId").toString():null;
-                String  transactionDate = mainObject.get("transactionId")!=null?mainObject.get("transactionId").toString():null;
+                String  transactionDate = mainObject.get("transactionDate")!=null?mainObject.get("transactionDate").toString():null;
                 makeChequeEntry(transactionId,transactionDate, bookingId.intValue());
             }
             String firmName = mainObject.get("firmName")!=null?mainObject.get("firmName").toString():"";
@@ -495,7 +495,7 @@ public class TransactionService implements ITransactionService {
                             arguments[j] = serviceUtils.convertStrToSQLDate(arguments[j].toString());
                         }
                     }
-                    objectId =  transactionDAO.addData(sql, arguments, argumentTypes); // add entry in table
+                    objectId =  transactionDAO.addInstallmentData(sql, arguments, argumentTypes); // add entry in table
                 }
             }
             if (type.equalsIgnoreCase("installment")) {
@@ -593,7 +593,7 @@ public class TransactionService implements ITransactionService {
                             }
                             if(restRequest.get("paymentMode").toString().equalsIgnoreCase("Cheque")){
                                 String  transactionId = restRequest.get("transactionId")!=null?restRequest.get("transactionId").toString():null;
-                                String  transactionDate = restRequest.get("transactionId")!=null?restRequest.get("transactionId").toString():null;
+                                String  transactionDate = restRequest.get("transactionDate")!=null?restRequest.get("transactionDate").toString():null;
                                 makeChequeEntry(transactionId,transactionDate, bookingId);
                             }
                             dayBookEntry(Integer.parseInt(bookingData.get("FirmId").toString()), null,restRequest.get("paymentMode").toString(),  Double.parseDouble(restRequest.get("amount").toString()), "Credit", Integer.toString(bookingId), "Installment");
@@ -622,7 +622,7 @@ public class TransactionService implements ITransactionService {
         List projectList = masterDAO.getAllData(selectProjectMaster);
         Double busnessValuePercentage = Double.parseDouble(((Map) projectList.get(0)).get("businessValue").toString());
         Double businessValue = amount * busnessValuePercentage / 100;
-        String queries[] = null;
+        List<String> queries = null;
         int count = 0;
         Double chainBusiness = 0.00;
         int sellerAgentLevel = 0;
@@ -641,7 +641,7 @@ public class TransactionService implements ITransactionService {
                 "" + "SELECT * FROM category_path cp ";
 
         List allAgentList = masterDAO.getAllData(selectChainAgents);
-        queries = new String[allAgentList.size()];
+        queries = new ArrayList<String>();
         for (Object agentObject : allAgentList) {
             Map agentMap = (Map) agentObject;
             Double commissionAmount = 0.00;
@@ -671,7 +671,7 @@ public class TransactionService implements ITransactionService {
                         newCommissionPerc = Double.parseDouble(((Map) newLevelList.get(0)).get("Commission").toString());
                         //update agent details with new agent level;
                         String agentNewLevel = "UPDATE AgentMaster SET Designation = '"+newLevel+"' WHERE AgentId = " + agentMap.get("agentId");
-                        queries[count] = agentNewLevel;
+                       queries.add(agentNewLevel);
                         count++;
                     }
 
@@ -689,12 +689,12 @@ public class TransactionService implements ITransactionService {
                 }
 
                 // update total amount in Agent master
-                String agentTotalAmount =  "UPDATE AgentMaster TotalAmount = CASE WHEN TotalAmount = 0.00 || TotalAmount is null  THEN " + businessValue + "  ELSE TotalAmount + " + businessValue + " END WHERE AgentId = " + agentMap.get("agentId");
+                String agentTotalAmount =  "UPDATE AgentMaster SET TotalAmount = CASE WHEN TotalAmount = 0.00 || TotalAmount is null  THEN " + businessValue + "  ELSE TotalAmount + " + businessValue + " END WHERE AgentId = " + agentMap.get("agentId");
                 //update chain business value
-                queries[count] = agentTotalAmount;
-                count++;
+                queries.add(agentTotalAmount);
+
                 String updateABQuery = "UPDATE AgentBusinessDetails SET  TotalBusiness = CASE WHEN TotalBusiness = 0.00 || TotalBusiness is null  THEN " + businessValue + "  ELSE TotalBusiness + " + businessValue + " END, SelfBusiness = CASE WHEN SelfBusiness = 0.00 || SelfBusiness is null THEN " + businessValue + "  ELSE SelfBusiness + " + businessValue + " END,  TotalCommission = CASE WHEN TotalCommission = 0.00 || TotalCommission is null THEN " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END WHERE AgentId = " + agentMap.get("agentId");
-                queries[count] = updateABQuery;
+                queries.add(updateABQuery);
             } else {
                 Double chainAgentCommission = Double.parseDouble(agentMap.get("Commission").toString());
                 int chainAgentLevel = Integer.parseInt(agentMap.get("Designation").toString());
@@ -704,20 +704,21 @@ public class TransactionService implements ITransactionService {
 
                 }
                 sellerAgentCommission = chainAgentCommission;
-                String agentTotalAmount =  "UPDATE AgentMaster TotalAmount = CASE WHEN TotalAmount = 0.00 || TotalAmount is null  THEN " + businessValue + "  ELSE TotalAmount + " + businessValue + " END WHERE AgentId = " + agentMap.get("agentId");
+                String agentTotalAmount =  "UPDATE AgentMaster SET TotalAmount = CASE WHEN TotalAmount = 0.00 || TotalAmount is null  THEN " + businessValue + "  ELSE TotalAmount + " + businessValue + " END WHERE AgentId = " + agentMap.get("agentId");
                 //update chain business value
-                queries[count] = agentTotalAmount;
-                count++;
+                queries.add( agentTotalAmount);
+
                 //update chain business value
                 String updateABQuery = null;
                 updateABQuery = "UPDATE AgentBusinessDetails SET TotalCommission = CASE WHEN TotalCommission = 0.00  || TotalCommission is null THEN  " + commissionAmount + "  ELSE TotalCommission + " + commissionAmount + " END , ChainBusiness = CASE WHEN ChainBusiness = 0.00  || ChainBusiness is null THEN " + businessValue + "  ELSE ChainBusiness + " + businessValue + " END WHERE AgentId = " + agentMap.get("agentId");
 
-                queries[count] = updateABQuery;
+                queries.add( updateABQuery);
             }
             count++;
         }
         //update commissionAmount and chain business in agent business details
-        transactionDAO.insertDataBatch(queries);
+        String stringArray[] = Arrays.stream(queries.toArray()).toArray(String[]::new);
+        transactionDAO.insertDataBatch(stringArray);
         calculateReward(sponsorId);
     }
 
@@ -815,7 +816,7 @@ public class TransactionService implements ITransactionService {
                     String name = "@"+replaceString[i];
                     System.out.println(name +" --- "+replaceValue);
                     if(replaceString[i].equalsIgnoreCase("customerId")){
-                        replaceValue = replaceValue.substring(0,replaceValue.indexOf("_")-1);
+                        replaceValue = replaceValue.substring(0,replaceValue.indexOf("_"));
                     }
                     receiptTemplate =   receiptTemplate.replaceAll(name,replaceValue);
                 }
@@ -864,7 +865,10 @@ public class TransactionService implements ITransactionService {
     private void makeChequeEntry(String chequeNumber,String chequeDate,Integer bookingId)
     {
         try {
-            String chequeEntryQuery = "INSERT INTO  ChequeEntry (ChequeNumber, ChequeDate,  BookingId, Status) VALUES ('" + chequeNumber + "'+" + chequeDate + "," + bookingId + ", 'Pending')";
+            Instant instant = Instant.parse(chequeDate);
+            ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Kolkata"));
+
+            String chequeEntryQuery = "INSERT INTO  ChequeEntry (ChequeNumber, ChequeDate,  BookingId, Status) VALUES ('" + chequeNumber + "',"+ new java.sql.Date(Date.from(zonedDateTime.toInstant()).getTime()) + "," + bookingId + ", 'Pending')";
             transactionDAO.updateData(chequeEntryQuery);
         }
         catch(Exception e) {
@@ -1093,7 +1097,7 @@ public class TransactionService implements ITransactionService {
         }
     }
 
-    public RestResponse getRewards(String agentId){
+    public RestResponse getRewards(Integer agentId){
         String rewardQuery = "SELECT AgentId,AgentName,RewardId,RewardCategory,Status from UserReward";
         String whereClause = "";
         String statusCode = "";
@@ -1102,7 +1106,7 @@ public class TransactionService implements ITransactionService {
         RestResponse restResponse = null;
         if(agentId!=null){
             whereClause = "AgentId = "+agentId;
-            rewardQuery = " WHERE "+whereClause;
+            rewardQuery += " WHERE "+whereClause;
         }
         try{
             result = masterDAO.getAllData(rewardQuery);
@@ -1122,12 +1126,78 @@ public class TransactionService implements ITransactionService {
     public RestResponse updateRewards(String agentId, String rewardId, String issuedBy,String rewardOpted){
         String statusCode = "";
         String statusMessage = "";
+        RestResponse restResponse = null;
         String updateReward = "UPDATE UserReward SET RewardOpted = '"+rewardOpted+"', STATUS = 'Done',IssuedBy = '"+issuedBy+"', IssuedOn = Now() WHERE RewardId = "+rewardId+" AND AgentId ="+agentId;
-
-        transactionDAO.updateData(updateReward);
-        statusCode = "1";
-        statusMessage = "Success";
-        return null;
+        try {
+            transactionDAO.updateData(updateReward);
+            statusCode = "1";
+            statusMessage = "Success";
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
+        return restResponse;
     }
+
+    @Override
+    public RestResponse holdProperty(List plotIds,String userId) {
+        String query[] = new String[plotIds.size()];
+        int count = 0;
+        for (Object plotId:
+              plotIds) {
+            String updatePlotDetails = "UPDATE PlotDetails set Status = 'Hold', HoldBy = '"+userId+"' , HoldOn = Now() WHERE Id = "+plotId  ;
+            query[count] = updatePlotDetails;
+            count++;
+        }
+
+        String statusCode = "";
+        String statusMessage = "";
+        RestResponse restResponse = null;
+        try {
+            transactionDAO.insertDataBatch(query);
+            statusCode = "1";
+            statusMessage = "Success";
+
+        }
+        catch(Exception e){
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
+        return restResponse;
+    }
+
+    @Override
+    public RestResponse unHoldProperty(List plotIds) {
+        String statusCode = "";
+        String statusMessage = "";
+        RestResponse restResponse = null;
+        String query[] = new String[plotIds.size()];
+        try {
+            int count = 0;
+            for (Object plotId:
+                    plotIds) {
+                String updatePlotDetails = "UPDATE PlotDetails set Status = 'Available', HoldBy = null , HoldOn = null WHERE Id = "+plotId  ;
+                query[count] = updatePlotDetails;
+                count++;
+            }
+            transactionDAO.insertDataBatch(query);
+            statusCode = "1";
+            statusMessage = "Success";
+
+        }
+        catch(Exception e){
+            statusCode = "0";
+            statusMessage = "Failed";
+        }
+        restResponse = ServiceUtils.convertObjToResponse(statusCode, statusMessage, null);
+        return restResponse;
+
+    }
+
+
 }
 

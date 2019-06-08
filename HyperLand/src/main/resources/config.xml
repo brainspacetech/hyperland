@@ -650,7 +650,7 @@
                 sqftRate FROM CustomerDetails a INNER JOIN BookingDetails b on b.BookingId = a.BookingId LEFT OUTER JOIN
                 AgentMaster c on b.AgentId = c.AgentId INNER JOIN PlotTransaction d
                 ON d.BookingId = b.BookingId INNER JOIN PlotDetails e ON e.Id = d.PlotId WHERE a.CustomerType =
-                'Primary' AND  IsCancelled is null  AND {MACRO}
+                'Primary' AND  (IsCancelled is null || IsCancelled = 'N') AND e.Status = 'Booked' AND {MACRO}
             </SearchQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
@@ -660,11 +660,40 @@
                 <Property columnName="b.ProjectId" name="projectId" dataType="4"/>
                 <Property columnName="b.BlockId" name="blockId" dataType="4"/>
                 <Property columnName="b.PlotNumber" name="plotNumber" dataType="12"/>
-                <Property columnName="b.PlotNumber" name="plotId" dataType="12"/>
+                <Property columnName="b.PlotNumber" name="plotNo" dataType="12"/>
+                <Property columnName="e.Status" name="status" dataType="12"/>
                 <Property columnName="BookingDate" name="bookingDateFrom" dataType="-101"/>
                 <Property columnName="BookingDate" name="bookingDateTo" dataType="-102"/>
             </PropertyMapping>
         </Search>
+
+        <Search id="agentBooking"> <!-- Booking report-->
+            <SearchQuery>SELECT a.Id as id, a.CustomerId as customerId, a.CustomerName as customerName,c.AgentName as
+                agentName,DATE_FORMAT(b.BookingDate,'%d/%m/%Y') as bookingDate,b.BookingId as bookingId, b.ProjectName as projectName,b.FirmName as firmName,b.Block as
+                block,b.PlotNumber as plotNumber,b.TotalAmount as totalAmount,b.TotalPaidAmount as totalPaidAmount,
+                b.BookingType as bookingType,DATE_FORMAT(b.LastPaymentDate,'%d/%m/%Y') as paymentDate,e.PlotSize as plotSize,e.SqFtRate as
+                sqftRate FROM CustomerDetails a INNER JOIN BookingDetails b on b.BookingId = a.BookingId LEFT OUTER JOIN
+                AgentMaster c on b.AgentId = c.AgentId INNER JOIN PlotTransaction d
+                ON d.BookingId = b.BookingId INNER JOIN PlotDetails e ON e.Id = d.PlotId WHERE a.CustomerType =
+                'Primary' AND  (IsCancelled is null || IsCancelled = 'N') AND e.Status = 'Booked' AND  b.BookingType = 'MLM' AND {MACRO}
+            </SearchQuery>
+            <PropertyMapping>
+                <Property columnName="Id" name="id" dataType="4"/>
+                <Property columnName="CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="CustomerName" name="customerName" dataType="12"/>
+                <Property columnName="b.FirmId" name="firmId" dataType="4"/>
+                <Property columnName="b.ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="b.BlockId" name="blockId" dataType="4"/>
+                <Property columnName="b.PlotNumber" name="plotNumber" dataType="12"/>
+                <Property columnName="b.PlotNumber" name="plotNo" dataType="12"/>
+                <Property columnName="e.Status" name="status" dataType="12"/>
+                <Property columnName="b.AgentId" name="agentId" dataType="4"/>
+                <Property columnName="BookingDate" name="bookingDateFrom" dataType="-101"/>
+                <Property columnName="BookingDate" name="bookingDateTo" dataType="-102"/>
+            </PropertyMapping>
+        </Search>
+
+
         <Search id="transaction"><!-- Transaction Report-->
             <SearchQuery>
                 SELECT a.CustomerName as customerName, b.FirmName as firmName,b.ProjectName as projectName,b.block as
@@ -689,67 +718,62 @@
             </PropertyMapping>
         </Search>
         <Search id="paymentDue"><!-- Payment Due Report-->
-            <SearchQuery>SELECT a.CustomerName as customerName,a.PhoneNo as phoneNo, c.AgentName as agentName,
-                sum(d.InstallmentAmount) as pendingInstallment,DATE_FORMAT(b.BookingDate,'%d/%m/%Y')  as bookingDate, b.FirmName as
-                firmName,b.ProjectName as projectName,b.block as block,b.PlotNumber as plotNumber FROM CustomerDetails a
+            <SearchQuery>SELECT a.CustomerName as customerName,a.PhoneNo as phoneNo,
+                CASE WHEN d.PendingAmount = 0.00 || d.PendingAmount is null  THEN d.InstallmentAmount  ELSE d.PendingAmount END  as pendingAmount ,DATE_FORMAT(b.BookingDate,'%d/%m/%Y')  as bookingDate, b.FirmName as
+                firmName,b.ProjectName as projectName,b.block as block,b.PlotNumber as plotNumber,DATE_FORMAT(d.DueDate,'%d/%m/%Y')  as dueDate FROM CustomerDetails a
                 INNER JOIN
-                BookingDetails b ON a.CustomerId = b.CustomerId LEFT OUTER JOIN AgentMaster c ON c.AgentId = b.AgentId INNER
-                JOIN PaymentDetails d ON d.BookingId = b.BookingId where d.Status ='Pending' and d.DueDate &lt;
-                SYSDATE() and d.BookingId = '15' AND d.IsCancelled is null AND {MACRO} group by a.CustomerName,a.PhoneNo
+                BookingDetails b ON a.CustomerId = b.CustomerId INNER
+                JOIN InstallmentDetails d ON d.BookingId = b.BookingId where d.Status ='Pending' and d.DueDate &lt; SYSDATE() AND (b.IsCancelled is null || b.IsCancelled = 'N') AND {MACRO}
+
             </SearchQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
-                <Property columnName="CustomerId" name="customerId" dataType="12"/>
-                <Property columnName="CustomerName" name="customerName" dataType="12"/>
-                <Property columnName="FirmId" name="firmId" dataType="4"/>
-                <Property columnName="ProjectId" name="projectId" dataType="4"/>
-                <Property columnName="BlockId" name="blockId" dataType="4"/>
-                <Property columnName="PlotId" name="plotId" dataType="12"/>
+                <Property columnName="a.CustomerId" name="customerId" dataType="12"/>
+                <Property columnName="a.CustomerName" name="customerName" dataType="12"/>
+                <Property columnName="b.FirmId" name="firmId" dataType="4"/>
+                <Property columnName="b.ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="b.BlockId" name="blockId" dataType="4"/>
+                <Property columnName="b.PlotId" name="plotNo" dataType="12"/>
             </PropertyMapping>
         </Search>
         <Search id="propertyAvailableStatus"><!-- Property Availability Report-->
-            <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
-                propertyTypeName,ProjectName as projectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize,Facing as facing FROM PlotDetails
-                WHERE {MACRO}
+            <SearchQuery>SELECT pd.Id as plotId,pd.PlotNo as plotNo, pd.FirmName as firmName,pd.ProjectName as projectName,pd.Block as block,pd.SqftRate as sqftRate, pd.PlotSize as plotSize,Facing as facing FROM PlotDetails pd
+                WHERE Status = 'Available' AND {MACRO}
             </SearchQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
-                <Property columnName="CustomerId" name="customerId" dataType="12"/>
-                <Property columnName="CustomerName" name="customerName" dataType="12"/>
                 <Property columnName="FirmId" name="firmId" dataType="4"/>
                 <Property columnName="ProjectId" name="projectId" dataType="4"/>
                 <Property columnName="BlockId" name="blockId" dataType="4"/>
                 <Property columnName="PlotNo" name="plotId" dataType="12"/>
-                <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
-                <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
                 <Property columnName="Status" name="status" dataType="12"/>
             </PropertyMapping>
         </Search>
 
-        <Search id="propertyBookedStatus"><!-- Property Availability Report-->
-            <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
-                propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize FROM PlotDetails
+        <Search id="propertyBookedStatus">
+            <SearchQuery>SELECT pd.PlotNo as plotNo, pd.FirmName as firmName,pd.ProjectName as projectName,pd.Block as block,pd.SqftRate as sqftRate, pd.PlotSize as plotSize,Facing as facing,cd.CustomerName as customerName,bd.TotalAmount as totalAmount, bd.TotalPaidAmount as totalPaidAmount FROM PlotDetails pd
+                INNER JOIN PlotTransaction pt  ON pt.PlotId = pd.Id INNER JOIN  BookingDetails bd ON bd.BookingId = pt.BookingId INNER JOIN CustomerDetails cd ON  cd.BookingId = bd.BookingId
                 WHERE {MACRO}
             </SearchQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>
-                <Property columnName="CustomerId" name="customerId" dataType="12"/>
-                <Property columnName="CustomerName" name="customerName" dataType="12"/>
-                <Property columnName="FirmId" name="firmId" dataType="4"/>
-                <Property columnName="ProjectId" name="projectId" dataType="4"/>
-                <Property columnName="BlockId" name="blockId" dataType="4"/>
-                <Property columnName="PlotId" name="plotId" dataType="12"/>
-                <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
-                <Property columnName="PropertyTypeId" name="propertyTypeId" dataType="4"/>
+                <Property columnName="bd.BookingId" name="customerId" dataType="12"/>
+                <Property columnName="cd.CustomerName" name="customerName" dataType="12"/>
+                <Property columnName="pd.FirmId" name="firmId" dataType="4"/>
+                <Property columnName="pd.ProjectId" name="projectId" dataType="4"/>
+                <Property columnName="pd.BlockId" name="blockId" dataType="4"/>
+                <Property columnName="pd.PlotNo" name="plotNo" dataType="4"/>
                 <Property columnName="Status" name="status" dataType="12"/>
+                <Property columnName="bd.BookingDate" name="bookingDateFrom" dataType="-101"/>
+                <Property columnName="bd.BookingDate" name="bookingDateFrom" dataType="-102"/>
             </PropertyMapping>
         </Search>
 
 
-        <Search id="propertyHoldStatus"><!-- Property Availability Report-->
-            <SearchQuery>SELECT PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
-                propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize, Facing as facing, HoldBy as holdBy, HoldOn as holdOn FROM PlotDetails
-                WHERE {MACRO}
+        <Search id="propertyHoldStatus">
+            <SearchQuery>SELECT Id as plotId , PlotNo as plotNo, FirmName as firmName,PropertyTypeName as
+                propertyTypeName,ProjectName,Block as block,SqftRate as sqftRate, PlotSize as plotSize, Facing as facing, HoldBy as holdBy, DATE_FORMAT(HoldOn,'%d/%m/%Y')  as holdOn FROM PlotDetails
+                WHERE Status = 'Hold' AND {MACRO}
             </SearchQuery>
             <PropertyMapping>
                 <Property columnName="Id" name="id" dataType="4"/>

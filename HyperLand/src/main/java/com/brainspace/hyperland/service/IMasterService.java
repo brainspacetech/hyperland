@@ -18,7 +18,7 @@ public interface IMasterService {
 	RestResponse addRoleMenuConfig(String menuConfig,String role);
 	RestResponse getMenuConfig();
 	RestResponse getRoleMenuConfig();
-    RestResponse createPlots(InputStream inputStream);
+    RestResponse createPlots(InputStream inputStream,String extension);
     RestResponse createFirm(InputStream logoFile, String firmName);
 	/*RestResponse updateFirm(Firm firm);
 	RestResponse deleteFirm(int firmId);*/

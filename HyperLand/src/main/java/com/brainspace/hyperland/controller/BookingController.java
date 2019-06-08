@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -145,10 +146,10 @@ public class BookingController {
     @RequestMapping(value = "/get/reward", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity<RestResponse> getRewards(@RequestBody Object restRequest)
     {
-        String agentId = null;
+        Integer agentId = null;
         if(restRequest!=null){
            Map requestMap = (Map) restRequest;
-            agentId = requestMap.get("AgentId")!=null ? (String)requestMap.get("AgentId"):null;
+            agentId = requestMap.get("AgentId")!=null ? (Integer)requestMap.get("AgentId"):null;
         }
         RestResponse response = transactionService.getRewards(agentId);
         if(response.getStatusCode().equalsIgnoreCase("1"))
@@ -165,9 +166,9 @@ public class BookingController {
         Map requestMap = (Map) restRequest;
         String issuedBy = new ServiceUtils().getUserName();
 
-        agentId = requestMap.get("AgentId")!=null ? (String)requestMap.get("AgentId"):null;
-        rewardId = requestMap.get("RewardId")!=null ? (String)requestMap.get("RewardId"):null;
-       String rewardOpted = requestMap.get("RewardOpted")!=null ? (String)requestMap.get("RewardOpted"):null;
+        agentId = requestMap.get("agentId")!=null ? (String)requestMap.get("agentId"):null;
+        rewardId = requestMap.get("rewardId")!=null ? (String)requestMap.get("rewardId"):null;
+       String rewardOpted = requestMap.get("rewardOpted")!=null ? (String)requestMap.get("rewardOpted"):null;
 
         RestResponse response = transactionService.updateRewards(agentId,rewardId,issuedBy,rewardOpted);
         if(response.getStatusCode().equalsIgnoreCase("1"))
@@ -176,5 +177,35 @@ public class BookingController {
             return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
+
+    @RequestMapping(value = "/hold/property", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public ResponseEntity<RestResponse> holdProperty(@RequestBody Object restRequest)
+    {
+
+        Map requestMap = (Map) restRequest;
+        List plotIdList = (List)requestMap.get("plotId");
+        String userId = new ServiceUtils().getUserName();
+        RestResponse response = transactionService.holdProperty(plotIdList,userId);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+    }
+
+    @RequestMapping(value = "/unhold/property", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public ResponseEntity<RestResponse> unHoldProperty(@RequestBody Object restRequest)
+    {
+
+        Map requestMap = (Map) restRequest;
+        List plotIdList = (List)requestMap.get("plotId");
+        RestResponse response = transactionService.unHoldProperty(plotIdList);
+        if(response.getStatusCode().equalsIgnoreCase("1"))
+            return new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+        else
+            return new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+    }
+
 
 }

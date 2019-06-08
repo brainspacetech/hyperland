@@ -12,5 +12,6 @@ public interface ITransactionDAO {
     public Object updateData(String query);
     public void insertDataBatch(final String sql[]);
     public Object getReceiptNumber(String query);
+    public Object addInstallmentData(String query,Object params[], int argTypes[]);
 
 }

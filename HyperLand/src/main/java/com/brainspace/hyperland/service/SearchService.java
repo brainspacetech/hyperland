@@ -29,7 +29,7 @@ public class SearchService implements ISearchService {
                 Set<String> keys = searchCriteria.keySet();
                 String whereClause = "";
                 for (String key : keys) {
-                    if (searchCriteria.get(key) != null) {
+                    if (searchCriteria.get(key) != null && !((String)searchCriteria.get(key)).equalsIgnoreCase("null")) {
                         List<String> colDataType = (List<String>) jsonColumnMap.get(key);
                         if (colDataType.get(1).equalsIgnoreCase("-101")) {
                             whereClause += colDataType.get(0) + " >= CAST('" + searchCriteria.get(key) + "' AS DATE) AND ";

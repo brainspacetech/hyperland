@@ -16,6 +16,8 @@ public interface ITransactionService {
     public RestResponse udpateChequeEntry(String id);
     RestResponse createDailyExpense(Map paymentMap, String type, String createdBy) ;
     RestResponse  cancelProperty(int firmId,String firmName, int bookingId,String paymentMode, String customerName,Double paidAmount,int projectId, int blockId, int plotNumber) ;
-    RestResponse getRewards(String agentId);
+    RestResponse getRewards(Integer agentId);
     RestResponse updateRewards(String agentId,String rewardId,String issuedBy,String rewardOpted);
+    RestResponse holdProperty(List plotIds,String userId);
+    RestResponse unHoldProperty(List plotIds);
 }

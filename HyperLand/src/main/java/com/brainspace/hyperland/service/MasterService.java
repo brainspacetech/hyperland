@@ -392,14 +392,14 @@ public class MasterService implements IMasterService {
         return restResponse;
     }
 
-    public RestResponse createPlots(InputStream inputStream)
+    public RestResponse createPlots(InputStream inputStream,String extension)
     {
 
         String statusCode = "";
         String statusMessage ="";
         try {
             PlotCreation plotCreation = new PlotCreation();
-            plotCreation.createPlot(masterDAO, inputStream);
+            plotCreation.createPlot(masterDAO, inputStream,extension);
             statusCode = "1";
             statusMessage = "Success";
         }

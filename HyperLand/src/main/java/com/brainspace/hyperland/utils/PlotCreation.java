@@ -2,17 +2,11 @@ package com.brainspace.hyperland.utils;
 
 import com.brainspace.hyperland.dao.IMasterDAO;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.CellType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -22,7 +16,7 @@ import java.util.Map;
 
 public class PlotCreation {
 
-    public boolean createPlot(IMasterDAO masterDAO,InputStream inputStream)
+    public boolean createPlot(IMasterDAO masterDAO,InputStream inputStream,String extension)
     {
         boolean flag = false;
         try {
@@ -35,7 +29,7 @@ public class PlotCreation {
             Double plotSize = 1000.00;
             Double sqftRate = 600.00;
 
-            List<Map> valueList = readFile(inputStream);
+            List<Map> valueList = readFile(inputStream,extension);
 
             for (int i = 0; i < valueList.size(); i++) {
                 //    Firm	Property	Block	Facing	Plot No	Area(in Sqr Ft.)	Rate/Sqr Ft.	Road	Description	PLC	PLC ChargingType
@@ -112,20 +106,27 @@ public class PlotCreation {
 
         masterDAO.updateData(query);
     }
-    private  List<Map>  readFile(InputStream inputStream) throws IOException
+    private  List<Map>  readFile(InputStream inputStream,String extension) throws IOException
     {
         List<Map> valueMapList = new ArrayList<>();
-        POIFSFileSystem fs = new POIFSFileSystem(inputStream);
-        HSSFWorkbook wb = new HSSFWorkbook(fs);
-        HSSFSheet sheet = wb.getSheetAt(0);
-        HSSFRow row;
-        HSSFCell cell;
+      //  POIFSFileSystem fs = new POIFSFileSystem(inputStream);
+        Workbook wb = null;
+        if(extension.equalsIgnoreCase("XLSX")){
+            wb = new XSSFWorkbook(inputStream);
+        }
+        else{
+            wb = new HSSFWorkbook(inputStream);
+
+        }
+        Sheet sheet = wb.getSheetAt(0);
+        Row row;
+        Cell cell;
         int cols =11; // No of columns
         int tmp = 0;
         int rows; // No of rows
         rows = sheet.getPhysicalNumberOfRows();
 
-        HSSFRow tempRow = null;
+        Row tempRow = null;
         Map valueMap = null;
         for(int r = 0; r < rows; r++) {
             valueMap = new HashMap();
@@ -156,3 +157,4 @@ public class PlotCreation {
         return valueMapList;
     }
 }
+

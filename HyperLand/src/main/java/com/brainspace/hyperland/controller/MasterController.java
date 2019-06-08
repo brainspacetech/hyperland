@@ -164,8 +164,10 @@ public class MasterController {
     public ResponseEntity<RestResponse> uploadPlot(@RequestParam("file") MultipartFile file) {
         RestResponse response = null;
         System.out.println(file);
+        String fileName = file.getOriginalFilename();
+        String extension = fileName.substring(fileName.lastIndexOf(".")+1);
         try {
-            response  = masterService.createPlots(file.getInputStream());
+            response  = masterService.createPlots(file.getInputStream(),extension);
         }
         catch(Exception e)
         {
